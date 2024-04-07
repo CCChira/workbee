@@ -1,0 +1,15 @@
+apiVersion: v1
+data:
+  DATABASE_URL: postgres://postgres:Gingishan123$@postgres:5432/licenta?schema=public
+  JWT_SECRET: zjP9h6ZI5LoSKCRj
+  POSTGRES_DB: users
+  POSTGRES_PASSWORD: Gingishan123$
+  POSTGRES_USER: postgres
+  SENDER_EMAIL: chira.cristian621@gmail.com
+  SENDER_EMAIL_PASSWORD: Gingishan123$
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: backend-backend--env
+  name: backend--env

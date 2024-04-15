@@ -22,9 +22,20 @@ let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    login({ email, password }) {
-        console.log(email, password);
-        return this.authService.login(email, password);
+    async login({ email, password }) {
+        try {
+            return await this.authService.login(email, password);
+        }
+        catch (e) {
+            switch (e.status) {
+                case common_1.HttpStatus.NOT_FOUND:
+                    throw new common_1.NotFoundException(e.message);
+                case common_1.HttpStatus.FORBIDDEN:
+                    throw new common_1.ForbiddenException(e.message);
+                default:
+                    throw new common_1.NotFoundException('There was a problem authenticating');
+            }
+        }
     }
     logout(req) {
         req.logOut();
@@ -37,7 +48,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [login_dto_1.LoginDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 __decorate([
     (0, common_1.Post)(),

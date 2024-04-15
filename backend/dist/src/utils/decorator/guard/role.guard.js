@@ -20,6 +20,7 @@ let RolesGuard = class RolesGuard {
     }
     canActivate(context) {
         const requiredRoles = this.reflector.get('roles', context.getHandler());
+        console.log(context.switchToHttp().getRequest().headers.authorization);
         const decodedRole = this.jwtService.decode(context.switchToHttp().getRequest().headers.authorization.split(' ')[1]).role;
         if (!requiredRoles)
             return true;

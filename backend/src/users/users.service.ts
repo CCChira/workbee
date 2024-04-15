@@ -5,7 +5,7 @@ import { ROUNDS_OF_HASHING } from '../auth/constants/auth.constants';
 import { Role } from '@prisma/client';
 import { Pagination } from '../utils/decorator/paginationParams.decorator';
 import { Sorting } from '../utils/decorator/sortingParams.decorator';
-import { CreateUserDto } from './dto/user.dto';
+import { CreateUserDto } from './dto/createUser.dto';
 import { GenerateUserDto } from './dto/generateUser.dto';
 
 @Injectable()
@@ -50,9 +50,11 @@ export class UsersService {
     const response = await this.prisma.user.findMany({
       skip: offset,
       take: limit,
-      orderBy: {
-        [sort?.property || 'id']: sort?.direction || 'asc',
-      },
+      orderBy: [
+        {
+          [sort?.property || 'id']: sort?.direction || 'asc',
+        },
+      ],
     });
     return {
       data: response,

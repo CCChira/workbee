@@ -9,7 +9,7 @@ async function main() {
 
   for (let i = 1; i <= 40; i++) {
     await prisma.user.upsert({
-      where: { email: `admin${i}@example.com` },
+      where: { email: `admin${i != 10 ? Math.random() + 100 : i}@example.com` },
       update: {
         email: `admin${i}@example.com`,
         name: `Admin User ${i}`,
@@ -17,7 +17,7 @@ async function main() {
         role: i < 20 ? 'ADMIN' : 'CLIENT',
       },
       create: {
-        email: `admin${i}@example.com`,
+        email: `admin${Math.random() + 100}@example.com`,
         name: `Admin User ${i}`,
         password: commonPassword,
         role: i < 20 ? 'ADMIN' : 'CLIENT',

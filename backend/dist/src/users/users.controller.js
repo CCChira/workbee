@@ -18,16 +18,16 @@ const common_1 = require("@nestjs/common");
 const users_service_1 = require("./users.service");
 const paginationParams_decorator_1 = require("../utils/decorator/paginationParams.decorator");
 const sortingParams_decorator_1 = require("../utils/decorator/sortingParams.decorator");
-const PagSortApiQuery_decorator_1 = require("../utils/decorator/PagSortApiQuery.decorator");
+const swagger_1 = require("@nestjs/swagger");
 const AuthDecorators_decorator_1 = require("../utils/decorator/AuthDecorators.decorator");
 const client_1 = require("@prisma/client");
+const PagSortApiQuery_decorator_1 = require("../utils/decorator/PagSortApiQuery.decorator");
 let UsersController = UsersController_1 = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
         this.logger = new common_1.Logger(UsersController_1.name);
     }
     async getUsers(paginationParams, sortingParams) {
-        this.logger.log('Get all users');
         return this.usersService.findAllUsers(paginationParams, sortingParams);
     }
     async generateUser(generateUserDto) {
@@ -38,16 +38,16 @@ exports.UsersController = UsersController;
 __decorate([
     (0, common_1.Get)(),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN]),
     (0, PagSortApiQuery_decorator_1.PagSortApiQuery)(),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN]),
     __param(0, (0, paginationParams_decorator_1.PaginationParamsDecorator)()),
-    __param(1, (0, sortingParams_decorator_1.SortingParamsDecorator)(['role'])),
+    __param(1, (0, sortingParams_decorator_1.SortingParamsDecorator)(['id', 'role', 'email', 'name', 'createdAt'])),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getUsers", null);
 __decorate([
-    (0, common_1.Get)(),
+    (0, common_1.Post)('/generate'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -55,6 +55,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "generateUser", null);
 exports.UsersController = UsersController = UsersController_1 = __decorate([
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [users_service_1.UsersService])
 ], UsersController);

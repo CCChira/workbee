@@ -12,7 +12,7 @@ export interface Pagination {
   offset: number;
 }
 export const PaginationParamsDecorator = createParamDecorator(
-  (data, ctx: ExecutionContext): Pagination => {
+  (_, ctx: ExecutionContext): Pagination => {
     const req: Request = ctx.switchToHttp().getRequest();
     const page = parseInt(req.query.page as string);
     const size = parseInt(req.query.size as string);
@@ -29,7 +29,7 @@ export const PaginationParamsDecorator = createParamDecorator(
     }
 
     const limit = size;
-    const offset = page * limit;
+    const offset = (page - 1) * limit;
     return { page, limit, size, offset };
   },
 );

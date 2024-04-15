@@ -1,12 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { persist } from 'zustand/middleware';
-enum Roles {
-  UNASSIGNED,
-  CLIENT,
-  EMPLOYEE,
-  ADMIN,
-}
+import { Roles } from '@/utils/types.ts';
 export interface User {
   accessToken: string;
   id: string;

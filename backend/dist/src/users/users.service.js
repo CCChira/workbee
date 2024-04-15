@@ -46,9 +46,11 @@ let UsersService = class UsersService {
         const response = await this.prisma.user.findMany({
             skip: offset,
             take: limit,
-            orderBy: {
-                [sort?.property || 'id']: sort?.direction || 'asc',
-            },
+            orderBy: [
+                {
+                    [sort?.property || 'id']: sort?.direction || 'asc',
+                },
+            ],
         });
         return {
             data: response,

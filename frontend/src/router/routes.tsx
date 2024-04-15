@@ -1,9 +1,9 @@
-import { RouteObject } from 'react-router-dom';
 import App from '@/App.tsx';
 import { ReactNode } from 'react';
-import { HomeIcon } from 'lucide-react';
+import { HomeIcon, ContactRound } from 'lucide-react';
 import Login from '@/components/pages/Login.tsx';
 import ProtectedRoute from '@/router/ProtectedRoute.tsx';
+import Clients from '@/components/pages/Clients.tsx';
 interface CustomRouteObject {
   path: string;
   element: ReactNode;
@@ -22,6 +22,15 @@ const routes: CustomRouteObject[] = [
   {
     path: '/login',
     element: <Login />,
+  },
+  {
+    path: '/clients',
+    element: (
+      <ProtectedRoute>
+        <Clients />
+      </ProtectedRoute>
+    ),
+    icon: <ContactRound />,
   },
 ];
 export const paths = routes.map((route) => route.path);

@@ -1,4 +1,5 @@
 import {
+  HttpStatus,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -20,13 +21,19 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({ where: { email: email } });
 
     if (!user) {
-      throw new NotFoundException(`No user found for email: ${email}`);
+      throw new NotFoundException({
+        message: `Invalid email or password`,
+        status: HttpStatus.NOT_FOUND,
+      });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid password');
+      throw new UnauthorizedException({
+        message: 'Invalid email or password',
+        status: HttpStatus.FORBIDDEN,
+      });
     }
 
     return {

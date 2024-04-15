@@ -14,7 +14,6 @@ export declare class UsersController {
             password: string;
             createdAt: Date;
             updatedAt: Date;
-            loginCode: string;
         }[];
         dataSize: number;
         page: number;
@@ -28,6 +27,5 @@ export declare class UsersController {
         password: string;
         createdAt: Date;
         updatedAt: Date;
-        loginCode: string;
     }>;
 }

@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Logger,
+  Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -15,10 +16,12 @@ import {
   Sorting,
   SortingParamsDecorator,
 } from '../utils/decorator/sortingParams.decorator';
-import { PagSortApiQuery } from '../utils/decorator/PagSortApiQuery.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthDecorators } from '../utils/decorator/AuthDecorators.decorator';
 import { Role } from '@prisma/client';
+import { PagSortApiQuery } from '../utils/decorator/PagSortApiQuery.decorator';
 
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
@@ -26,17 +29,17 @@ export class UsersController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  @AuthDecorators([Role.ADMIN])
   @PagSortApiQuery()
+  @AuthDecorators([Role.ADMIN])
   public async getUsers(
     @PaginationParamsDecorator() paginationParams: Pagination,
-    @SortingParamsDecorator(['role']) sortingParams: Sorting,
+    @SortingParamsDecorator(['id', 'role', 'email', 'name', 'createdAt'])
+    sortingParams: Sorting,
   ) {
-    this.logger.log('Get all users');
     return this.usersService.findAllUsers(paginationParams, sortingParams);
   }
 
-  @Get()
+  @Post('/generate')
   @HttpCode(HttpStatus.OK)
   public async generateUser(@Body() generateUserDto: any) {
     return this.usersService.create(generateUserDto);

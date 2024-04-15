@@ -13,8 +13,7 @@ export interface Sorting {
 export const SortingParamsDecorator = createParamDecorator(
   (validParams, ctx: ExecutionContext): Sorting => {
     const req: Request = ctx.switchToHttp().getRequest();
-    const sort = req.query.sort as string;
-    console.log(sort);
+    const sort = req.query['sort:order'] as string;
     if (!sort) return null;
 
     // check if the valid params sent is an array
@@ -22,7 +21,6 @@ export const SortingParamsDecorator = createParamDecorator(
     //   throw new BadRequestException('Invalid sort parameter');
     // check the format of the sort query param
     const sortPattern = /^([a-zA-Z0-9]+):(asc|desc)$/;
-    console.log(sort.match(sortPattern));
     if (!sort.match(sortPattern))
       throw new BadRequestException('Invalid sort parameter');
 
@@ -30,7 +28,6 @@ export const SortingParamsDecorator = createParamDecorator(
     const [property, direction] = sort.split(':');
     if (!validParams.includes(property))
       throw new BadRequestException(`Invalid sort property: ${property}`);
-
     return { property, direction };
   },
 );

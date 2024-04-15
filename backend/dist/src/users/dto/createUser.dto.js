@@ -42,4 +42,4 @@ __decorate([
     (0, swagger_1.ApiProperty)(),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "role", void 0);
-//# sourceMappingURL=user.dto.js.map
+//# sourceMappingURL=createUser.dto.js.map

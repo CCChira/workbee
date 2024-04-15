@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PaginationParamsDecorator = void 0;
 const common_1 = require("@nestjs/common");
-exports.PaginationParamsDecorator = (0, common_1.createParamDecorator)((data, ctx) => {
+exports.PaginationParamsDecorator = (0, common_1.createParamDecorator)((_, ctx) => {
     const req = ctx.switchToHttp().getRequest();
     const page = parseInt(req.query.page);
     const size = parseInt(req.query.size);
@@ -16,7 +16,7 @@ exports.PaginationParamsDecorator = (0, common_1.createParamDecorator)((data, ct
         throw new common_1.BadRequestException('Invalid pagination params: Max size is 100');
     }
     const limit = size;
-    const offset = page * limit;
+    const offset = (page - 1) * limit;
     return { page, limit, size, offset };
 });
 //# sourceMappingURL=paginationParams.decorator.js.map

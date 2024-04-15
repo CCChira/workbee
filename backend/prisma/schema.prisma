@@ -14,14 +14,20 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  role      Role     @default(CLIENT)
-  name      String?
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  loginCode String?  @unique @default(uuid())
+  id             String           @id @default(uuid())
+  email          String           @unique
+  role           Role             @default(CLIENT)
+  name           String?
+  password       String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now()) @updatedAt
+  TaskAssignment TaskAssignment[]
+}
+
+model Tools {
+  id   Int      @id @default(autoincrement())
+  name String
+  type ToolType
 }
 
 model InviteCodes {
@@ -31,8 +37,44 @@ model InviteCodes {
   registered Boolean @default(false)
 }
 
+model TaskTemplate {
+  id               Int      @id @default(autoincrement())
+  title            String
+  necessaryWorkers Int      @default(1)
+  necessaryTools   String[]
+  Task             Task[]
+}
+
+model Task {
+  id             Int              @id @default(autoincrement())
+  taskTemplate   TaskTemplate     @relation(fields: [taskTemplateId], references: [id])
+  taskTemplateId Int
+  description    String
+  dayOfWeek      Int[]
+  frequency      Int
+  startDate      DateTime         @default(now())
+  endDate        DateTime
+  isActive       Boolean
+  TaskAssignment TaskAssignment[]
+}
+
+model TaskAssignment {
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId Int
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@id([taskId, userId])
+}
+
 enum Role {
   ADMIN
   EMPLOYEE
   CLIENT
+}
+
+enum ToolType {
+  PLUG
+  BATTERIES
+  GASOLINE
 }

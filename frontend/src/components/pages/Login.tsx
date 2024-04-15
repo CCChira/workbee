@@ -1,20 +1,13 @@
 import { User, useUserStore } from '@/store/user.ts';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation } from 'react-query';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Navigate } from 'react-router-dom';
-import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  Form,
-} from '@/components/ui/form.tsx';
+import Logo from '@/assets/chira_logo.svg';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form.tsx';
 
 interface LoginForm {
   email: string;
@@ -29,18 +22,37 @@ const loginFormSchema: z.ZodType<LoginForm> = z.object({
 function Login() {
   const userStore = useUserStore();
 
-  const mutation = useMutation('user', async (formData: LoginForm) => {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-      body: JSON.stringify(formData),
-    });
-    const user = await response.json();
-    userStore.setUser({ ...user, loggedIn: true });
-    return user;
+  const mutation = useMutation('user', {
+    mutationFn: async (formData: LoginForm) => {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.json(); // Assuming the server returns JSON with error details
+
+        console.log(errorBody);
+        throw new Error(errorBody.message || 'Failed to login');
+      }
+
+      return response.json();
+    },
+    onError: (error, variables) => {
+      form.setError('root.serverError', { type: '404' });
+      console.log('Error:', error);
+      console.log('Variables:', variables);
+    },
+    onSuccess: (data: Omit<User, 'loggedIn'>) => {
+      userStore.setUser({
+        ...data,
+        loggedIn: true,
+      });
+    },
   });
 
   const form = useForm({
@@ -58,7 +70,7 @@ function Login() {
   }
 
   return (
-    <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
+    <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px] h-[calc(100vh-64px)]">
       <div className="flex items-center justify-center py-12">
         <div className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
@@ -73,8 +85,9 @@ function Login() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="email" {...field} />
+                        <Input placeholder="email" type="email" {...field} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -84,8 +97,9 @@ function Login() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
+                      <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input placeholder="password" {...field} />
+                        <Input placeholder="password" type="password" {...field} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -96,15 +110,10 @@ function Login() {
           </div>
         </div>
       </div>
-      {/*<div className="hidden bg-muted lg:block">*/}
-      {/*  <img*/}
-      {/*    src="/placeholder.svg"*/}
-      {/*    alt="Image"*/}
-      {/*    width="1920"*/}
-      {/*    height="1080"*/}
-      {/*    className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"*/}
-      {/*  />*/}
-      {/*</div>*/}
+      <div className="flex items-center justify-center bg-primary">
+        <h1 className="text-6xl text-black font-bold">Work Bee</h1>
+        <img src={Logo} alt="Workbee logo" className="w-80 h-80" />
+      </div>
     </div>
   );
 }

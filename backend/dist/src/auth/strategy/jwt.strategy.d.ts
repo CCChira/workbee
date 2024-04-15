@@ -14,7 +14,6 @@ export declare class JwtStrategy extends JwtStrategy_base {
         password: string;
         createdAt: Date;
         updatedAt: Date;
-        loginCode: string;
     }>;
 }
 export {};

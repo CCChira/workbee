@@ -14,7 +14,7 @@ function Layout({ children }: LayoutProps) {
           <Navbar />
         </aside>
       )}
-      <main className={`${user.loggedIn ? 'ml-16' : ''} p-8`}>{children}</main>
+      <main className={`${user.loggedIn ? 'ml-16' : ''} p-8 min-h-screen`}>{children}</main>
     </div>
   );
 }

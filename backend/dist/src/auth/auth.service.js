@@ -23,11 +23,17 @@ let AuthService = class AuthService {
         console.log(email, password);
         const user = await this.prisma.user.findUnique({ where: { email: email } });
         if (!user) {
-            throw new common_1.NotFoundException(`No user found for email: ${email}`);
+            throw new common_1.NotFoundException({
+                message: `Invalid email or password`,
+                status: common_1.HttpStatus.NOT_FOUND,
+            });
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            throw new common_1.UnauthorizedException('Invalid password');
+            throw new common_1.UnauthorizedException({
+                message: 'Invalid email or password',
+                status: common_1.HttpStatus.FORBIDDEN,
+            });
         }
         return {
             accessToken: this.jwtService.sign({ id: user.id, role: user.role }),

@@ -4,6 +4,7 @@ declare const JwtStrategy_base: new (...args: any[]) => Strategy;
 export declare class JwtStrategy extends JwtStrategy_base {
     private usersService;
     constructor(usersService: UsersService);
+    private static extractJwtFromCookie;
     validate(payload: {
         id: string;
     }): Promise<{

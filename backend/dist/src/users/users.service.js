@@ -25,8 +25,11 @@ let UsersService = class UsersService {
             data: createUserDto,
         });
     }
-    async generateUser(generateUserDto) {
-        const creationResponse = await this.prisma.inviteCodes.create({
+    async deleteUser(id) {
+        return this.prisma.user.delete({ where: { id } });
+    }
+    async generateInviteCode(generateUserDto) {
+        return this.prisma.inviteCodes.create({
             data: generateUserDto,
         });
     }
@@ -40,9 +43,9 @@ let UsersService = class UsersService {
         return this.prisma.user.findMany({ where: { role: roleEnumValue } });
     }
     findUser(id) {
-        return this.prisma.user.findUnique({ where: { id } });
+        return this.prisma.user.findUnique({ where: { id: id } });
     }
-    async findAllUsers({ page, limit, offset, size }, sort) {
+    async findAllUsers({ page, limit, offset, size }, sort, search) {
         const response = await this.prisma.user.findMany({
             skip: offset,
             take: limit,
@@ -51,13 +54,38 @@ let UsersService = class UsersService {
                     [sort?.property || 'id']: sort?.direction || 'asc',
                 },
             ],
+            where: search.field && search.searchParam
+                ? {
+                    [search.field]: {
+                        contains: search.searchParam,
+                        mode: 'insensitive',
+                    },
+                }
+                : {},
         });
+        console.log(search.field && search.searchParam
+            ? {
+                [search.field]: {
+                    contains: search.searchParam,
+                    mode: 'insensitive',
+                },
+            }
+            : {});
         return {
             data: response,
             dataSize: response.length,
             page,
             size,
         };
+    }
+    async deleteMultiple(deleteMultipleUsersDto) {
+        return this.prisma.user.deleteMany({
+            where: {
+                id: {
+                    in: deleteMultipleUsersDto.users,
+                },
+            },
+        });
     }
 };
 exports.UsersService = UsersService;

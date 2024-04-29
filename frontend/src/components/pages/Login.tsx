@@ -24,7 +24,7 @@ function Login() {
 
   const mutation = useMutation('user', {
     mutationFn: async (formData: LoginForm) => {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+      const response = await fetch(`/api/auth/login`, {
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',

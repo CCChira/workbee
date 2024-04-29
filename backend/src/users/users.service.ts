@@ -7,6 +7,8 @@ import { Pagination } from '../utils/decorator/paginationParams.decorator';
 import { Sorting } from '../utils/decorator/sortingParams.decorator';
 import { CreateUserDto } from './dto/createUser.dto';
 import { GenerateUserDto } from './dto/generateUser.dto';
+import { ISearch } from '../utils/decorator/SearchDecorator.decorator';
+import { DeleteMultipleUsersDto } from './dto/deleteMultipleUsers.dto';
 
 @Injectable()
 export class UsersService {
@@ -22,9 +24,11 @@ export class UsersService {
       data: createUserDto,
     });
   }
-
-  async generateUser(generateUserDto: GenerateUserDto) {
-    const creationResponse = await this.prisma.inviteCodes.create({
+  async deleteUser(id: string) {
+    return this.prisma.user.delete({ where: { id } });
+  }
+  async generateInviteCode(generateUserDto: GenerateUserDto) {
+    return this.prisma.inviteCodes.create({
       data: generateUserDto,
     });
   }
@@ -41,11 +45,12 @@ export class UsersService {
     return this.prisma.user.findMany({ where: { role: roleEnumValue } });
   }
   findUser(id: string) {
-    return this.prisma.user.findUnique({ where: { id } });
+    return this.prisma.user.findUnique({ where: { id: id } });
   }
   async findAllUsers(
     { page, limit, offset, size }: Pagination,
     sort?: Sorting,
+    search?: ISearch,
   ) {
     const response = await this.prisma.user.findMany({
       skip: offset,
@@ -55,12 +60,41 @@ export class UsersService {
           [sort?.property || 'id']: sort?.direction || 'asc',
         },
       ],
+      where:
+        search.field && search.searchParam
+          ? {
+              [search.field]: {
+                contains: search.searchParam,
+                mode: 'insensitive',
+              },
+            }
+          : {},
     });
+
+    console.log(
+      search.field && search.searchParam
+        ? {
+            [search.field]: {
+              contains: search.searchParam,
+              mode: 'insensitive',
+            },
+          }
+        : {},
+    );
     return {
       data: response,
       dataSize: response.length,
       page,
       size,
     };
+  }
+  async deleteMultiple(deleteMultipleUsersDto: DeleteMultipleUsersDto) {
+    return this.prisma.user.deleteMany({
+      where: {
+        id: {
+          in: deleteMultipleUsersDto.users,
+        },
+      },
+    });
   }
 }

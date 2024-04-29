@@ -3,6 +3,8 @@ import { Pagination } from '../utils/decorator/paginationParams.decorator';
 import { Sorting } from '../utils/decorator/sortingParams.decorator';
 import { CreateUserDto } from './dto/createUser.dto';
 import { GenerateUserDto } from './dto/generateUser.dto';
+import { ISearch } from '../utils/decorator/SearchDecorator.decorator';
+import { DeleteMultipleUsersDto } from './dto/deleteMultipleUsers.dto';
 export declare class UsersService {
     private prisma;
     constructor(prisma: PrismaService);
@@ -15,7 +17,22 @@ export declare class UsersService {
         createdAt: Date;
         updatedAt: Date;
     }>;
-    generateUser(generateUserDto: GenerateUserDto): Promise<void>;
+    deleteUser(id: string): Promise<{
+        id: string;
+        email: string;
+        role: import(".prisma/client").$Enums.Role;
+        name: string;
+        password: string;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    generateInviteCode(generateUserDto: GenerateUserDto): Promise<{
+        id: string;
+        email: string;
+        phoneNumber: string;
+        role: import(".prisma/client").$Enums.Role;
+        registered: boolean;
+    }>;
     userExists(id: string): import(".prisma/client").Prisma.Prisma__UserClient<{
         id: string;
         email: string;
@@ -43,7 +60,7 @@ export declare class UsersService {
         createdAt: Date;
         updatedAt: Date;
     }, null, import("@prisma/client/runtime/library").DefaultArgs>;
-    findAllUsers({ page, limit, offset, size }: Pagination, sort?: Sorting): Promise<{
+    findAllUsers({ page, limit, offset, size }: Pagination, sort?: Sorting, search?: ISearch): Promise<{
         data: {
             id: string;
             email: string;
@@ -57,4 +74,5 @@ export declare class UsersService {
         page: number;
         size: number;
     }>;
+    deleteMultiple(deleteMultipleUsersDto: DeleteMultipleUsersDto): Promise<import(".prisma/client").Prisma.BatchPayload>;
 }

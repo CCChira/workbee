@@ -6,11 +6,13 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ThemeProvider } from '@/components/theme-provider.tsx';
 import Layout from '@/components/layout/Layout.tsx';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
 
 const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
+      <ReactQueryDevtools initialIsOpen={false} />
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <BrowserRouter>
           <Layout>

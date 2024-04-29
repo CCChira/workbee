@@ -1,5 +1,5 @@
 import { getClients } from '@/queries/clients.ts';
-import { Action, PaginationSortingState, User } from '@/utils/types.ts';
+import { User } from '@/utils/types.ts';
 import QueryTable from '@/components/layout/table/QueryTable.tsx';
 import {
   DropdownMenu,
@@ -70,6 +70,7 @@ function Clients({}: ClientsProps) {
           name: true,
           createdAt: true,
         }}
+        searchField="email"
       />
     </>
   );

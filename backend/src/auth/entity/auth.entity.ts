@@ -4,6 +4,8 @@ export class AuthEntity {
   @ApiProperty()
   accessToken: string;
   @ApiProperty()
+  refreshToken: string;
+  @ApiProperty()
   id: string;
   @ApiProperty()
   email: string;

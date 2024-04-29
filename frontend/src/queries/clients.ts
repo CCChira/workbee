@@ -9,6 +9,8 @@ export async function getClients(pagSort: PaginationSortingState): Promise<Query
     pagSort.page,
     pagSort.size,
     `${pagSort.sortOrder.property}:${pagSort.sortOrder.direction}`,
+    pagSort.search?.field ?? '',
+    pagSort.search?.searchParam ?? '',
     `${import.meta.env.VITE_API_URL}/users`,
   );
 
@@ -18,6 +20,7 @@ export async function getClients(pagSort: PaginationSortingState): Promise<Query
       'Content-Type': 'application/json',
       Authorization: `Bearer ${user.accessToken}`,
     },
+    credentials: 'same-origin',
     method: 'GET',
   });
 
@@ -29,3 +32,7 @@ export async function getClients(pagSort: PaginationSortingState): Promise<Query
 
   return response.json();
 }
+
+// export async function deleteClients(clients: string[]): Promise<DeletionResponse> {
+//   const fetchUrl = `${import.meta.env.VITE_API_URL}/users`;
+// }

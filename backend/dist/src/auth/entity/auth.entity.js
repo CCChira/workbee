@@ -21,6 +21,10 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)(),
     __metadata("design:type", String)
+], AuthEntity.prototype, "refreshToken", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", String)
 ], AuthEntity.prototype, "id", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),

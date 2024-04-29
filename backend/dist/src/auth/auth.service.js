@@ -14,10 +14,22 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const jwt_1 = require("@nestjs/jwt");
 const bcrypt = require("bcrypt");
+const uuid_1 = require("uuid");
 let AuthService = class AuthService {
     constructor(prisma, jwtService) {
         this.prisma = prisma;
         this.jwtService = jwtService;
+    }
+    async createAccessToken(userId, role) {
+        return this.jwtService.sign({ id: userId, role }, { expiresIn: '1h' });
+    }
+    async createRefreshToken(userId, role) {
+        const token = (0, uuid_1.v4)();
+        return this.jwtService.sign({ id: userId, tokenId: token, role: role }, { expiresIn: '7d' });
+    }
+    async validateToken(token) {
+        const { id } = this.jwtService.decode(token);
+        return this.prisma.user.findUnique({ where: { id } });
     }
     async login(email, password) {
         console.log(email, password);
@@ -35,8 +47,11 @@ let AuthService = class AuthService {
                 status: common_1.HttpStatus.FORBIDDEN,
             });
         }
+        const accessToken = await this.createAccessToken(user.id, user.role);
+        const refreshToken = await this.createRefreshToken(user.id, user.role);
         return {
-            accessToken: this.jwtService.sign({ id: user.id, role: user.role }),
+            accessToken,
+            refreshToken,
             id: user.id,
             email: user.email,
             role: user.role,

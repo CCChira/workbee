@@ -11,8 +11,10 @@ exports.SortingParamsDecorator = (0, common_1.createParamDecorator)((validParams
     if (!sort.match(sortPattern))
         throw new common_1.BadRequestException('Invalid sort parameter');
     const [property, direction] = sort.split(':');
-    if (!validParams.includes(property))
+    console.log(validParams);
+    if (!validParams.includes(property)) {
         throw new common_1.BadRequestException(`Invalid sort property: ${property}`);
+    }
     return { property, direction };
 });
 //# sourceMappingURL=sortingParams.decorator.js.map

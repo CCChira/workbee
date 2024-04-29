@@ -22,9 +22,13 @@ let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    async login({ email, password }) {
+    async login({ email, password }, request, res) {
         try {
-            return await this.authService.login(email, password);
+            const authEntity = await this.authService.login(email, password);
+            res
+                .cookie('access_token', authEntity.accessToken)
+                .cookie('refresh_token', authEntity.refreshToken)
+                .send(authEntity);
         }
         catch (e) {
             switch (e.status) {
@@ -37,8 +41,19 @@ let AuthController = class AuthController {
             }
         }
     }
-    logout(req) {
-        req.logOut();
+    async refresh(res, req) {
+        const refreshToken = req.cookies.refresh_token;
+        if (!refreshToken) {
+            throw new common_1.ForbiddenException('No refresh token provided');
+        }
+        const { id: userId, role: userRole } = await this.authService.validateToken(refreshToken);
+        const newAccessToken = await this.authService.createAccessToken(userId, userRole);
+        const newRefreshToken = await this.authService.createRefreshToken(userId, userRole);
+        res.cookie('refresh_token', newRefreshToken);
+        res.cookie('access_token', newAccessToken);
+    }
+    test() {
+        return 'test';
     }
 };
 exports.AuthController = AuthController;
@@ -46,17 +61,26 @@ __decorate([
     (0, common_1.Post)('login'),
     (0, swagger_1.ApiOkResponse)({ type: auth_entity_1.AuthEntity }),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [login_dto_1.LoginDto]),
+    __metadata("design:paramtypes", [login_dto_1.LoginDto, Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 __decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Req)()),
+    (0, common_1.Post)('refresh'),
+    __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "refresh", null);
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
-], AuthController.prototype, "logout", null);
+], AuthController.prototype, "test", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

@@ -1,5 +1,11 @@
+import MyMapComponent from '@/components/test.tsx';
+
 function App() {
-  return <>fasdfdas</>;
+  return (
+    <>
+      <MyMapComponent />
+    </>
+  );
 }
 
 export default App;

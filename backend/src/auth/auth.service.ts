@@ -8,6 +8,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthEntity } from './entity/auth.entity';
 import * as bcrypt from 'bcrypt';
+import { Role } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +18,20 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  async createAccessToken(userId: string, role: Role) {
+    return this.jwtService.sign({ id: userId, role }, { expiresIn: '1h' });
+  }
+  async createRefreshToken(userId: string, role: Role) {
+    const token = uuidv4();
+    return this.jwtService.sign(
+      { id: userId, tokenId: token, role: role },
+      { expiresIn: '7d' },
+    );
+  }
+  async validateToken(token: string) {
+    const { id } = this.jwtService.decode(token);
+    return this.prisma.user.findUnique({ where: { id } });
+  }
   async login(email?: string, password?: string): Promise<AuthEntity> {
     console.log(email, password);
     const user = await this.prisma.user.findUnique({ where: { email: email } });
@@ -35,9 +51,11 @@ export class AuthService {
         status: HttpStatus.FORBIDDEN,
       });
     }
-
+    const accessToken = await this.createAccessToken(user.id, user.role);
+    const refreshToken = await this.createRefreshToken(user.id, user.role);
     return {
-      accessToken: this.jwtService.sign({ id: user.id, role: user.role }),
+      accessToken,
+      refreshToken,
       id: user.id,
       email: user.email,
       role: user.role,

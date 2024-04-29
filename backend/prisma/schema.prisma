@@ -22,6 +22,7 @@ model User {
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @default(now()) @updatedAt
   TaskAssignment TaskAssignment[]
+  Contract       Contract[]
 }
 
 model Tools {
@@ -31,40 +32,106 @@ model Tools {
 }
 
 model InviteCodes {
-  id         String  @id @default(uuid())
-  email      String
-  role       Role    @default(CLIENT)
-  registered Boolean @default(false)
+  id          String  @id @default(uuid())
+  email       String? @unique
+  phoneNumber String?
+  role        Role    @default(CLIENT)
+  registered  Boolean @default(false)
 }
 
 model TaskTemplate {
-  id               Int      @id @default(autoincrement())
+  id               Int            @id @default(autoincrement())
   title            String
-  necessaryWorkers Int      @default(1)
+  necessaryWorkers Int            @default(1)
   necessaryTools   String[]
-  Task             Task[]
+  Task             TaskSchedule[]
+  Contract         Contract?      @relation(fields: [contractId], references: [id])
+  contractId       Int?
 }
 
-model Task {
-  id             Int              @id @default(autoincrement())
-  taskTemplate   TaskTemplate     @relation(fields: [taskTemplateId], references: [id])
+model TaskSchedule {
+  id             Int            @id @default(autoincrement())
+  taskTemplate   TaskTemplate   @relation(fields: [taskTemplateId], references: [id], onDelete: Cascade)
   taskTemplateId Int
   description    String
   dayOfWeek      Int[]
   frequency      Int
-  startDate      DateTime         @default(now())
+  startDate      DateTime       @default(now())
   endDate        DateTime
   isActive       Boolean
+  TaskInstance   TaskInstance[]
+}
+
+model TaskInstance {
+  id             Int              @id @default(autoincrement())
+  taskSchedule   TaskSchedule     @relation(fields: [taskScheduleId], references: [id], onDelete: Cascade)
+  taskScheduleId Int
+  status         Status           @default(UNASSIGNED)
+  date           DateTime
   TaskAssignment TaskAssignment[]
 }
 
+model Vehicle {
+  id           Int    @id @default(autoincrement())
+  name         String
+  licensePlate String
+  loadCapacity Float
+  seats        Int
+}
+
 model TaskAssignment {
-  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  task   TaskInstance @relation(fields: [taskId], references: [id], onDelete: Cascade)
   taskId Int
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
   @@id([taskId, userId])
+}
+
+model Contract {
+  id            Int            @id @default(autoincrement())
+  title         String
+  description   String
+  startDate     String?
+  endDate       String?
+  clientId      String?
+  user          User?          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  taskTemplates TaskTemplate[]
+  locations     Location[]
+}
+
+model Location {
+  id         Int       @id @default(autoincrement())
+  name       String
+  address    String
+  coords     String
+  Room       Room[]
+  contractId Int?
+  Contract   Contract? @relation(fields: [contractId], references: [id], onDelete: Cascade)
+}
+
+model Room {
+  id         Int        @id @default(autoincrement())
+  name       String
+  location   Location   @relation(fields: [locationId], references: [id])
+  locationId Int
+  accessMode accessMode
+}
+
+enum accessMode {
+  STAIRS
+  ELEVATOR
+  RAMP
+}
+
+enum Status {
+  UNASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  INCOMPLETE
+  REQUESTED_CANCEL
+  VERIFIED
 }
 
 enum Role {

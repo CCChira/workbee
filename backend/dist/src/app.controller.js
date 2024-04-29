@@ -17,6 +17,7 @@ let AppController = class AppController {
         this.appService = appService;
     }
     getHello() {
+        console.log('muie');
         return this.appService.getHello();
     }
 };

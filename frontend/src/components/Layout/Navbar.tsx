@@ -5,9 +5,15 @@ import routes from '@/router/routes.tsx';
 import { Link } from 'react-router-dom';
 import { Tooltip, TooltipProvider } from '@radix-ui/react-tooltip';
 import { TooltipContent, TooltipTrigger } from '@/components/ui/tooltip.tsx';
+import { useSideBarStore } from '@/store/sidebar.ts';
 interface NavbarProps {}
 
 function Navbar({}: NavbarProps) {
+  const sidebar = useSideBarStore();
+  const onClick = (alias: string) => {
+    console.log(sidebar);
+    sidebar.changeIcon(alias);
+  };
   return (
     <nav className="flex flex-col justify-between items-center gap-4 px-2 sm:py-5 h-full">
       <div className="flex flex-col gap-4 items-center">
@@ -20,13 +26,16 @@ function Navbar({}: NavbarProps) {
               <TooltipProvider key={route.path}>
                 <Tooltip>
                   <TooltipTrigger>
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8">
+                    <div
+                      onClick={() => {
+                        onClick(route.alias);
+                      }}
+                      className={`flex h-9 w-9 items-center justify-center rounded-lg  transition-colors  md:h-8 md:w-8 ${sidebar.active === route.alias ? 'bg-primary text-accent-foreground hover:bg-primary-foreground hover:text-accent' : 'bg-none text-muted-foreground hover:text-foreground'}`}
+                    >
                       <Link to={route.path}>{route.icon}</Link>
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent side="right">
-                    {route.path === '/' ? 'Home' : route.path.charAt(1).toUpperCase() + route.path.slice(2)}
-                  </TooltipContent>
+                  <TooltipContent side="right">{route.alias}</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             ),

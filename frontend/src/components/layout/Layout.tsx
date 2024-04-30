@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import Navbar from '@/components/Layout/Navbar.tsx';
+import Navbar from '@/components/layout/Navbar.tsx';
 import { useUserStore } from '@/store/user.ts';
 
 interface LayoutProps {

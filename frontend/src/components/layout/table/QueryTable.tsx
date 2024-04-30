@@ -19,7 +19,7 @@ import { Form } from '@/components/ui/form.tsx';
 import { debounce } from 'lodash';
 import { FormControl, FormField, FormItem } from '@/components/ui/form.tsx';
 import { useNavigate } from 'react-router-dom';
-import TableSkeleton from '@/components/Layout/Table/TableSkeleton.tsx';
+import TableSkeleton from '@/components/layout/table/TableSkeleton.tsx';
 interface QueryTableProps<TType, TValue> {
   queryFn: (pagSort: PaginationSortingState) => Promise<QueryResponse<TType>>;
   queryKey: string;

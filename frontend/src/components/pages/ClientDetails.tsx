@@ -9,7 +9,7 @@ import {
 } from '@/queries/clientDetails.ts';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card.tsx';
-import QueryTable from '@/components/Layout/Table/QueryTable.tsx';
+import QueryTable from '@/components/layout/table/QueryTable.tsx';
 import { ColumnDef } from '@tanstack/react-table';
 import { PaginationSortingState } from '@/utils/types.ts';
 import { TableCell } from '@/components/ui/table.tsx';

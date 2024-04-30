@@ -1,6 +1,6 @@
 import { getClients } from '@/queries/clients.ts';
 import { User } from '@/utils/types.ts';
-import QueryTable from '@/components/Layout/Table/QueryTable.tsx';
+import QueryTable from '@/components/layout/table/QueryTable.tsx';
 import {
   DropdownMenu,
   DropdownMenuContent,

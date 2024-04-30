@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import QueryTable from '@/components/Layout/Table/QueryTable.tsx';
+import QueryTable from '@/components/layout/table/QueryTable.tsx';
 import { getContractLocations } from '@/queries/contractDetails.ts';
 import { ColumnDef } from '@tanstack/react-table';
 import { LocationData } from '@/queries/clientDetails.ts';

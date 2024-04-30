@@ -4,7 +4,7 @@ import './index.css';
 import routes from '@/router/routes.tsx';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ThemeProvider } from '@/components/theme-provider.tsx';
-import Layout from '@/components/layout/Layout.tsx';
+import Layout from '@/components/Layout/Layout.tsx';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 

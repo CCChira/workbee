@@ -17,23 +17,26 @@ async function main() {
                 },
             });
         }
-        await prisma.user.upsert({
-            where: {
-                email: `admin${i != 10 ? Math.floor(Math.random() + 100 / i) : i}@example.com`,
-            },
-            update: {
-                email: `admin${i}@example.com`,
-                name: `Admin User ${i}`,
-                password: commonPassword,
-                role: i < 20 ? 'ADMIN' : 'CLIENT',
-            },
-            create: {
-                email: `${i < 20 ? 'admin' : 'client'}${i != 10 ? Math.floor(Math.random() + 40 + i) : i}@example.com`,
-                name: `${i < 20 ? 'Admin' : 'Client'} User ${i}`,
-                password: commonPassword,
-                role: i < 20 ? 'ADMIN' : 'CLIENT',
-            },
-        });
+        if (i < 20) {
+            await prisma.user.create({
+                data: {
+                    email: `employee${i}@example.com`,
+                    name: `Employee ${i}`,
+                    password: commonPassword,
+                    role: 'EMPLOYEE',
+                },
+            });
+        }
+        else if (i < 40) {
+            await prisma.user.create({
+                data: {
+                    email: `client${i}@example.com`,
+                    name: `Client ${i}`,
+                    password: commonPassword,
+                    role: 'CLIENT',
+                },
+            });
+        }
     }
     const specialUser = await prisma.user.create({
         data: {
@@ -43,38 +46,57 @@ async function main() {
             name: 'Client Special',
         },
     });
-    const employees = [];
-    for (let i = 0; i < 20; i++) {
-        const response = await prisma.user.create({
-            data: {
-                email: `employee${i}@employee.com`,
-                password: commonPassword,
-                role: 'EMPLOYEE',
-                name: 'Employee' + i,
-            },
-        });
-        employees.push(response);
-    }
     const locations = [
         {
             name: 'Cluj Business Center',
             address: 'Strada Dorobanților 14-16, Cluj-Napoca 400117',
-            coords: '46.769379, 23.5899542',
+            latitude: 46.769379,
+            longitude: 23.5899542,
         },
         {
             name: 'Sigma Business Park',
             address: 'Calea Turzii 178K, Cluj-Napoca 400495',
-            coords: '46.749245, 23.585616',
+            latitude: 46.749245,
+            longitude: 23.585616,
         },
         {
             name: 'The Office',
             address: 'Bulevardul 21 Decembrie 1989 nr. 77, Cluj-Napoca 400604',
-            coords: '46.771210, 23.623635',
+            latitude: 46.77121,
+            longitude: 23.623635,
         },
         {
             name: 'United Business Center',
             address: 'Strada Alexandru Vaida Voievod 53B, Cluj-Napoca 400436',
-            coords: '46.771984, 23.612319',
+            latitude: 46.771984,
+            longitude: 23.612319,
+        },
+    ];
+    const taskTemplates = [
+        {
+            title: 'Office Floor Cleaning',
+            necessaryWorkers: 2,
+            necessaryTools: ['Mop', 'Bucket', 'Detergent'],
+        },
+        {
+            title: 'Window Cleaning',
+            necessaryWorkers: 1,
+            necessaryTools: ['Squeegee', 'Window Cleaner', 'Ladder'],
+        },
+        {
+            title: 'Bathroom Sanitization',
+            necessaryWorkers: 2,
+            necessaryTools: ['Disinfectant', 'Scrubbing Brush', 'Gloves'],
+        },
+        {
+            title: 'Kitchen Deep Cleaning',
+            necessaryWorkers: 3,
+            necessaryTools: ['Degreaser', 'Scraper', 'Sponge', 'Detergent'],
+        },
+        {
+            title: 'Carpet Shampooing',
+            necessaryWorkers: 2,
+            necessaryTools: ['Carpet Cleaner', 'Shampoo', 'Vacuum'],
         },
     ];
     const contract = await prisma.contract.create({
@@ -96,12 +118,21 @@ async function main() {
                 endDate: Date.now().toString(),
             },
         });
+        await Promise.all(taskTemplates.map((taskTemplate) => prisma.taskTemplate.create({
+            data: {
+                title: taskTemplate.title,
+                necessaryWorkers: taskTemplate.necessaryWorkers,
+                necessaryTools: taskTemplate.necessaryTools,
+                contractId: contract.id,
+            },
+        })));
         await Promise.all(locations.map(async (location) => {
             const locationResponse = await prisma.location.create({
                 data: {
                     name: location.name,
                     address: location.address,
-                    coords: location.coords,
+                    latitude: location.latitude,
+                    longitude: location.longitude,
                     contractId: contract.id,
                 },
             });
@@ -112,15 +143,16 @@ async function main() {
                             data: {
                                 name: `Room ${i}-${j}`,
                                 locationId: locationResponse.id,
-                                accessMode: client_1.accessMode.STAIRS,
+                                accessMode: client_1.AccessMode.STAIRS,
                             },
                         });
+                        break;
                     case 1:
                         await prisma.room.create({
                             data: {
                                 name: `Room ${i}-${j}`,
                                 locationId: locationResponse.id,
-                                accessMode: client_1.accessMode.ELEVATOR,
+                                accessMode: client_1.AccessMode.ELEVATOR,
                             },
                         });
                         break;
@@ -129,7 +161,7 @@ async function main() {
                             data: {
                                 name: `Room ${i}-${j}`,
                                 locationId: locationResponse.id,
-                                accessMode: client_1.accessMode.RAMP,
+                                accessMode: client_1.AccessMode.RAMP,
                             },
                         });
                         break;
@@ -138,7 +170,7 @@ async function main() {
                             data: {
                                 name: `Room ${i}-${j}`,
                                 locationId: locationResponse.id,
-                                accessMode: client_1.accessMode.RAMP,
+                                accessMode: client_1.AccessMode.RAMP,
                             },
                         });
                         break;
@@ -147,7 +179,7 @@ async function main() {
                             data: {
                                 name: `Room ${i}-${j}`,
                                 locationId: locationResponse.id,
-                                accessMode: client_1.accessMode.STAIRS,
+                                accessMode: client_1.AccessMode.STAIRS,
                             },
                         });
                 }

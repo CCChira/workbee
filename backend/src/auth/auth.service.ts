@@ -19,6 +19,9 @@ export class AuthService {
   ) {}
 
   async createAccessToken(userId: string, role: Role) {
+    console.log(
+      await this.jwtService.sign({ id: userId, role }, { expiresIn: '1h' }),
+    );
     return this.jwtService.sign({ id: userId, role }, { expiresIn: '1h' });
   }
   async createRefreshToken(userId: string, role: Role) {

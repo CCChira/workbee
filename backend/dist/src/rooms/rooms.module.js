@@ -10,13 +10,23 @@ exports.RoomsModule = void 0;
 const common_1 = require("@nestjs/common");
 const rooms_controller_1 = require("./rooms.controller");
 const rooms_service_1 = require("./rooms.service");
+const createImage_service_1 = require("../services/createImage.service");
+const prisma_service_1 = require("../prisma/prisma.service");
+const jwt_1 = require("@nestjs/jwt");
+const aws_s3_service_1 = require("../services/aws-s3.service");
 let RoomsModule = class RoomsModule {
 };
 exports.RoomsModule = RoomsModule;
 exports.RoomsModule = RoomsModule = __decorate([
     (0, common_1.Module)({
         controllers: [rooms_controller_1.RoomsController],
-        providers: [rooms_service_1.RoomsService]
+        providers: [
+            rooms_service_1.RoomsService,
+            createImage_service_1.PrismaImageService,
+            prisma_service_1.PrismaService,
+            jwt_1.JwtService,
+            aws_s3_service_1.AwsS3Service,
+        ],
     })
 ], RoomsModule);
 //# sourceMappingURL=rooms.module.js.map

@@ -22,19 +22,22 @@ const paginationParams_decorator_1 = require("../utils/decorator/paginationParam
 const sortingParams_decorator_1 = require("../utils/decorator/sortingParams.decorator");
 const SearchDecorator_decorator_1 = require("../utils/decorator/SearchDecorator.decorator");
 const createLocation_dto_1 = require("./dto/createLocation.dto");
+const swagger_1 = require("@nestjs/swagger");
 let LocationsController = class LocationsController {
     constructor(locationsService) {
         this.locationsService = locationsService;
     }
     async getLocation({ id }) {
-        console.log(id);
         return this.locationsService.findLocation(id);
     }
     async getLocations(clientId, contractId, paginationParams, sortingParams, searchParams) {
         return this.locationsService.findLocations(clientId, contractId, paginationParams, sortingParams, searchParams);
     }
-    async createLocation(locationDto) {
-        return this.locationsService.createLocation(locationDto);
+    async createLocation(locationDto, contractId) {
+        return this.locationsService.createLocation(locationDto, contractId);
+    }
+    async createMultipleLocations(locations, contractId) {
+        return this.locationsService.createMultipleLocations(locations, parseInt(contractId));
     }
     async updateLocation(id, locationDto) {
         return this.locationsService.updateLocation(id, locationDto);
@@ -58,7 +61,7 @@ __decorate([
     __param(0, (0, common_1.Query)('clientId')),
     __param(1, (0, common_1.Query)('contractId')),
     __param(2, (0, paginationParams_decorator_1.PaginationParamsDecorator)()),
-    __param(3, (0, sortingParams_decorator_1.SortingParamsDecorator)(['name'])),
+    __param(3, (0, sortingParams_decorator_1.SortingParamsDecorator)(['name', 'id'])),
     __param(4, (0, SearchDecorator_decorator_1.SearchDecorator)('email')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, Object, Object, Object]),
@@ -69,10 +72,21 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [createLocation_dto_1.CreateLocationDto]),
+    __metadata("design:paramtypes", [createLocation_dto_1.CreateLocationDto, Number]),
     __metadata("design:returntype", Promise)
 ], LocationsController.prototype, "createLocation", null);
+__decorate([
+    (0, common_1.Post)('/multiple'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Query)('contractId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Array, String]),
+    __metadata("design:returntype", Promise)
+], LocationsController.prototype, "createMultipleLocations", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
@@ -84,6 +98,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], LocationsController.prototype, "updateLocation", null);
 exports.LocationsController = LocationsController = __decorate([
+    (0, swagger_1.ApiTags)('Locations'),
     (0, common_1.Controller)('locations'),
     __metadata("design:paramtypes", [locations_service_1.LocationsService])
 ], LocationsController);

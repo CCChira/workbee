@@ -2,9 +2,19 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ISearch } from '../utils/decorator/SearchDecorator.decorator';
 import { Sorting } from '../utils/decorator/sortingParams.decorator';
 import { Pagination } from '../utils/decorator/paginationParams.decorator';
+import { CreateContractDto } from './dto/createContract.dto';
 export declare class ContractsService {
     private readonly prisma;
     constructor(prisma: PrismaService);
+    createContract(createContractDto: CreateContractDto, clientId: string): import(".prisma/client").Prisma.Prisma__ContractClient<{
+        id: number;
+        title: string;
+        description: string;
+        startDate: string;
+        endDate: string;
+        clientId: string;
+        pdfUrl: string;
+    }, never, import("@prisma/client/runtime/library").DefaultArgs>;
     getAllContracts({ page, limit, offset, size }: Pagination, sort?: Sorting, search?: ISearch): Promise<{
         data: {
             id: number;
@@ -13,6 +23,7 @@ export declare class ContractsService {
             startDate: string;
             endDate: string;
             clientId: string;
+            pdfUrl: string;
         }[];
         dataSize: number;
         page: number;
@@ -26,6 +37,7 @@ export declare class ContractsService {
             startDate: string;
             endDate: string;
             clientId: string;
+            pdfUrl: string;
         }[];
         dataSize: number;
         page: number;

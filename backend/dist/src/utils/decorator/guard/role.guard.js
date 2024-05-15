@@ -20,10 +20,15 @@ let RolesGuard = class RolesGuard {
     }
     canActivate(context) {
         const requiredRoles = this.reflector.get('roles', context.getHandler());
-        const decodedRole = this.jwtService.decode(context.switchToHttp().getRequest().cookies['access_token']).role;
-        if (!requiredRoles)
-            return true;
-        return requiredRoles.some((role) => decodedRole?.includes(role));
+        const decoded = this.jwtService.decode(context.switchToHttp().getRequest().cookies['access_token']);
+        if (decoded) {
+            const decodedRole = decoded.role;
+            if (!requiredRoles)
+                return true;
+            return requiredRoles.some((role) => decodedRole?.includes(role));
+        }
+        else
+            throw new common_1.UnauthorizedException(401, 'Unauthorized');
     }
 };
 exports.RolesGuard = RolesGuard;

@@ -28,15 +28,15 @@ __decorate([
     __metadata("design:type", String)
 ], CreateLocationDto.prototype, "address", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsNotEmpty)(),
     (0, swagger_1.ApiProperty)(),
-    __metadata("design:type", String)
-], CreateLocationDto.prototype, "coords", void 0);
+    __metadata("design:type", Number)
+], CreateLocationDto.prototype, "latitude", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsNotEmpty)(),
     (0, swagger_1.ApiProperty)(),
     __metadata("design:type", Number)
-], CreateLocationDto.prototype, "contractId", void 0);
+], CreateLocationDto.prototype, "longitude", void 0);
 //# sourceMappingURL=createLocation.dto.js.map

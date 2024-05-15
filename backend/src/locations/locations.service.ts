@@ -12,11 +12,21 @@ export class LocationsService {
     private readonly prisma: PrismaService,
     private readonly contractsService: ContractsService,
   ) {}
-  createLocation(location: CreateLocationDto) {
+  createLocation(location: CreateLocationDto, contractId: number) {
     return this.prisma.location.create({
       data: {
         ...location,
+        contractId,
       },
+    });
+  }
+  createMultipleLocations(locations: CreateLocationDto[], contractId: number) {
+    console.log(contractId);
+    return this.prisma.location.createMany({
+      data: locations.map((location) => ({
+        ...location,
+        contractId,
+      })),
     });
   }
   updateLocation(id: number, location: CreateLocationDto) {

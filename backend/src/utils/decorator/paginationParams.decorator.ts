@@ -16,6 +16,7 @@ export const PaginationParamsDecorator = createParamDecorator(
     const req: Request = ctx.switchToHttp().getRequest();
     const page = parseInt(req.query.page as string);
     const size = parseInt(req.query.size as string);
+
     if (req.query.page === undefined || req.query.size === undefined) {
       return { page: 0, limit: 100, size: 100, offset: 0 };
     }

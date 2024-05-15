@@ -14,15 +14,17 @@ datasource db {
 }
 
 model User {
-  id             String           @id @default(uuid())
-  email          String           @unique
-  role           Role             @default(CLIENT)
-  name           String?
-  password       String
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @default(now()) @updatedAt
-  TaskAssignment TaskAssignment[]
-  Contract       Contract[]
+  id                String           @id @default(uuid())
+  email             String           @unique
+  role              Role             @default(CLIENT)
+  name              String?
+  password          String
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @default(now()) @updatedAt
+  TaskAssignment    TaskAssignment[]
+  Contract          Contract[]
+  createdRequests   Request[]        @relation("RequestCreator")
+  addressedRequests Request[]        @relation("RequestReviewer")
 }
 
 model Tools {
@@ -44,8 +46,8 @@ model TaskTemplate {
   title            String
   necessaryWorkers Int            @default(1)
   necessaryTools   String[]
-  Task             TaskSchedule[]
-  Contract         Contract?      @relation(fields: [contractId], references: [id])
+  TaskSchedule     TaskSchedule[]
+  Contract         Contract?      @relation(fields: [contractId], references: [id], onDelete: Cascade)
   contractId       Int?
 }
 
@@ -55,19 +57,26 @@ model TaskSchedule {
   taskTemplateId Int
   description    String
   dayOfWeek      Int[]
-  frequency      Int
+  frequency      Int[]
   startDate      DateTime       @default(now())
   endDate        DateTime
   isActive       Boolean
+  status         Status         @default(PENDING)
+  hour           String
+  roomId         Int
+  room           Room           @relation(fields: [roomId], references: [id], onDelete: Cascade)
   TaskInstance   TaskInstance[]
 }
 
 model TaskInstance {
   id             Int              @id @default(autoincrement())
-  taskSchedule   TaskSchedule     @relation(fields: [taskScheduleId], references: [id], onDelete: Cascade)
-  taskScheduleId Int
-  status         Status           @default(UNASSIGNED)
+  taskSchedule   TaskSchedule?    @relation(fields: [taskScheduleId], references: [id], onDelete: Cascade)
+  taskScheduleId Int?
+  status         Status           @default(PENDING)
   date           DateTime
+  hour           String
+  room           Room             @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  roomId         Int
   TaskAssignment TaskAssignment[]
 }
 
@@ -95,6 +104,7 @@ model Contract {
   startDate     String?
   endDate       String?
   clientId      String?
+  pdfUrl        String?
   user          User?          @relation(fields: [clientId], references: [id], onDelete: Cascade)
   taskTemplates TaskTemplate[]
   locations     Location[]
@@ -104,24 +114,55 @@ model Location {
   id         Int       @id @default(autoincrement())
   name       String
   address    String
-  coords     String
+  latitude   Float
+  longitude  Float
   Room       Room[]
   contractId Int?
   Contract   Contract? @relation(fields: [contractId], references: [id], onDelete: Cascade)
 }
 
 model Room {
-  id         Int        @id @default(autoincrement())
-  name       String
-  location   Location   @relation(fields: [locationId], references: [id])
-  locationId Int
-  accessMode accessMode
+  id           Int            @id @default(autoincrement())
+  name         String
+  location     Location       @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  locationId   Int
+  accessMode   AccessMode
+  images       Image[]
+  TaskInstance TaskInstance[]
+  TaskSchedule TaskSchedule[]
 }
 
-enum accessMode {
+model Image {
+  id     Int    @id @default(autoincrement())
+  url    String
+  roomId Int
+  room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+}
+
+enum AccessMode {
   STAIRS
   ELEVATOR
   RAMP
+}
+
+enum RequestType {
+  TASK_SCHEDULE_CREATION
+  TASK_INSTANCE_REDO
+  TASK_INSTANCE_CREATION
+  TASK_INSTANCE_UPDATE
+}
+
+model Request {
+  id           Int         @id @default(autoincrement())
+  type         RequestType
+  status       Status      @default(PENDING)
+  details      Json
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @default(now()) @updatedAt
+  createdBy    User        @relation("RequestCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  assignedTo   User        @relation("RequestReviewer", fields: [assignedToId], references: [id], onDelete: Cascade)
+  assignedToId String
+  createdById  String
 }
 
 enum Status {
@@ -132,6 +173,7 @@ enum Status {
   INCOMPLETE
   REQUESTED_CANCEL
   VERIFIED
+  PENDING
 }
 
 enum Role {

@@ -8,7 +8,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { useCallback, useReducer } from 'react';
+import { useCallback, useEffect, useReducer } from 'react';
 import { Button } from '@/components/ui/button.tsx';
 import { Action, customPagSort, PaginationSortingState, QueryResponse } from '@/utils/types.ts';
 import { useQuery } from 'react-query';
@@ -31,6 +31,8 @@ interface QueryTableProps<TType, TValue> {
   pagCenter?: boolean;
   navigateTo?: string;
   navigateToState?: string;
+  onRowHover?: (rowNo: string) => void;
+  onRowExit?: (rowNo: string) => void;
 }
 function reducer(state: PaginationSortingState, action: Action): PaginationSortingState {
   switch (action.type) {
@@ -69,10 +71,20 @@ function QueryTable<TType extends { id: string | number }, TValue>({
   pagCenter = false,
   navigateTo,
   navigateToState,
+  onRowHover,
+  onRowExit,
 }: QueryTableProps<TType, TValue>) {
   const [pagSort, dispatch] = useReducer(reducer, customPagSort(maxResults, defaultSort));
 
-  const { data, isLoading } = useQuery<QueryResponse<TType>, Error>([queryKey, pagSort], () => queryFn(pagSort));
+  const { data, isLoading } = useQuery<QueryResponse<TType>, Error>(
+    [queryKey, pagSort],
+    () => {
+      return queryFn(pagSort);
+    },
+    {
+      onSuccess: (data) => console.log(data),
+    },
+  );
 
   const sortAppliedColumns = columns.map((column) => {
     return {
@@ -171,6 +183,8 @@ function QueryTable<TType extends { id: string | number }, TValue>({
                         navigateToState ? { state: row.original[navigateToState as keyof typeof row.original] } : {},
                       )
                     }
+                    onMouseOver={() => (onRowHover ? onRowHover(row.id) : null)}
+                    onMouseLeave={() => (onRowExit ? onRowExit(row.id) : null)}
                     data-state={row.getIsSelected() && 'selected'}
                   >
                     {row.getVisibleCells().map((cell) => (

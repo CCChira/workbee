@@ -16,6 +16,18 @@ let ContractsService = class ContractsService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    createContract(createContractDto, clientId) {
+        console.log(createContractDto);
+        return this.prisma.contract.create({
+            data: {
+                clientId: clientId,
+                title: createContractDto.title,
+                description: createContractDto.description,
+                endDate: createContractDto.endDate,
+                startDate: createContractDto.startDate,
+            },
+        });
+    }
     async getAllContracts({ page, limit, offset, size }, sort, search) {
         const response = await this.prisma.contract.findMany({
             skip: offset,

@@ -71,16 +71,6 @@ export class UsersService {
           : {},
     });
 
-    console.log(
-      search.field && search.searchParam
-        ? {
-            [search.field]: {
-              contains: search.searchParam,
-              mode: 'insensitive',
-            },
-          }
-        : {},
-    );
     return {
       data: response,
       dataSize: response.length,

@@ -26,7 +26,9 @@ import {
   SearchDecorator,
 } from '../utils/decorator/SearchDecorator.decorator';
 import { CreateLocationDto } from './dto/createLocation.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Locations')
 @Controller('locations')
 export class LocationsController {
   constructor(private readonly locationsService: LocationsService) {}
@@ -34,7 +36,6 @@ export class LocationsController {
   @HttpCode(HttpStatus.OK)
   @AuthDecorators([Role.ADMIN, Role.CLIENT])
   public async getLocation(@Param() { id }: { id: number }) {
-    console.log(id);
     return this.locationsService.findLocation(id);
   }
 
@@ -46,7 +47,7 @@ export class LocationsController {
     @Query('clientId') clientId: string,
     @Query('contractId') contractId: string,
     @PaginationParamsDecorator() paginationParams: Pagination,
-    @SortingParamsDecorator(['name'])
+    @SortingParamsDecorator(['name', 'id'])
     sortingParams: Sorting,
     @SearchDecorator('email') searchParams: ISearch,
   ) {
@@ -62,8 +63,23 @@ export class LocationsController {
   @Post()
   @HttpCode(HttpStatus.OK)
   @AuthDecorators([Role.ADMIN, Role.CLIENT])
-  public async createLocation(@Body() locationDto: CreateLocationDto) {
-    return this.locationsService.createLocation(locationDto);
+  public async createLocation(
+    @Body() locationDto: CreateLocationDto,
+    @Query() contractId: number,
+  ) {
+    return this.locationsService.createLocation(locationDto, contractId);
+  }
+  @Post('/multiple')
+  @HttpCode(HttpStatus.OK)
+  @AuthDecorators([Role.ADMIN, Role.CLIENT])
+  public async createMultipleLocations(
+    @Body() locations: CreateLocationDto[],
+    @Query('contractId') contractId: string,
+  ) {
+    return this.locationsService.createMultipleLocations(
+      locations,
+      parseInt(contractId),
+    );
   }
 
   @Patch(':id')

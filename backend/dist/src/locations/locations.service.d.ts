@@ -8,25 +8,29 @@ export declare class LocationsService {
     private readonly prisma;
     private readonly contractsService;
     constructor(prisma: PrismaService, contractsService: ContractsService);
-    createLocation(location: CreateLocationDto): import(".prisma/client").Prisma.Prisma__LocationClient<{
+    createLocation(location: CreateLocationDto, contractId: number): import(".prisma/client").Prisma.Prisma__LocationClient<{
         id: number;
         name: string;
         address: string;
-        coords: string;
+        latitude: number;
+        longitude: number;
         contractId: number;
     }, never, import("@prisma/client/runtime/library").DefaultArgs>;
+    createMultipleLocations(locations: CreateLocationDto[], contractId: number): import(".prisma/client").Prisma.PrismaPromise<import(".prisma/client").Prisma.BatchPayload>;
     updateLocation(id: number, location: CreateLocationDto): import(".prisma/client").Prisma.Prisma__LocationClient<{
         id: number;
         name: string;
         address: string;
-        coords: string;
+        latitude: number;
+        longitude: number;
         contractId: number;
     }, never, import("@prisma/client/runtime/library").DefaultArgs>;
     findLocation(id: number): import(".prisma/client").Prisma.Prisma__LocationClient<{
         id: number;
         name: string;
         address: string;
-        coords: string;
+        latitude: number;
+        longitude: number;
         contractId: number;
     }, null, import("@prisma/client/runtime/library").DefaultArgs>;
     findLocations(clientId?: string, contractId?: string, paginationParams?: Pagination, sortingParams?: Sorting, searchParams?: ISearch): Promise<{
@@ -34,7 +38,8 @@ export declare class LocationsService {
             id: number;
             name: string;
             address: string;
-            coords: string;
+            latitude: number;
+            longitude: number;
             contractId: number;
         }[];
         dataSize: number;

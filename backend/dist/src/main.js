@@ -12,10 +12,10 @@ async function bootstrap() {
         .setVersion('1.0')
         .addBearerAuth()
         .build();
-    const document = swagger_1.SwaggerModule.createDocument(app, config);
-    swagger_1.SwaggerModule.setup('api-docs', app, document);
     app.use(cookieParser());
     app.setGlobalPrefix('api');
+    const document = swagger_1.SwaggerModule.createDocument(app, config);
+    swagger_1.SwaggerModule.setup('api-docs', app, document);
     await app.listen(3001);
 }
 bootstrap();

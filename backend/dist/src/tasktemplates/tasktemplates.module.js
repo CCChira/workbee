@@ -6,17 +6,19 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TasktemplatesModule = void 0;
+exports.TaskTemplatesModule = void 0;
 const common_1 = require("@nestjs/common");
 const tasktemplates_controller_1 = require("./tasktemplates.controller");
 const tasktemplates_service_1 = require("./tasktemplates.service");
-let TasktemplatesModule = class TasktemplatesModule {
+const prisma_service_1 = require("../prisma/prisma.service");
+const jwt_1 = require("@nestjs/jwt");
+let TaskTemplatesModule = class TaskTemplatesModule {
 };
-exports.TasktemplatesModule = TasktemplatesModule;
-exports.TasktemplatesModule = TasktemplatesModule = __decorate([
+exports.TaskTemplatesModule = TaskTemplatesModule;
+exports.TaskTemplatesModule = TaskTemplatesModule = __decorate([
     (0, common_1.Module)({
-        controllers: [tasktemplates_controller_1.TasktemplatesController],
-        providers: [tasktemplates_service_1.TasktemplatesService]
+        controllers: [tasktemplates_controller_1.TaskTemplatesController],
+        providers: [tasktemplates_service_1.TaskTemplatesService, prisma_service_1.PrismaService, jwt_1.JwtService],
     })
-], TasktemplatesModule);
+], TaskTemplatesModule);
 //# sourceMappingURL=tasktemplates.module.js.map

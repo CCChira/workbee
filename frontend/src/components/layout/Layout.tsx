@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import Navbar from '@/components/layout/Navbar.tsx';
 import { useUserStore } from '@/store/user.ts';
+import { Toaster } from '@/components/ui/toaster.tsx';
 
 interface LayoutProps {
   children: ReactNode;
@@ -15,6 +16,7 @@ function Layout({ children }: LayoutProps) {
         </aside>
       )}
       <main className={`${user.loggedIn ? 'ml-16' : ''} p-8 min-h-screen`}>{children}</main>
+      <Toaster />
     </div>
   );
 }

@@ -1,7 +1,9 @@
+import CreateTaskSchedule from '@/components/forms/CreateTaskSchedule.tsx';
+
 interface LocationsProps {}
 
 function Locations({}: LocationsProps) {
-  return <div>kjdfvbnjvunsdk</div>;
+  return <CreateTaskSchedule />;
 }
 
 export default Locations;

@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TasktemplatesController } from './tasktemplates.controller';
-import { TasktemplatesService } from './tasktemplates.service';
+import { TaskTemplatesController } from './tasktemplates.controller';
+import { TaskTemplatesService } from './tasktemplates.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
-  controllers: [TasktemplatesController],
-  providers: [TasktemplatesService]
+  controllers: [TaskTemplatesController],
+  providers: [TaskTemplatesService, PrismaService, JwtService],
 })
-export class TasktemplatesModule {}
+export class TaskTemplatesModule {}

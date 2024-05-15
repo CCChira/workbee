@@ -10,11 +10,12 @@ import {
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthEntity } from './entity/auth.entity';
 import { LoginDto } from './dto/login.dto';
 import { Request, Response } from 'express';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -28,8 +29,10 @@ export class AuthController {
     try {
       const authEntity = await this.authService.login(email, password);
       res
-        .cookie('access_token', authEntity.accessToken)
-        .cookie('refresh_token', authEntity.refreshToken)
+        .cookie('access_token', authEntity.accessToken, { maxAge: 1800000 })
+        .cookie('refresh_token', authEntity.refreshToken, {
+          maxAge: 7 * 24 * 3600000,
+        })
         .send(authEntity);
     } catch (e) {
       switch (e.status) {

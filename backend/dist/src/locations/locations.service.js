@@ -18,11 +18,21 @@ let LocationsService = class LocationsService {
         this.prisma = prisma;
         this.contractsService = contractsService;
     }
-    createLocation(location) {
+    createLocation(location, contractId) {
         return this.prisma.location.create({
             data: {
                 ...location,
+                contractId,
             },
+        });
+    }
+    createMultipleLocations(locations, contractId) {
+        console.log(contractId);
+        return this.prisma.location.createMany({
+            data: locations.map((location) => ({
+                ...location,
+                contractId,
+            })),
         });
     }
     updateLocation(id, location) {

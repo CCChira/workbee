@@ -18,7 +18,7 @@ import {
   Sorting,
   SortingParamsDecorator,
 } from '../utils/decorator/sortingParams.decorator';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthDecorators } from '../utils/decorator/AuthDecorators.decorator';
 import { Role } from '@prisma/client';
 import { PagSortApiQuery } from '../utils/decorator/PagSortApiQuery.decorator';
@@ -32,6 +32,7 @@ import { DeleteMultipleUsersDto } from './dto/deleteMultipleUsers.dto';
 import { DummyProvider } from '../providers/SMSProvider/dummyProvider.service';
 
 @ApiBearerAuth()
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
@@ -62,7 +63,6 @@ export class UsersController {
   @PagSortApiQuery()
   @AuthDecorators([Role.ADMIN])
   public async getUser(@Param() { id }: { id: string }) {
-    console.log(id);
     return this.usersService.findUser(id);
   }
 

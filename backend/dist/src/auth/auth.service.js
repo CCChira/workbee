@@ -21,6 +21,7 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
     }
     async createAccessToken(userId, role) {
+        console.log(await this.jwtService.sign({ id: userId, role }, { expiresIn: '1h' }));
         return this.jwtService.sign({ id: userId, role }, { expiresIn: '1h' });
     }
     async createRefreshToken(userId, role) {

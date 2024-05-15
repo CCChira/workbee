@@ -12,7 +12,8 @@ export declare class LocationsController {
         id: number;
         name: string;
         address: string;
-        coords: string;
+        latitude: number;
+        longitude: number;
         contractId: number;
     }>;
     getLocations(clientId: string, contractId: string, paginationParams: Pagination, sortingParams: Sorting, searchParams: ISearch): Promise<{
@@ -20,25 +21,29 @@ export declare class LocationsController {
             id: number;
             name: string;
             address: string;
-            coords: string;
+            latitude: number;
+            longitude: number;
             contractId: number;
         }[];
         dataSize: number;
         page: number;
         size: number;
     }>;
-    createLocation(locationDto: CreateLocationDto): Promise<{
+    createLocation(locationDto: CreateLocationDto, contractId: number): Promise<{
         id: number;
         name: string;
         address: string;
-        coords: string;
+        latitude: number;
+        longitude: number;
         contractId: number;
     }>;
+    createMultipleLocations(locations: CreateLocationDto[], contractId: string): Promise<import(".prisma/client").Prisma.BatchPayload>;
     updateLocation(id: number, locationDto: CreateLocationDto): Promise<{
         id: number;
         name: string;
         address: string;
-        coords: string;
+        latitude: number;
+        longitude: number;
         contractId: number;
     }>;
 }

@@ -26,7 +26,6 @@ export const SortingParamsDecorator = createParamDecorator(
 
     // extract the property name and direction and check if they are valid
     const [property, direction] = sort.split(':');
-    console.log(validParams);
     if (!validParams.includes(property)) {
       throw new BadRequestException(`Invalid sort property: ${property}`);
     }

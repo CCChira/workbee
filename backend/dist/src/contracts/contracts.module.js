@@ -12,12 +12,13 @@ const contracts_service_1 = require("./contracts.service");
 const contracts_controller_1 = require("./contracts.controller");
 const prisma_service_1 = require("../prisma/prisma.service");
 const jwt_1 = require("@nestjs/jwt");
+const aws_s3_service_1 = require("../services/aws-s3.service");
 let ContractsModule = class ContractsModule {
 };
 exports.ContractsModule = ContractsModule;
 exports.ContractsModule = ContractsModule = __decorate([
     (0, common_1.Module)({
-        providers: [contracts_service_1.ContractsService, prisma_service_1.PrismaService, jwt_1.JwtService],
+        providers: [contracts_service_1.ContractsService, prisma_service_1.PrismaService, jwt_1.JwtService, aws_s3_service_1.AwsS3Service],
         controllers: [contracts_controller_1.ContractsController],
     })
 ], ContractsModule);

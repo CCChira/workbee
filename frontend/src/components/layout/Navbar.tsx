@@ -6,6 +6,10 @@ import { Link } from 'react-router-dom';
 import { Tooltip, TooltipProvider } from '@radix-ui/react-tooltip';
 import { TooltipContent, TooltipTrigger } from '@/components/ui/tooltip.tsx';
 import { useSideBarStore } from '@/store/sidebar.ts';
+import ClientRequests from '@/components/ClientRequests.tsx';
+import { useFetchRequests } from '@/queries/requests.ts';
+import { Button } from '@/components/ui/button.tsx';
+import { MailQuestion } from 'lucide-react';
 interface NavbarProps {}
 
 function Navbar({}: NavbarProps) {
@@ -14,6 +18,8 @@ function Navbar({}: NavbarProps) {
     console.log(sidebar);
     sidebar.changeIcon(alias);
   };
+  const requestsData = useFetchRequests(1, 100);
+  console.log(requestsData);
   return (
     <nav className="flex flex-col justify-between items-center gap-4 px-2 sm:py-5 h-full">
       <div className="flex flex-col gap-4 items-center">
@@ -41,7 +47,14 @@ function Navbar({}: NavbarProps) {
             ),
         )}
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center flex-col gap-4">
+        {!requestsData.isLoading && requestsData.data?.data ? (
+          <ClientRequests requests={requestsData.data.data} />
+        ) : (
+          <Button variant="outline" size="icon">
+            <MailQuestion />
+          </Button>
+        )}
         <ModeToggle />
       </div>
     </nav>

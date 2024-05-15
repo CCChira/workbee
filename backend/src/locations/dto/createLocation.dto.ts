@@ -12,13 +12,13 @@ export class CreateLocationDto {
   @ApiProperty()
   address: string;
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
   @ApiProperty()
-  coords: string;
+  latitude: number;
 
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty()
-  contractId: number;
+  longitude: number;
 }

@@ -26,8 +26,10 @@ let AuthController = class AuthController {
         try {
             const authEntity = await this.authService.login(email, password);
             res
-                .cookie('access_token', authEntity.accessToken)
-                .cookie('refresh_token', authEntity.refreshToken)
+                .cookie('access_token', authEntity.accessToken, { maxAge: 1800000 })
+                .cookie('refresh_token', authEntity.refreshToken, {
+                maxAge: 7 * 24 * 3600000,
+            })
                 .send(authEntity);
         }
         catch (e) {
@@ -82,6 +84,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "test", null);
 exports.AuthController = AuthController = __decorate([
+    (0, swagger_1.ApiTags)('Auth'),
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);

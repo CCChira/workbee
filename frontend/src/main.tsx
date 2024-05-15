@@ -7,12 +7,27 @@ import { ThemeProvider } from '@/components/theme-provider.tsx';
 import Layout from '@/components/layout/Layout.tsx';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
+import { useUserStore } from '@/store/user.ts';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      onError: (error) => {
+        const { logoutUser } = useUserStore.getState();
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        if (error?.message === '401') {
+          logoutUser();
+        }
+      },
+    },
+  },
+});
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ReactQueryDevtools initialIsOpen={false} />
+      <ReactQueryDevtools initialIsOpen={false} position={'bottom-right'} />
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <BrowserRouter>
           <Layout>

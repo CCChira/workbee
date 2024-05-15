@@ -36,7 +36,6 @@ let UsersController = UsersController_1 = class UsersController {
         return this.usersService.findAllUsers(paginationParams, sortingParams, searchParams);
     }
     async getUser({ id }) {
-        console.log(id);
         return this.usersService.findUser(id);
     }
     async deleteUser(userId) {
@@ -101,6 +100,7 @@ __decorate([
 ], UsersController.prototype, "patchUsers", null);
 exports.UsersController = UsersController = UsersController_1 = __decorate([
     (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiTags)('Users'),
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [users_service_1.UsersService,
         dummyProvider_service_1.DummyProvider])

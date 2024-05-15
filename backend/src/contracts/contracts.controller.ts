@@ -1,4 +1,14 @@
-import { Controller, Get, HttpCode, HttpStatus, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { PagSortApiQuery } from '../utils/decorator/PagSortApiQuery.decorator';
 import {
   ISearch,
@@ -16,6 +26,10 @@ import {
   SortingParamsDecorator,
 } from '../utils/decorator/sortingParams.decorator';
 import { ContractsService } from './contracts.service';
+import { CreateContractDto } from './dto/createContract.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { AwsS3Service } from '../services/aws-s3.service';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 
 const contract: Contract = {
   id: 0,
@@ -24,11 +38,16 @@ const contract: Contract = {
   endDate: '',
   description: '',
   clientId: '',
+  pdfUrl: '',
 };
 
+@ApiTags('Contracts')
 @Controller('contracts')
 export class ContractsController {
-  constructor(private readonly contractsService: ContractsService) {}
+  constructor(
+    private readonly contractsService: ContractsService,
+    private readonly awsS3Service: AwsS3Service,
+  ) {}
   @Get()
   @HttpCode(HttpStatus.OK)
   @PagSortApiQuery()
@@ -64,5 +83,51 @@ export class ContractsController {
       sortingParams,
       searchParam,
     );
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(FileInterceptor('pdf'))
+  @ApiConsumes('multipart/form-data') // Indicates the endpoint accepts form-data
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        pdf: {
+          type: 'string',
+          format: 'binary',
+        },
+        title: {
+          type: 'string',
+        },
+        description: {
+          type: 'string',
+        },
+        startDate: {
+          type: 'string',
+        },
+        endDate: {
+          type: 'string',
+        },
+      },
+    },
+  })
+  @AuthDecorators([Role.ADMIN, Role.CLIENT])
+  public async createContract(
+    @Body() createContractDto: CreateContractDto,
+    @UploadedFile() pdf: Express.Multer.File,
+    @Query('clientId') clientId: string,
+  ) {
+    const bucketName = 'workbee-files';
+    const fileKey = `contracts/${Date.now()}-${'test'}`;
+    let pdfUrl = '';
+    if (pdf)
+      pdfUrl = await this.awsS3Service.uploadFile(
+        bucketName,
+        fileKey,
+        pdf.buffer,
+      );
+    createContractDto.pdfUrl = pdfUrl ? pdfUrl : '';
+    return this.contractsService.createContract(createContractDto, clientId);
   }
 }

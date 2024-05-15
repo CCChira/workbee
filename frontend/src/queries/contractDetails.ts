@@ -27,13 +27,13 @@ export async function getClientContract(pagSort: PaginationSortingState, clientI
   }
   return response.json();
 }
-export async function getContractLocations(pagSort: PaginationSortingState, contractId: string) {
+export async function getContractLocations(contractId: string, pagSort?: PaginationSortingState) {
   const paginationFetchURL = addPagSortParams(
-    pagSort.page,
-    pagSort.size,
-    `${pagSort.sortOrder.property}:${pagSort.sortOrder.direction}`,
-    pagSort.search?.field ?? '',
-    pagSort.search?.searchParam ?? '',
+    pagSort?.page ?? 1,
+    pagSort?.size ?? 10,
+    `${pagSort?.sortOrder.property ?? 'id'}:${pagSort?.sortOrder.direction ?? 'asc'}`,
+    pagSort?.search?.field ?? '',
+    pagSort?.search?.searchParam ?? '',
     `${import.meta.env.VITE_API_URL}/locations`,
   );
   const fetchURL = `${paginationFetchURL}&contractId=${contractId}`;
@@ -45,7 +45,6 @@ export async function getContractLocations(pagSort: PaginationSortingState, cont
     credentials: 'same-origin',
     method: 'GET',
   });
-  console.log('response');
   if (!response.ok) {
     const errorBody = await response.json(); // Assuming the server returns JSON with error details
 

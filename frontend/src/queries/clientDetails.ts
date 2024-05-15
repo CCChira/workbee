@@ -1,5 +1,16 @@
 import { PaginationSortingState, Roles } from '@/utils/types.ts';
 import addPagSortParams from '@/queries/addPagSortParams.ts';
+// src/queries/clientDetails.ts (or an appropriate file for data models)
+export interface TaskTemplate {
+  id: number;
+  title: string;
+  necessaryWorkers: number;
+  necessaryTools: string[];
+  contractId?: number; // The template may be linked to a contract or not
+  _count: {
+    TaskSchedule: number;
+  };
+}
 
 export interface ClientData {
   name: string;
@@ -27,7 +38,8 @@ export interface LocationData {
   id: number;
   name: string;
   address: string;
-  coords: string;
+  latitude: number;
+  longitude: number;
   contractId: number;
 }
 export async function getClientDetails(id: string) {
@@ -64,7 +76,6 @@ export async function getClientContract(pagSort: PaginationSortingState, clientI
     credentials: 'same-origin',
     method: 'GET',
   });
-  console.log('response');
   if (!response.ok) {
     const errorBody = await response.json(); // Assuming the server returns JSON with error details
 
@@ -90,7 +101,6 @@ export async function getClientLocations(pagSort: PaginationSortingState, client
     credentials: 'same-origin',
     method: 'GET',
   });
-  console.log('response');
   if (!response.ok) {
     const errorBody = await response.json(); // Assuming the server returns JSON with error details
 

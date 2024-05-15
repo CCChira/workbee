@@ -1,6 +1,6 @@
 import App from '@/App.tsx';
 import { ReactNode } from 'react';
-import { HomeIcon, ContactRound, MapPin } from 'lucide-react';
+import { HomeIcon, ContactRound, MapPin, PackageOpenIcon } from 'lucide-react';
 import Login from '@/components/pages/Login.tsx';
 import ProtectedRoute from '@/router/ProtectedRoute.tsx';
 import Clients from '@/components/pages/Clients.tsx';
@@ -8,6 +8,8 @@ import ClientDetails from '@/components/pages/ClientDetails.tsx';
 import Locations from '@/components/pages/Locations.tsx';
 import LocationDetails from '@/components/pages/LocationDetails.tsx';
 import ContractDetails from '@/components/pages/ContractDetails.tsx';
+import Tasks from '@/components/pages/Tasks.tsx';
+import TasksDetails from '@/components/pages/TasksDetails.tsx';
 interface CustomRouteObject {
   path: string;
   alias: string;
@@ -85,6 +87,28 @@ const routes: CustomRouteObject[] = [
         <ContractDetails />
       </ProtectedRoute>
     ),
+  },
+  {
+    path: '/tasks/:clientId',
+    alias: 'Tasks Overview',
+    element: (
+      <ProtectedRoute>
+        <Tasks />
+      </ProtectedRoute>
+    ),
+    icon: <PackageOpenIcon />,
+  },
+  {
+    path: 'contracts/tasks/:clientId/:contractId',
+    alias: 'Tasks Contract Details',
+    element: (
+      <ProtectedRoute>
+        <TasksDetails />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/',
   },
 ];
 export const paths = routes.map((route) => route.path);

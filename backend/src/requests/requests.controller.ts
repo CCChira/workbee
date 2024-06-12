@@ -72,7 +72,7 @@ export class RequestsController {
 
     throw new Error('Request cannot be approved');
   }
-  @Patch(':id/taskinstance/deny')
+  @Patch(':id/deny')
   @HttpCode(HttpStatus.OK)
   @AuthDecorators([Role.ADMIN])
   async denyTaskInstanceRequest(@Param('id') requestId: string) {

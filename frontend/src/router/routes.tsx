@@ -1,6 +1,6 @@
 import App from '@/App.tsx';
 import { ReactNode } from 'react';
-import { HomeIcon, ContactRound, MapPin, PackageOpenIcon } from 'lucide-react';
+import { ContactRound, HardHatIcon, HomeIcon, MapPin, PackageOpenIcon } from 'lucide-react';
 import Login from '@/components/pages/Login.tsx';
 import ProtectedRoute from '@/router/ProtectedRoute.tsx';
 import Clients from '@/components/pages/Clients.tsx';
@@ -8,8 +8,12 @@ import ClientDetails from '@/components/pages/ClientDetails.tsx';
 import Locations from '@/components/pages/Locations.tsx';
 import LocationDetails from '@/components/pages/LocationDetails.tsx';
 import ContractDetails from '@/components/pages/ContractDetails.tsx';
-import Tasks from '@/components/pages/Tasks.tsx';
-import TasksDetails from '@/components/pages/TasksDetails.tsx';
+import Tasks from '@/components/pages/Tasks/Tasks.tsx';
+import TasksDetails from '@/components/pages/Tasks/TasksDetails.tsx';
+import { Roles } from '@/utils/types.ts';
+import Employees from '@/components/pages/Employees.tsx';
+import EmployeeDetails from '@/components/pages/EmployeeDetails.tsx';
+
 interface CustomRouteObject {
   path: string;
   alias: string;
@@ -21,7 +25,7 @@ const routes: CustomRouteObject[] = [
     path: '/',
     alias: 'Home',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={[Roles.ADMIN]}>
         <App />
       </ProtectedRoute>
     ),
@@ -36,17 +40,36 @@ const routes: CustomRouteObject[] = [
     path: '/clients',
     alias: 'All Clients',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={[Roles.ADMIN]}>
         <Clients />
       </ProtectedRoute>
     ),
     icon: <ContactRound />,
   },
   {
+    path: 'employees',
+    alias: 'Employees',
+    element: (
+      <ProtectedRoute roles={[Roles.ADMIN]}>
+        <Employees />
+      </ProtectedRoute>
+    ),
+    icon: <HardHatIcon />,
+  },
+  {
+    path: 'employees/:employeeId',
+    alias: 'Employees Tasks',
+    element: (
+      <ProtectedRoute roles={[Roles.ADMIN]}>
+        <EmployeeDetails />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: '/clients/:clientId',
     alias: 'All Clients',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={[Roles.ADMIN]}>
         <ClientDetails />
       </ProtectedRoute>
     ),
@@ -55,7 +78,7 @@ const routes: CustomRouteObject[] = [
     path: '/locations',
     alias: 'Locations',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={[Roles.ADMIN, Roles.CLIENT]}>
         <Locations />
       </ProtectedRoute>
     ),
@@ -65,7 +88,7 @@ const routes: CustomRouteObject[] = [
     path: '/locations/:locationId',
     alias: 'Locations',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={[Roles.ADMIN, Roles.CLIENT]}>
         <LocationDetails />
       </ProtectedRoute>
     ),
@@ -74,7 +97,7 @@ const routes: CustomRouteObject[] = [
     path: '/contracts/:contractId',
     alias: 'Contracts',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={[Roles.ADMIN, Roles.CLIENT]}>
         <ContractDetails />
       </ProtectedRoute>
     ),
@@ -83,7 +106,7 @@ const routes: CustomRouteObject[] = [
     path: '/clients/:userId/:contractId/',
     alias: 'Clients',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={[Roles.ADMIN]}>
         <ContractDetails />
       </ProtectedRoute>
     ),
@@ -92,23 +115,20 @@ const routes: CustomRouteObject[] = [
     path: '/tasks/:clientId',
     alias: 'Tasks Overview',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={[Roles.ADMIN, Roles.CLIENT]}>
         <Tasks />
       </ProtectedRoute>
     ),
     icon: <PackageOpenIcon />,
   },
   {
-    path: 'contracts/tasks/:clientId/:contractId',
+    path: 'tasks/:clientId/:contractId',
     alias: 'Tasks Contract Details',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute roles={[Roles.ADMIN, Roles.CLIENT]}>
         <TasksDetails />
       </ProtectedRoute>
     ),
-  },
-  {
-    path: '/',
   },
 ];
 export const paths = routes.map((route) => route.path);

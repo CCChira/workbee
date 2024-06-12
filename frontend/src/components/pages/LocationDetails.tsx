@@ -2,15 +2,8 @@ import { useLocation } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import Map, { Marker } from 'react-map-gl';
 interface LocationDetailsProps {}
-const mapBoxAccessToken = 'pk.eyJ1Ijoic2t5MTMzNyIsImEiOiJjbHZtZXVrbXEwMXJ1MnFsOWZlM3VvZGw3In0.U_n4PkUbZjGV7gor_49rUA';
-function LocationDetails({}: LocationDetailsProps) {
-  const { state } = useLocation();
-  const tempCoords = state.split(', ');
-  const coordinates = {
-    lat: parseFloat(tempCoords[0]),
-    lng: parseFloat(tempCoords[1]),
-  };
 
+function LocationDetails({}: LocationDetailsProps) {
   return (
     <Map
       mapboxAccessToken={mapBoxAccessToken}

@@ -12,6 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TaskinstanceService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const date_fns_1 = require("date-fns");
+const client_1 = require("@prisma/client");
 let TaskinstanceService = class TaskinstanceService {
     constructor(prismaService) {
         this.prismaService = prismaService;
@@ -58,7 +60,7 @@ let TaskinstanceService = class TaskinstanceService {
         });
     }
     async getTasksAssignedToUser(userId) {
-        return this.prismaService.taskInstance.findMany({
+        const response = await this.prismaService.taskInstance.findMany({
             where: {
                 TaskAssignment: {
                     some: {
@@ -68,10 +70,24 @@ let TaskinstanceService = class TaskinstanceService {
             },
             include: {
                 TaskAssignment: true,
-                room: true,
+                room: {
+                    select: {
+                        id: true,
+                        name: true,
+                        location: {
+                            select: {
+                                latitude: true,
+                                longitude: true,
+                            },
+                        },
+                    },
+                },
                 taskSchedule: true,
             },
         });
+        return {
+            data: response,
+        };
     }
     async getTasksAssignedToUserWithinInterval(userId, startDate, endDate) {
         return this.prismaService.taskInstance.findMany({
@@ -88,6 +104,34 @@ let TaskinstanceService = class TaskinstanceService {
                         date: {
                             gte: new Date(startDate),
                             lte: new Date(endDate),
+                        },
+                    },
+                ],
+            },
+            include: {
+                TaskAssignment: true,
+                room: true,
+                taskSchedule: true,
+            },
+        });
+    }
+    async getTasksAssignedToUserThisWeek(userId) {
+        const startOfThisWeek = (0, date_fns_1.startOfWeek)(new Date(), { weekStartsOn: 1 });
+        const endOfThisWeek = (0, date_fns_1.endOfWeek)(new Date(), { weekStartsOn: 1 });
+        return this.prismaService.taskInstance.findMany({
+            where: {
+                AND: [
+                    {
+                        TaskAssignment: {
+                            some: {
+                                userId: userId,
+                            },
+                        },
+                    },
+                    {
+                        date: {
+                            gte: startOfThisWeek,
+                            lte: endOfThisWeek,
                         },
                     },
                 ],
@@ -125,10 +169,36 @@ let TaskinstanceService = class TaskinstanceService {
         };
     }
     async assignUserToTaskInstance(instanceId, userId) {
+        await this.prismaService.taskInstance.update({
+            where: { id: instanceId },
+            data: {
+                status: client_1.Status.PENDING,
+            },
+        });
         return this.prismaService.taskAssignment.create({
             data: {
                 taskId: instanceId,
                 userId: userId,
+            },
+        });
+    }
+    async getStatusCounts() {
+        const today = new Date();
+        const currentWeekStart = (0, date_fns_1.startOfWeek)(today, { weekStartsOn: 1 });
+        const currentWeekEnd = (0, date_fns_1.endOfWeek)(today, { weekStartsOn: 1 });
+        return this.prismaService.taskInstance.groupBy({
+            by: ['status'],
+            _count: {
+                status: true,
+            },
+            where: {
+                status: {
+                    in: ['IN_PROGRESS', 'COMPLETED', 'INCOMPLETE'],
+                },
+                date: {
+                    gte: currentWeekStart,
+                    lte: currentWeekEnd,
+                },
             },
         });
     }

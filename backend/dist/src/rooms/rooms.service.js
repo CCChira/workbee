@@ -83,6 +83,15 @@ let RoomsService = class RoomsService {
             include: { images: true },
         });
     }
+    async getAllRoomsFromContract(locationId) {
+        return {
+            data: await this.prisma.room.findMany({
+                where: {
+                    locationId: locationId,
+                },
+            }),
+        };
+    }
 };
 exports.RoomsService = RoomsService;
 exports.RoomsService = RoomsService = __decorate([

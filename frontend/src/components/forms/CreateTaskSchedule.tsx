@@ -19,6 +19,13 @@ import { Input } from '@/components/ui/input.tsx';
 import { Checkbox } from '@/components/ui/checkbox.tsx';
 import { Button } from '../ui/button';
 import { toast } from '@/components/ui/use-toast.ts';
+import { useGetTaskTemplates } from '@/queries/taskTemplatesDetails.ts';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.tsx';
+import { useCallback, useEffect, useState } from 'react';
+import { data } from 'autoprefixer';
+import { getRoomByLocationId, useGetLocationsByContract, useGetRoomsByLocation } from '@/queries/locationDetails.ts';
+import { useQuery } from 'react-query';
+import { debounce } from 'lodash';
 
 // Define the Zod schema based on the TaskSchedule interface
 // Type for the form based on the schema
@@ -40,7 +47,29 @@ const weeksOfMonth = [
 ];
 
 export const CreateTaskScheduleForm = () => {
-  const form = useForm({
+  const [selectedTaskTemplate, setSelectedTaskTemplate] = useState('');
+  const [locationId, setLocationId] = useState<string>('');
+  const [selectedRoom, setSelectedRoom] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const { mutate } = useCreateTaskSchedule();
+  const { data: locations, isLoading: isLocationsLoading } = useGetLocationsByContract('105');
+  const {
+    data: rooms,
+    isLoading: isRoomsLoading,
+    refetch: refetchRooms,
+  } = useQuery('roomz', () => getRoomByLocationId(locationId), {
+    enabled: !!locationId,
+    cacheTime: 0,
+  });
+  const { data: taskTemplates, isLoading: isTaskTemplatesLoading } = useGetTaskTemplates(
+    {
+      page: 1,
+      size: 100,
+      sortOrder: { property: 'title', direction: 'asc' },
+    },
+    '105',
+  );
+  const form = useForm<TaskSchedule>({
     defaultValues: {
       taskTemplateId: 0,
       description: '',
@@ -51,34 +80,139 @@ export const CreateTaskScheduleForm = () => {
       userId: '',
       startDate: '',
       endDate: '',
+      locationId: 0,
+      hour: '12:00PM',
     },
   });
-  const onSubmit = async (data) => {
+
+  const onSubmit = async (data: TaskSchedule) => {
     try {
-      // Assume a function to send data
-      console.log('Submitting:', data);
+      await mutate(data);
       toast({ title: 'Task Schedule created successfully!' });
     } catch (error) {
       toast({ title: 'Error creating task schedule', description: error.message });
     }
   };
 
+  const onChange = useCallback(
+    debounce((value: string) => {
+      const location = locations.find((location) => location.id === parseInt(value));
+      setSelectedLocation(location.name);
+      setLocationId(value);
+    }),
+    [locations],
+  );
+  const onRoomChange = useCallback(
+    debounce((value: string) => {
+      if (rooms) {
+        const room = rooms.data.find((room) => room.id === parseInt(value));
+        setSelectedRoom(room.name);
+      }
+    }),
+    [rooms],
+  );
+  const onTaskTemplateChange = useCallback(
+    debounce((value: string) => {
+      if (rooms) {
+        const taskTempalte = taskTemplates.data.find((room) => room.id === parseInt(value));
+        setSelectedTaskTemplate(taskTempalte.title);
+      }
+    }),
+    [taskTemplates],
+  );
+  useEffect(() => {
+    refetchRooms();
+  }, [locationId, refetchRooms]);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8">
+        <Select
+          onValueChange={(value) => {
+            onChange(value);
+          }}
+          defaultValue={0}
+        >
+          <FormLabel>Location</FormLabel>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a location">{selectedLocation}</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {!isLocationsLoading &&
+              locations &&
+              locations.map((location) => (
+                <SelectItem value={location.id} key={location.id}>
+                  {location.name}
+                </SelectItem>
+              ))}
+          </SelectContent>
+        </Select>
         <FormField
-          name="taskTemplateId"
+          name="roomId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Task Template ID</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} />
-              </FormControl>
+              <FormLabel>Rooms</FormLabel>
+              <Select
+                onValueChange={(value) => {
+                  form.setValue('roomId', parseInt(value));
+                  onRoomChange(value);
+                  return field.onChange;
+                }}
+                defaultValue={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a room">{selectedRoom}</SelectValue>
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {!isRoomsLoading &&
+                    rooms &&
+                    rooms.data.map((room) => (
+                      <SelectItem value={room.id} key={room.id}>
+                        {room.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
             </FormItem>
           )}
         />
         <FormField
+          name="taskTemplateId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Task Template</FormLabel>
+              <Select
+                onValueChange={(value) => {
+                  form.setValue('taskTemplateId', parseInt(value));
+                  onTaskTemplateChange(value);
+                  return field.onChange;
+                }}
+                defaultValue={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a task template">{selectedTaskTemplate}</SelectValue>
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {!isTaskTemplatesLoading &&
+                    taskTemplates &&
+                    taskTemplates.data.map((taskTemplate) => (
+                      <SelectItem value={taskTemplate.id} key={taskTemplate.id}>
+                        {taskTemplate.title}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </FormItem>
+          )}
+        />
+
+        <FormField
           name="description"
+          control={form.control}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
@@ -159,6 +293,17 @@ export const CreateTaskScheduleForm = () => {
                 />
               ))}
               <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          name="hour"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Input type={'time'} placeholder="hour" {...field} className="bg-primary" />
+              </FormControl>
             </FormItem>
           )}
         />

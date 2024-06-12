@@ -1,4 +1,4 @@
-import { ColumnDef, getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
+import { ColumnDef, getCoreRowModel, useReactTable, flexRender, Row } from '@tanstack/react-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
   Pagination,
@@ -8,10 +8,10 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { useCallback, useEffect, useReducer } from 'react';
+import { useCallback, useEffect, useReducer, useState } from 'react';
 import { Button } from '@/components/ui/button.tsx';
 import { Action, customPagSort, PaginationSortingState, QueryResponse } from '@/utils/types.ts';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { ArrowUpDown } from 'lucide-react';
 import { Input } from '@/components/ui/input.tsx';
 import { useForm } from 'react-hook-form';
@@ -22,7 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import TableSkeleton from '@/components/layout/table/TableSkeleton.tsx';
 interface QueryTableProps<TType, TValue> {
   queryFn: (pagSort: PaginationSortingState) => Promise<QueryResponse<TType>>;
-  queryKey: string;
+  queryKey: string | string[];
   columns: ColumnDef<TType, TValue>[];
   sortableColumns: Record<string, boolean>;
   searchField?: string;
@@ -33,6 +33,9 @@ interface QueryTableProps<TType, TValue> {
   navigateToState?: string;
   onRowHover?: (rowNo: string) => void;
   onRowExit?: (rowNo: string) => void;
+  selectedDeleteFn?: (rows: Row<TType>[]) => void;
+  showActionBtns?: boolean;
+  refetchOnMount?: boolean;
 }
 function reducer(state: PaginationSortingState, action: Action): PaginationSortingState {
   switch (action.type) {
@@ -73,19 +76,25 @@ function QueryTable<TType extends { id: string | number }, TValue>({
   navigateToState,
   onRowHover,
   onRowExit,
+  selectedDeleteFn,
+  showActionBtns,
+  refetchOnMount = false,
 }: QueryTableProps<TType, TValue>) {
   const [pagSort, dispatch] = useReducer(reducer, customPagSort(maxResults, defaultSort));
-
+  const queryClient = useQueryClient();
   const { data, isLoading } = useQuery<QueryResponse<TType>, Error>(
     [queryKey, pagSort],
     () => {
       return queryFn(pagSort);
     },
     {
+      refetchOnMount: refetchOnMount,
       onSuccess: (data) => console.log(data),
+      cacheTime: refetchOnMount ? 0 : 1000000,
     },
   );
 
+  const [rowSelection, setRowSelection] = useState({});
   const sortAppliedColumns = columns.map((column) => {
     return {
       ...column,
@@ -116,12 +125,17 @@ function QueryTable<TType extends { id: string | number }, TValue>({
     data: !isLoading && data ? data.data : [],
     columns: sortAppliedColumns,
     getCoreRowModel: getCoreRowModel(),
+    onRowSelectionChange: setRowSelection ?? (() => {}),
+    state: {
+      rowSelection,
+    },
   });
   const form = useForm({
     defaultValues: {
       search: '',
     },
   });
+
   const changePage = (page: number) => {
     dispatch({ type: 'SET_PAGE', payload: page });
   };
@@ -137,11 +151,15 @@ function QueryTable<TType extends { id: string | number }, TValue>({
     }, 300),
     [],
   );
+  const onClickDelete = useCallback(() => {
+    if (selectedDeleteFn) selectedDeleteFn(table.getFilteredSelectedRowModel().rows);
+    setRowSelection({});
+  }, [selectedDeleteFn, table]);
   return (
     <div className="w-full flex flex-col gap-4 justify-between">
-      <div>
+      <div className="flex w-full justify-between gap-4">
         <Form {...form}>
-          <form onChange={form.handleSubmit(onSearch)}>
+          <form onChange={form.handleSubmit(onSearch)} className="w-full">
             <FormField
               control={form.control}
               name="search"
@@ -155,9 +173,10 @@ function QueryTable<TType extends { id: string | number }, TValue>({
             />
           </form>
         </Form>
+        {showActionBtns && selectedDeleteFn && <Button onClick={onClickDelete}>Delete</Button>}
       </div>
       <div className="rounded-md border">
-        {!isLoading && data ? (
+        {table ? (
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -173,25 +192,43 @@ function QueryTable<TType extends { id: string | number }, TValue>({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel()?.rows?.length ? (
-                table.getRowModel()?.rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    onClick={() =>
-                      navigate(
-                        `${navigateTo ? navigateTo + '/' : ''}${row.original.id}`,
-                        navigateToState ? { state: row.original[navigateToState as keyof typeof row.original] } : {},
-                      )
-                    }
-                    onMouseOver={() => (onRowHover ? onRowHover(row.id) : null)}
-                    onMouseLeave={() => (onRowExit ? onRowExit(row.id) : null)}
-                    data-state={row.getIsSelected() && 'selected'}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                    ))}
-                  </TableRow>
-                ))
+              {data && !isLoading ? (
+                table.getRowModel()?.rows.map((row) =>
+                  selectedDeleteFn ? (
+                    <TableRow
+                      key={row.id}
+                      onClick={() =>
+                        navigate(
+                          `${navigateTo ? navigateTo + '/' : ''}${row.original.id}`,
+                          navigateToState ? { state: row.original[navigateToState as keyof typeof row.original] } : {},
+                        )
+                      }
+                      onMouseOver={() => (onRowHover ? onRowHover(row.id) : null)}
+                      onMouseLeave={() => (onRowExit ? onRowExit(row.id) : null)}
+                      data-state={row.getIsSelected() && 'selected'}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                      ))}
+                    </TableRow>
+                  ) : (
+                    <TableRow
+                      key={row.id}
+                      onClick={() =>
+                        navigate(
+                          `${navigateTo ? navigateTo + '/' : ''}${row.original.id}`,
+                          navigateToState ? { state: row.original[navigateToState as keyof typeof row.original] } : {},
+                        )
+                      }
+                      onMouseOver={() => (onRowHover ? onRowHover(row.id) : null)}
+                      onMouseLeave={() => (onRowExit ? onRowExit(row.id) : null)}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                      ))}{' '}
+                    </TableRow>
+                  ),
+                )
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">

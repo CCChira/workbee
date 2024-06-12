@@ -6,6 +6,14 @@ export declare class RoomsController {
     private readonly roomsService;
     private readonly awsS3Service;
     constructor(roomsService: RoomsService, awsS3Service: AwsS3Service);
+    getRoomsFromLocation(locationId: string): Promise<{
+        data: {
+            id: number;
+            name: string;
+            locationId: number;
+            accessMode: import(".prisma/client").$Enums.AccessMode;
+        }[];
+    }>;
     getRoomWithImages(id: string): Promise<{
         message: string;
         room: {

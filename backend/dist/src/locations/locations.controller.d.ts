@@ -6,6 +6,14 @@ import { CreateLocationDto } from './dto/createLocation.dto';
 export declare class LocationsController {
     private readonly locationsService;
     constructor(locationsService: LocationsService);
+    getLocationsByContractId(contractId: string): Promise<{
+        id: number;
+        name: string;
+        address: string;
+        latitude: number;
+        longitude: number;
+        contractId: number;
+    }[]>;
     getLocation({ id }: {
         id: number;
     }): Promise<{

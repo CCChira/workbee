@@ -82,7 +82,6 @@ let RequestsService = class RequestsService {
             };
         });
         const toSend = await Promise.all(promises);
-        console.log(toSend);
         return {
             data: toSend,
             dataSize: toSend.length,

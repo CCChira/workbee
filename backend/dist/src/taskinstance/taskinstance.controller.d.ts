@@ -37,14 +37,11 @@ export declare class TaskinstanceController {
         hour: string;
         roomId: number;
     }>;
-    getTaskInstance(instanceId: string): Promise<{
-        id: number;
-        taskScheduleId: number;
-        status: import(".prisma/client").$Enums.Status;
-        date: Date;
-        hour: string;
-        roomId: number;
-    }>;
+    getStatusCounts(): Promise<(Prisma.PickEnumerable<Prisma.TaskInstanceGroupByOutputType, "status"[]> & {
+        _count: {
+            status: number;
+        };
+    })[]>;
     getTaskInstancesByTaskScheduleId(taskScheduleId: string): Promise<{
         id: number;
         taskScheduleId: number;
@@ -61,7 +58,53 @@ export declare class TaskinstanceController {
         hour: string;
         roomId: number;
     }[]>;
-    getTasksAssignedToUser(userId: string): Promise<({
+    getTasksAssignedToUser(userId: string): Promise<{
+        data: ({
+            TaskAssignment: {
+                taskId: number;
+                userId: string;
+            }[];
+            room: {
+                id: number;
+                name: string;
+                location: {
+                    latitude: number;
+                    longitude: number;
+                };
+            };
+            taskSchedule: {
+                id: number;
+                taskTemplateId: number;
+                description: string;
+                dayOfWeek: number[];
+                frequency: number[];
+                startDate: Date;
+                endDate: Date;
+                isActive: boolean;
+                status: import(".prisma/client").$Enums.Status;
+                hour: string;
+                roomId: number;
+            };
+        } & {
+            id: number;
+            taskScheduleId: number;
+            status: import(".prisma/client").$Enums.Status;
+            date: Date;
+            hour: string;
+            roomId: number;
+        })[];
+    }>;
+    getTasksAssignedToUserWithinInterval(userId: string, startDate: string, endDate: string): Promise<({
+        TaskAssignment: {
+            taskId: number;
+            userId: string;
+        }[];
+        room: {
+            id: number;
+            name: string;
+            locationId: number;
+            accessMode: import(".prisma/client").$Enums.AccessMode;
+        };
         taskSchedule: {
             id: number;
             taskTemplateId: number;
@@ -75,16 +118,6 @@ export declare class TaskinstanceController {
             hour: string;
             roomId: number;
         };
-        room: {
-            id: number;
-            name: string;
-            locationId: number;
-            accessMode: import(".prisma/client").$Enums.AccessMode;
-        };
-        TaskAssignment: {
-            taskId: number;
-            userId: string;
-        }[];
     } & {
         id: number;
         taskScheduleId: number;
@@ -93,7 +126,17 @@ export declare class TaskinstanceController {
         hour: string;
         roomId: number;
     })[]>;
-    getTasksAssignedToUserWithinInterval(userId: string, startDate: string, endDate: string): Promise<({
+    getTasksAssignedToUserThisWeek(userId: string): Promise<({
+        TaskAssignment: {
+            taskId: number;
+            userId: string;
+        }[];
+        room: {
+            id: number;
+            name: string;
+            locationId: number;
+            accessMode: import(".prisma/client").$Enums.AccessMode;
+        };
         taskSchedule: {
             id: number;
             taskTemplateId: number;
@@ -107,16 +150,6 @@ export declare class TaskinstanceController {
             hour: string;
             roomId: number;
         };
-        room: {
-            id: number;
-            name: string;
-            locationId: number;
-            accessMode: import(".prisma/client").$Enums.AccessMode;
-        };
-        TaskAssignment: {
-            taskId: number;
-            userId: string;
-        }[];
     } & {
         id: number;
         taskScheduleId: number;
@@ -137,6 +170,14 @@ export declare class TaskinstanceController {
         dataSize: number;
         page: number;
         size: number;
+    }>;
+    getTaskInstance(instanceId: string): Promise<{
+        id: number;
+        taskScheduleId: number;
+        status: import(".prisma/client").$Enums.Status;
+        date: Date;
+        hour: string;
+        roomId: number;
     }>;
     assignUserToTaskInstance(instanceId: string, userId: string): Promise<{
         taskId: number;

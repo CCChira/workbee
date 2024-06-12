@@ -46,4 +46,12 @@ export declare class LocationsService {
         page: number;
         size: number;
     }>;
+    getLocationsByContractId(contractId: number): Promise<{
+        id: number;
+        name: string;
+        address: string;
+        latitude: number;
+        longitude: number;
+        contractId: number;
+    }[]>;
 }

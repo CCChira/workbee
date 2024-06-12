@@ -20,10 +20,10 @@ let AwsS3Service = AwsS3Service_1 = class AwsS3Service {
     constructor() {
         this.logger = new common_1.Logger(AwsS3Service_1.name);
         this.s3Client = new client_s3_1.S3Client({
-            region: 'eu-north-1',
+            region: process.env.AWS_REGION,
             credentials: {
-                accessKeyId: 'AKIAXYKJRXR3QBRKPVS6',
-                secretAccessKey: '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',
+                accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
             },
         });
     }

@@ -32,6 +32,12 @@ let RoomsController = class RoomsController {
         this.roomsService = roomsService;
         this.awsS3Service = awsS3Service;
     }
+    async getRoomsFromLocation(locationId) {
+        if (locationId !== '')
+            return this.roomsService.getAllRoomsFromContract(parseInt(locationId));
+        else
+            return { data: [] };
+    }
     async getRoomWithImages(id) {
         const bucketName = 'workbee-files';
         const room = await this.roomsService.getRoomWithImages(parseInt(id));
@@ -65,6 +71,15 @@ let RoomsController = class RoomsController {
     }
 };
 exports.RoomsController = RoomsController;
+__decorate([
+    (0, common_1.Get)('byLocation'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
+    __param(0, (0, common_1.Query)('locationId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], RoomsController.prototype, "getRoomsFromLocation", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),

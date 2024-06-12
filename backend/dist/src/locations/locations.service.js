@@ -81,6 +81,16 @@ let LocationsService = class LocationsService {
             size: paginationParams.size,
         };
     }
+    async getLocationsByContractId(contractId) {
+        console.log(contractId);
+        const response = await this.prisma.location.findMany({
+            where: {
+                contractId: contractId,
+            },
+        });
+        console.log(response);
+        return response;
+    }
 };
 exports.LocationsService = LocationsService;
 exports.LocationsService = LocationsService = __decorate([

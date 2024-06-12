@@ -71,11 +71,10 @@ export class TaskinstanceController {
   async deleteTaskInstance(@Param('id') instanceId: string) {
     return this.taskInstanceService.deleteTaskInstance(parseInt(instanceId));
   }
-
-  @Get(':id')
+  @Get('statuscount')
   @AuthDecorators([Role.ADMIN, Role.CLIENT])
-  async getTaskInstance(@Param('id') instanceId: string) {
-    return this.taskInstanceService.getTaskInstance(parseInt(instanceId));
+  async getStatusCounts() {
+    return this.taskInstanceService.getStatusCounts();
   }
 
   @Get('by-schedule/:scheduleId')
@@ -106,10 +105,10 @@ export class TaskinstanceController {
     return this.taskInstanceService.getTasksAssignedToUser(userId);
   }
 
-  @Get('assigned-to-user-dates')
+  @Get('assigned-to-user-dates/:userId')
   @AuthDecorators([Role.ADMIN, Role.CLIENT])
   async getTasksAssignedToUserWithinInterval(
-    @Query('userId') userId: string,
+    @Param('userId') userId: string,
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
   ) {
@@ -118,6 +117,11 @@ export class TaskinstanceController {
       startDate,
       endDate,
     );
+  }
+  @Get('assigned-to-user-week/:userId')
+  @AuthDecorators([Role.ADMIN, Role.CLIENT])
+  async getTasksAssignedToUserThisWeek(@Param('userId') userId: string) {
+    return this.taskInstanceService.getTasksAssignedToUserThisWeek(userId);
   }
 
   @Get('all')
@@ -135,6 +139,11 @@ export class TaskinstanceController {
       sortingParams,
       searchParam,
     );
+  }
+  @Get(':id')
+  @AuthDecorators([Role.ADMIN, Role.CLIENT])
+  async getTaskInstance(@Param('id') instanceId: string) {
+    return this.taskInstanceService.getTaskInstance(parseInt(instanceId));
   }
 
   @Post('assign-user')

@@ -23,9 +23,10 @@ const AuthDecorators_decorator_1 = require("../utils/decorator/AuthDecorators.de
 const client_1 = require("@prisma/client");
 const PagSortApiQuery_decorator_1 = require("../utils/decorator/PagSortApiQuery.decorator");
 const SearchDecorator_decorator_1 = require("../utils/decorator/SearchDecorator.decorator");
-const createUser_dto_1 = require("./dto/createUser.dto");
 const deleteMultipleUsers_dto_1 = require("./dto/deleteMultipleUsers.dto");
 const dummyProvider_service_1 = require("../providers/SMSProvider/dummyProvider.service");
+const inviteUser_dto_1 = require("./dto/inviteUser.dto");
+const createUser_dto_1 = require("./dto/createUser.dto");
 let UsersController = UsersController_1 = class UsersController {
     constructor(usersService, smsProvider) {
         this.usersService = usersService;
@@ -35,15 +36,30 @@ let UsersController = UsersController_1 = class UsersController {
     async getUsers(paginationParams, sortingParams, searchParams) {
         return this.usersService.findAllUsers(paginationParams, sortingParams, searchParams);
     }
+    async getClients(paginationParams, sortingParams, searchParams) {
+        return this.usersService.findAllClients(paginationParams, sortingParams, searchParams);
+    }
+    async getEmployees(paginationParams, sortingParams, searchParams) {
+        return this.usersService.findAllEmployees(paginationParams, sortingParams, searchParams);
+    }
+    async getEmployeeDetails({ id }) {
+        return this.usersService.getEmployeeDetails(id);
+    }
     async getUser({ id }) {
         return this.usersService.findUser(id);
     }
     async deleteUser(userId) {
         return this.usersService.deleteUser(userId);
     }
-    async generateUser(generateUserDto) {
-        await this.smsProvider.sendSmsCode(generateUserDto.email, generateUserDto.role);
-        return await this.usersService.generateInviteCode(generateUserDto);
+    async generateUser(inviteUserDto) {
+        if (!inviteUserDto.phoneNumber && !inviteUserDto.email) {
+            throw new common_1.HttpException('Phone number or email is required', 400);
+        }
+        await this.smsProvider.sendSmsCode(inviteUserDto.email, inviteUserDto.role);
+        return await this.usersService.generateInviteCode(inviteUserDto);
+    }
+    async createUser(createUser) {
+        return this.usersService.createUser(createUser);
     }
     async patchUsers(deleteMultipleUsersDto) {
         return this.usersService.deleteMultiple(deleteMultipleUsersDto);
@@ -63,6 +79,41 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getUsers", null);
+__decorate([
+    (0, common_1.Get)('clients'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, PagSortApiQuery_decorator_1.PagSortApiQuery)(),
+    (0, SearchDecorator_decorator_1.SearchApiQuery)(),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN]),
+    __param(0, (0, paginationParams_decorator_1.PaginationParamsDecorator)()),
+    __param(1, (0, sortingParams_decorator_1.SortingParamsDecorator)(['id', 'role', 'email', 'name', 'createdAt'])),
+    __param(2, (0, SearchDecorator_decorator_1.SearchDecorator)('email')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "getClients", null);
+__decorate([
+    (0, common_1.Get)('employees'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, PagSortApiQuery_decorator_1.PagSortApiQuery)(),
+    (0, SearchDecorator_decorator_1.SearchApiQuery)(),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN]),
+    __param(0, (0, paginationParams_decorator_1.PaginationParamsDecorator)()),
+    __param(1, (0, sortingParams_decorator_1.SortingParamsDecorator)(['id', 'role', 'email', 'name', 'createdAt'])),
+    __param(2, (0, SearchDecorator_decorator_1.SearchDecorator)('name')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "getEmployees", null);
+__decorate([
+    (0, common_1.Get)('employee/:employeeId'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN]),
+    __param(0, (0, common_1.Param)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "getEmployeeDetails", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
@@ -87,9 +138,17 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [createUser_dto_1.CreateUserDto]),
+    __metadata("design:paramtypes", [inviteUser_dto_1.InviteUserDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "generateUser", null);
+__decorate([
+    (0, common_1.Post)('/verify'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [createUser_dto_1.CreateUserDto]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "createUser", null);
 __decorate([
     (0, common_1.Post)('/delete-multiple'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),

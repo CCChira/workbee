@@ -19,6 +19,9 @@ export interface User {
   role: Roles;
   name?: string;
   createdAt: Date;
+  _count: {
+    TaskAssignment: number;
+  };
 }
 export interface PaginationSortingState {
   size: number;

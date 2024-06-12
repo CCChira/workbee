@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
@@ -88,6 +89,14 @@ export class RoomsController {
   // public async getRoom(@Param() { id }: { id: string }) {
   //   return this.roomsService.getRoom(parseInt(id));
   // }
+  @Get('byLocation')
+  @HttpCode(HttpStatus.OK)
+  @AuthDecorators([Role.ADMIN, Role.CLIENT])
+  public async getRoomsFromLocation(@Query('locationId') locationId: string) {
+    if (locationId !== '')
+      return this.roomsService.getAllRoomsFromContract(parseInt(locationId));
+    else return { data: [] };
+  }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)

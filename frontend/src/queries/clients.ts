@@ -3,7 +3,6 @@ import addPagSortParams from '@/queries/addPagSortParams.ts';
 import { PaginationSortingState, QueryResponse, User } from '@/utils/types.ts';
 
 export async function getClients(pagSort: PaginationSortingState): Promise<QueryResponse<User>> {
-  console.log(pagSort);
   const user = useUserStore.getState().user;
   const fetchURL = addPagSortParams(
     pagSort.page,
@@ -11,7 +10,7 @@ export async function getClients(pagSort: PaginationSortingState): Promise<Query
     `${pagSort.sortOrder.property}:${pagSort.sortOrder.direction}`,
     pagSort.search?.field ?? '',
     pagSort.search?.searchParam ?? '',
-    `${import.meta.env.VITE_API_URL}/users`,
+    `${import.meta.env.VITE_API_URL}/users/clients`,
   );
 
   const response = await fetch(fetchURL, {

@@ -4,6 +4,8 @@ import { Sorting } from '../utils/decorator/sortingParams.decorator';
 import { Pagination } from '../utils/decorator/paginationParams.decorator';
 import { ISearch } from '../utils/decorator/SearchDecorator.decorator';
 import { CreateTaskInstanceDto } from './dto/createTaskInstance.dto';
+import { endOfWeek, startOfWeek } from 'date-fns';
+import { Status } from '@prisma/client';
 
 @Injectable()
 export class TaskinstanceService {
@@ -50,7 +52,7 @@ export class TaskinstanceService {
     });
   }
   async getTasksAssignedToUser(userId: string) {
-    return this.prismaService.taskInstance.findMany({
+    const response = await this.prismaService.taskInstance.findMany({
       where: {
         TaskAssignment: {
           some: {
@@ -60,11 +62,26 @@ export class TaskinstanceService {
       },
       include: {
         TaskAssignment: true,
-        room: true,
+        room: {
+          select: {
+            id: true,
+            name: true,
+            location: {
+              select: {
+                latitude: true,
+                longitude: true,
+              },
+            },
+          },
+        },
         taskSchedule: true,
       },
     });
+    return {
+      data: response,
+    };
   }
+
   async getTasksAssignedToUserWithinInterval(
     userId: string,
     startDate: string,
@@ -84,6 +101,34 @@ export class TaskinstanceService {
             date: {
               gte: new Date(startDate),
               lte: new Date(endDate),
+            },
+          },
+        ],
+      },
+      include: {
+        TaskAssignment: true,
+        room: true,
+        taskSchedule: true,
+      },
+    });
+  }
+  async getTasksAssignedToUserThisWeek(userId: string) {
+    const startOfThisWeek = startOfWeek(new Date(), { weekStartsOn: 1 });
+    const endOfThisWeek = endOfWeek(new Date(), { weekStartsOn: 1 });
+    return this.prismaService.taskInstance.findMany({
+      where: {
+        AND: [
+          {
+            TaskAssignment: {
+              some: {
+                userId: userId,
+              },
+            },
+          },
+          {
+            date: {
+              gte: startOfThisWeek,
+              lte: endOfThisWeek,
             },
           },
         ],
@@ -126,10 +171,38 @@ export class TaskinstanceService {
     };
   }
   async assignUserToTaskInstance(instanceId: number, userId: string) {
+    await this.prismaService.taskInstance.update({
+      where: { id: instanceId },
+      data: {
+        status: Status.PENDING,
+      },
+    });
     return this.prismaService.taskAssignment.create({
       data: {
         taskId: instanceId,
         userId: userId,
+      },
+    });
+  }
+
+  async getStatusCounts() {
+    const today = new Date(); // Current date
+    const currentWeekStart = startOfWeek(today, { weekStartsOn: 1 }); // Start of the week (Monday)
+    const currentWeekEnd = endOfWeek(today, { weekStartsOn: 1 }); // End of the week (Sunday)
+
+    return this.prismaService.taskInstance.groupBy({
+      by: ['status'],
+      _count: {
+        status: true,
+      },
+      where: {
+        status: {
+          in: ['IN_PROGRESS', 'COMPLETED', 'INCOMPLETE'],
+        },
+        date: {
+          gte: currentWeekStart, // Greater than or equal to the start of the week
+          lte: currentWeekEnd, // Less than or equal to the end of the week
+        },
       },
     });
   }

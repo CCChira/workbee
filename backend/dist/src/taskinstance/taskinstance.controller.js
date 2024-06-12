@@ -47,8 +47,8 @@ let TaskinstanceController = class TaskinstanceController {
     async deleteTaskInstance(instanceId) {
         return this.taskInstanceService.deleteTaskInstance(parseInt(instanceId));
     }
-    async getTaskInstance(instanceId) {
-        return this.taskInstanceService.getTaskInstance(parseInt(instanceId));
+    async getStatusCounts() {
+        return this.taskInstanceService.getStatusCounts();
     }
     async getTaskInstancesByTaskScheduleId(taskScheduleId) {
         return this.taskInstanceService.getTaskInstancesByTaskScheduleId(parseInt(taskScheduleId));
@@ -62,8 +62,14 @@ let TaskinstanceController = class TaskinstanceController {
     async getTasksAssignedToUserWithinInterval(userId, startDate, endDate) {
         return this.taskInstanceService.getTasksAssignedToUserWithinInterval(userId, startDate, endDate);
     }
+    async getTasksAssignedToUserThisWeek(userId) {
+        return this.taskInstanceService.getTasksAssignedToUserThisWeek(userId);
+    }
     async getAllTaskInstances(paginationParams, sortingParams, searchParam) {
         return this.taskInstanceService.getAllTaskInstances(paginationParams, sortingParams, searchParam);
+    }
+    async getTaskInstance(instanceId) {
+        return this.taskInstanceService.getTaskInstance(parseInt(instanceId));
     }
     async assignUserToTaskInstance(instanceId, userId) {
         return this.taskInstanceService.assignUserToTaskInstance(parseInt(instanceId), userId);
@@ -96,13 +102,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TaskinstanceController.prototype, "deleteTaskInstance", null);
 __decorate([
-    (0, common_1.Get)(':id'),
+    (0, common_1.Get)('statuscount'),
     (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
-    __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], TaskinstanceController.prototype, "getTaskInstance", null);
+], TaskinstanceController.prototype, "getStatusCounts", null);
 __decorate([
     (0, common_1.Get)('by-schedule/:scheduleId'),
     (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
@@ -129,15 +134,23 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TaskinstanceController.prototype, "getTasksAssignedToUser", null);
 __decorate([
-    (0, common_1.Get)('assigned-to-user-dates'),
+    (0, common_1.Get)('assigned-to-user-dates/:userId'),
     (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
-    __param(0, (0, common_1.Query)('userId')),
+    __param(0, (0, common_1.Param)('userId')),
     __param(1, (0, common_1.Query)('startDate')),
     __param(2, (0, common_1.Query)('endDate')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, String]),
     __metadata("design:returntype", Promise)
 ], TaskinstanceController.prototype, "getTasksAssignedToUserWithinInterval", null);
+__decorate([
+    (0, common_1.Get)('assigned-to-user-week/:userId'),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], TaskinstanceController.prototype, "getTasksAssignedToUserThisWeek", null);
 __decorate([
     (0, common_1.Get)('all'),
     (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
@@ -150,6 +163,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], TaskinstanceController.prototype, "getAllTaskInstances", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], TaskinstanceController.prototype, "getTaskInstance", null);
 __decorate([
     (0, common_1.Post)('assign-user'),
     (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN]),

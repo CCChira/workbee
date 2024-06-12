@@ -27,6 +27,10 @@ let LocationsController = class LocationsController {
     constructor(locationsService) {
         this.locationsService = locationsService;
     }
+    async getLocationsByContractId(contractId) {
+        console.log(contractId);
+        return this.locationsService.getLocationsByContractId(parseInt(contractId));
+    }
     async getLocation({ id }) {
         return this.locationsService.findLocation(id);
     }
@@ -44,6 +48,15 @@ let LocationsController = class LocationsController {
     }
 };
 exports.LocationsController = LocationsController;
+__decorate([
+    (0, common_1.Get)('/byContract'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
+    __param(0, (0, common_1.Query)('contractId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], LocationsController.prototype, "getLocationsByContractId", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),

@@ -9,22 +9,26 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GenerateUserDto = void 0;
+exports.InviteUserDto = void 0;
 const class_validator_1 = require("class-validator");
 const swagger_1 = require("@nestjs/swagger");
 const client_1 = require("@prisma/client");
-class GenerateUserDto {
+class InviteUserDto {
 }
-exports.GenerateUserDto = GenerateUserDto;
+exports.InviteUserDto = InviteUserDto;
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
     (0, swagger_1.ApiProperty)(),
     __metadata("design:type", String)
-], GenerateUserDto.prototype, "email", void 0);
+], InviteUserDto.prototype, "email", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", String)
+], InviteUserDto.prototype, "phoneNumber", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, swagger_1.ApiProperty)(),
     __metadata("design:type", String)
-], GenerateUserDto.prototype, "role", void 0);
-//# sourceMappingURL=generateUser.dto.js.map
+], InviteUserDto.prototype, "role", void 0);
+//# sourceMappingURL=inviteUser.dto.js.map

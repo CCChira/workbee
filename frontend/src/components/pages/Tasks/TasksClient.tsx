@@ -1,11 +1,7 @@
-interface TasksClientProps {
-
-}
+interface TasksClientProps {}
 
 function TasksClient({}: TasksClientProps) {
-    return (
-        <></>
-    );
+  return <></>;
 }
 
 export default TasksClient;

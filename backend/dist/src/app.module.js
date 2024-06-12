@@ -26,6 +26,8 @@ const createImage_service_1 = require("./services/createImage.service");
 const taskschedules_module_1 = require("./taskschedules/taskschedules.module");
 const requests_module_1 = require("./requests/requests.module");
 const taskinstance_module_1 = require("./taskinstance/taskinstance.module");
+const config_1 = require("@nestjs/config");
+const twilio_service_1 = require("./services/twilio.service");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(tokenRefresh_middleware_1.TokenRefreshMiddleware).forRoutes('*');
@@ -45,6 +47,7 @@ exports.AppModule = AppModule = __decorate([
             taskschedules_module_1.TaskschedulesModule,
             requests_module_1.RequestsModule,
             taskinstance_module_1.TaskinstanceModule,
+            config_1.ConfigModule.forRoot({ isGlobal: true }),
         ],
         controllers: [app_controller_1.AppController],
         providers: [
@@ -54,6 +57,7 @@ exports.AppModule = AppModule = __decorate([
             jwt_strategy_1.JwtStrategy,
             aws_s3_service_1.AwsS3Service,
             createImage_service_1.PrismaImageService,
+            twilio_service_1.TwilioService,
         ],
         exports: [aws_s3_service_1.AwsS3Service],
     })

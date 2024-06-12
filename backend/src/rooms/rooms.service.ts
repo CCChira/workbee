@@ -95,10 +95,21 @@ export class RoomsService {
       throw new Error('Failed to create room and save images.');
     }
   }
+
   async getRoomWithImages(id: number) {
     return this.prisma.room.findUnique({
       where: { id },
       include: { images: true }, // Ensure images are included in the query
     });
+  }
+
+  async getAllRoomsFromContract(locationId: number) {
+    return {
+      data: await this.prisma.room.findMany({
+        where: {
+          locationId: locationId,
+        },
+      }),
+    };
   }
 }

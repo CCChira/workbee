@@ -32,6 +32,17 @@ import { ApiTags } from '@nestjs/swagger';
 @Controller('locations')
 export class LocationsController {
   constructor(private readonly locationsService: LocationsService) {}
+
+  @Get('/byContract')
+  @HttpCode(HttpStatus.OK)
+  @AuthDecorators([Role.ADMIN, Role.CLIENT])
+  public async getLocationsByContractId(
+    @Query('contractId') contractId: string,
+  ) {
+    console.log(contractId);
+    return this.locationsService.getLocationsByContractId(parseInt(contractId));
+  }
+
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @AuthDecorators([Role.ADMIN, Role.CLIENT])

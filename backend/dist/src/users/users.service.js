@@ -15,9 +15,11 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const bcrypt = require("bcrypt");
 const auth_constants_1 = require("../auth/constants/auth.constants");
 const client_1 = require("@prisma/client");
+const twilio_service_1 = require("../services/twilio.service");
 let UsersService = class UsersService {
-    constructor(prisma) {
+    constructor(prisma, twilio) {
         this.prisma = prisma;
+        this.twilio = twilio;
     }
     async create(createUserDto) {
         createUserDto.password = await bcrypt.hash(createUserDto.password, auth_constants_1.ROUNDS_OF_HASHING);
@@ -28,10 +30,17 @@ let UsersService = class UsersService {
     async deleteUser(id) {
         return this.prisma.user.delete({ where: { id } });
     }
-    async generateInviteCode(generateUserDto) {
-        return this.prisma.inviteCodes.create({
-            data: generateUserDto,
+    async generateInviteCode(inviteUserDto) {
+        const { id } = await this.prisma.inviteCodes.create({
+            data: inviteUserDto.email
+                ? { email: inviteUserDto.email, role: inviteUserDto.role }
+                : { phoneNumber: inviteUserDto.phoneNumber, role: inviteUserDto.role },
         });
+        console.log(inviteUserDto.phoneNumber, id);
+        if (inviteUserDto.phoneNumber)
+            await this.twilio.sendInviteCodeSMS(inviteUserDto.phoneNumber, id);
+        else {
+        }
     }
     userExists(id) {
         return this.prisma.user.findUnique({ where: { id } });
@@ -70,6 +79,65 @@ let UsersService = class UsersService {
             size,
         };
     }
+    async findAllClients({ page, limit, offset, size }, sort, search) {
+        const response = await this.prisma.user.findMany({
+            skip: offset,
+            take: limit,
+            orderBy: [
+                {
+                    [sort?.property || 'id']: sort?.direction || 'asc',
+                },
+            ],
+            where: search.field && search.searchParam
+                ? {
+                    role: client_1.Role.CLIENT,
+                    [search.field]: {
+                        contains: search.searchParam,
+                        mode: 'insensitive',
+                    },
+                }
+                : { role: client_1.Role.CLIENT },
+        });
+        return {
+            data: response,
+            dataSize: response.length,
+            page,
+            size,
+        };
+    }
+    async findAllEmployees({ page, limit, offset, size }, sort, search) {
+        const response = await this.prisma.user.findMany({
+            skip: offset,
+            take: limit,
+            orderBy: [
+                {
+                    [sort?.property || 'id']: sort?.direction || 'asc',
+                },
+            ],
+            where: search.field && search.searchParam
+                ? {
+                    role: client_1.Role.EMPLOYEE,
+                    [search.field]: {
+                        contains: search.searchParam,
+                        mode: 'insensitive',
+                    },
+                }
+                : { role: client_1.Role.EMPLOYEE },
+            include: {
+                _count: {
+                    select: {
+                        TaskAssignment: true,
+                    },
+                },
+            },
+        });
+        return {
+            data: response,
+            dataSize: response.length,
+            page,
+            size,
+        };
+    }
     async deleteMultiple(deleteMultipleUsersDto) {
         return this.prisma.user.deleteMany({
             where: {
@@ -79,10 +147,41 @@ let UsersService = class UsersService {
             },
         });
     }
+    async createUser(createUser) {
+        const info = await this.prisma.inviteCodes.findUnique({
+            where: { id: createUser.inviteCode },
+        });
+        return this.prisma.user.create({
+            data: {
+                name: createUser.name,
+                email: createUser.email,
+                password: createUser.password,
+                role: info.role,
+            },
+        });
+    }
+    async getEmployeeDetails(id) {
+        return this.prisma.user.findUnique({
+            where: { id },
+            include: {
+                TaskAssignment: {
+                    include: {
+                        task: {
+                            select: {
+                                id: true,
+                                _count: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        twilio_service_1.TwilioService])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map

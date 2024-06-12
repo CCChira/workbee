@@ -54,7 +54,43 @@ export declare class TaskinstanceService {
         hour: string;
         roomId: number;
     }[]>;
-    getTasksAssignedToUser(userId: string): Promise<({
+    getTasksAssignedToUser(userId: string): Promise<{
+        data: ({
+            TaskAssignment: {
+                taskId: number;
+                userId: string;
+            }[];
+            room: {
+                id: number;
+                name: string;
+                location: {
+                    latitude: number;
+                    longitude: number;
+                };
+            };
+            taskSchedule: {
+                id: number;
+                taskTemplateId: number;
+                description: string;
+                dayOfWeek: number[];
+                frequency: number[];
+                startDate: Date;
+                endDate: Date;
+                isActive: boolean;
+                status: import(".prisma/client").$Enums.Status;
+                hour: string;
+                roomId: number;
+            };
+        } & {
+            id: number;
+            taskScheduleId: number;
+            status: import(".prisma/client").$Enums.Status;
+            date: Date;
+            hour: string;
+            roomId: number;
+        })[];
+    }>;
+    getTasksAssignedToUserWithinInterval(userId: string, startDate: string, endDate: string): Promise<({
         TaskAssignment: {
             taskId: number;
             userId: string;
@@ -86,7 +122,7 @@ export declare class TaskinstanceService {
         hour: string;
         roomId: number;
     })[]>;
-    getTasksAssignedToUserWithinInterval(userId: string, startDate: string, endDate: string): Promise<({
+    getTasksAssignedToUserThisWeek(userId: string): Promise<({
         TaskAssignment: {
             taskId: number;
             userId: string;
@@ -135,4 +171,9 @@ export declare class TaskinstanceService {
         taskId: number;
         userId: string;
     }>;
+    getStatusCounts(): Promise<(import(".prisma/client").Prisma.PickEnumerable<import(".prisma/client").Prisma.TaskInstanceGroupByOutputType, "status"[]> & {
+        _count: {
+            status: number;
+        };
+    })[]>;
 }

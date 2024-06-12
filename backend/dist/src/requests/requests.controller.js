@@ -71,7 +71,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], RequestsController.prototype, "approveTaskInstanceRequest", null);
 __decorate([
-    (0, common_1.Patch)(':id/taskinstance/deny'),
+    (0, common_1.Patch)(':id/deny'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN]),
     __param(0, (0, common_1.Param)('id')),

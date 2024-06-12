@@ -52,4 +52,12 @@ export declare class RoomsService {
         locationId: number;
         accessMode: import(".prisma/client").$Enums.AccessMode;
     }>;
+    getAllRoomsFromContract(locationId: number): Promise<{
+        data: {
+            id: number;
+            name: string;
+            locationId: number;
+            accessMode: import(".prisma/client").$Enums.AccessMode;
+        }[];
+    }>;
 }

@@ -1,5 +1,6 @@
 import { Role } from '@prisma/client';
-export declare class GenerateUserDto {
+export declare class InviteUserDto {
     email: string;
+    phoneNumber: string;
     role: Role;
 }

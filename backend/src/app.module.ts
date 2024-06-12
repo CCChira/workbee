@@ -18,6 +18,7 @@ import { TaskschedulesModule } from './taskschedules/taskschedules.module';
 import { RequestsModule } from './requests/requests.module';
 import { TaskinstanceModule } from './taskinstance/taskinstance.module';
 import { ConfigModule } from '@nestjs/config';
+import { TwilioService } from './services/twilio.service';
 
 @Module({
   imports: [
@@ -31,7 +32,7 @@ import { ConfigModule } from '@nestjs/config';
     TaskschedulesModule,
     RequestsModule,
     TaskinstanceModule,
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [AppController],
   providers: [
@@ -41,6 +42,7 @@ import { ConfigModule } from '@nestjs/config';
     JwtStrategy,
     AwsS3Service,
     PrismaImageService,
+    TwilioService,
   ],
   exports: [AwsS3Service],
 })

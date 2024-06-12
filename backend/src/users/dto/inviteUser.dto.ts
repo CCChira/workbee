@@ -11,4 +11,9 @@ export class GenerateUserDto {
   @IsNotEmpty()
   @ApiProperty()
   role: Role;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  phoneNumber: string;
 }

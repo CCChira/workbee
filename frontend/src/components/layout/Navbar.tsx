@@ -9,7 +9,7 @@ import { useSideBarStore } from '@/store/sidebar.ts';
 import ClientRequests from '@/components/ClientRequests.tsx';
 import { useFetchRequests } from '@/queries/requests.ts';
 import { Button } from '@/components/ui/button.tsx';
-import { MailQuestion } from 'lucide-react';
+import { MailQuestion, MessageCircleIcon, MessageSquare, MessageSquareDot, MessageSquareText } from 'lucide-react';
 interface NavbarProps {}
 
 function Navbar({}: NavbarProps) {
@@ -34,7 +34,7 @@ function Navbar({}: NavbarProps) {
                       onClick={() => {
                         onClick(route.alias);
                       }}
-                      className={`flex h-9 w-9 items-center justify-center rounded-lg  transition-colors  md:h-8 md:w-8 ${sidebar.active === route.alias ? 'bg-primary text-accent-foreground hover:bg-primary-foreground hover:text-accent' : 'bg-none text-muted-foreground hover:text-foreground'}`}
+                      className={`flex h-9 w-9 items-center justify-center rounded-lg  transition-colors  md:h-8 md:w-8 ${sidebar.active === route.alias ? 'bg-primary text-white hover:bg-primary-foreground hover:text-primary' : 'bg-none text-muted-foreground hover:text-foreground'}`}
                     >
                       <Link to={route.path}>{route.icon}</Link>
                     </div>
@@ -46,6 +46,22 @@ function Navbar({}: NavbarProps) {
         )}
       </div>
       <div className="flex items-center flex-col gap-4">
+        {
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <div
+                  className={`flex h-10 w-10 items-center justify-center border rounded-lg transition-colors ${sidebar.active === 'Messages' ? 'bg-primary text-white hover:bg-white hover:text-primary' : 'bg-none text-muted-foreground hover:text-foreground'}`}
+                  onClick={() => sidebar.changeIcon('Messages')}
+                >
+                  <Link to="/messages">
+                    <MessageSquareText />
+                  </Link>
+                </div>
+              </TooltipTrigger>
+            </Tooltip>
+          </TooltipProvider>
+        }
         {!requestsData.isLoading && requestsData.data?.data ? (
           <ClientRequests requests={requestsData.data.data} />
         ) : (

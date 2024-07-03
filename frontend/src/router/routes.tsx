@@ -1,6 +1,6 @@
 import App from '@/App.tsx';
 import { ReactNode } from 'react';
-import { ContactRound, HardHatIcon, HomeIcon, MapPin, PackageOpenIcon } from 'lucide-react';
+import { ContactRound, HardHatIcon, HomeIcon, MapPin, MessageSquareTextIcon, PackageOpenIcon } from 'lucide-react';
 import Login from '@/components/pages/Login.tsx';
 import ProtectedRoute from '@/router/ProtectedRoute.tsx';
 import Clients from '@/components/pages/Clients.tsx';
@@ -13,6 +13,9 @@ import TasksDetails from '@/components/pages/Tasks/TasksDetails.tsx';
 import { Roles } from '@/utils/types.ts';
 import Employees from '@/components/pages/Employees.tsx';
 import EmployeeDetails from '@/components/pages/EmployeeDetails.tsx';
+import Calendar from '@/components/pages/Calendar.tsx';
+import Messages from '@/components/pages/Messages.tsx';
+import RoomDetails from '@/components/pages/RoomDetails.tsx';
 
 interface CustomRouteObject {
   path: string;
@@ -94,6 +97,15 @@ const routes: CustomRouteObject[] = [
     ),
   },
   {
+    path: '/locations/:locationId/:roomId',
+    alias: 'Rooms',
+    element: (
+      <ProtectedRoute roles={[Roles.ADMIN, Roles.CLIENT]}>
+        <RoomDetails />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: '/contracts/:contractId',
     alias: 'Contracts',
     element: (
@@ -112,6 +124,21 @@ const routes: CustomRouteObject[] = [
     ),
   },
   {
+    path: '/tasks/calendar',
+    alias: 'Task Scheduling',
+    element: <Calendar />,
+  },
+  {
+    path: '/tasks',
+    alias: 'Tasks Overview',
+    element: (
+      <ProtectedRoute roles={[Roles.ADMIN, Roles.CLIENT]}>
+        <App />
+      </ProtectedRoute>
+    ),
+    icon: <PackageOpenIcon />,
+  },
+  {
     path: '/tasks/:clientId',
     alias: 'Tasks Overview',
     element: (
@@ -119,7 +146,6 @@ const routes: CustomRouteObject[] = [
         <Tasks />
       </ProtectedRoute>
     ),
-    icon: <PackageOpenIcon />,
   },
   {
     path: 'tasks/:clientId/:contractId',
@@ -127,6 +153,15 @@ const routes: CustomRouteObject[] = [
     element: (
       <ProtectedRoute roles={[Roles.ADMIN, Roles.CLIENT]}>
         <TasksDetails />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: 'messages',
+    alias: 'Messages',
+    element: (
+      <ProtectedRoute roles={[Roles.ADMIN, Roles.CLIENT]}>
+        <Messages />
       </ProtectedRoute>
     ),
   },

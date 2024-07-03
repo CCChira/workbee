@@ -54,4 +54,17 @@ export declare class LocationsService {
         longitude: number;
         contractId: number;
     }[]>;
+    getLocationsWithContractAndClient(paginationParams?: Pagination, sortingParams?: Sorting): Promise<{
+        data: {
+            id: number;
+            name: string;
+            address: string;
+            latitude: number;
+            longitude: number;
+            contractId: number;
+        }[];
+        total: number;
+        page: number;
+        size: number;
+    }>;
 }

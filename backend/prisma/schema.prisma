@@ -8,6 +8,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -15,7 +19,8 @@ datasource db {
 
 model User {
   id                String           @id @default(uuid())
-  email             String           @unique
+  email             String?          @default("test@test.com")
+  phoneNumber       String?          @default("070000000")
   role              Role             @default(CLIENT)
   name              String?
   password          String
@@ -49,6 +54,8 @@ model TaskTemplate {
   TaskSchedule     TaskSchedule[]
   Contract         Contract?      @relation(fields: [contractId], references: [id], onDelete: Cascade)
   contractId       Int?
+  duration         String         @default("30m")
+  TaskInstance     TaskInstance[]
 }
 
 model TaskSchedule {
@@ -72,11 +79,14 @@ model TaskInstance {
   id             Int              @id @default(autoincrement())
   taskSchedule   TaskSchedule?    @relation(fields: [taskScheduleId], references: [id], onDelete: Cascade)
   taskScheduleId Int?
+  taskTemplate   TaskTemplate?    @relation(fields: [taskTemplateId], references: [id], onDelete: Cascade)
+  taskTemplateId Int?
   status         Status           @default(PENDING)
   date           DateTime
   hour           String
   room           Room             @relation(fields: [roomId], references: [id], onDelete: Cascade)
   roomId         Int
+  updatedAt      DateTime         @default(now()) @updatedAt
   TaskAssignment TaskAssignment[]
 }
 

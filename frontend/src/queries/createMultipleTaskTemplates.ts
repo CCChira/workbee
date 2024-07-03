@@ -13,7 +13,7 @@ export async function createMultipleTaskTemplates(data: CreateMultipleTaskTempla
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data.taskTemplates),
   });
-
+  console.log(response);
   if (!response.ok) {
     throw new Error('Failed to create multiple task templates.');
   }

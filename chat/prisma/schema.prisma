@@ -13,6 +13,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Users {
+  id          String  @id @default(uuid())
+  email       String? @default("test@test.com")
+  phoneNumber String? @default("0700000000")
+  role        Role    @default(CLIENT)
+  name        String?
+}
+
 model Message {
   id         String   @id @default(uuid())
   content    String

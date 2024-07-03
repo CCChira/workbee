@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -54,6 +56,14 @@ export class TaskinstanceController {
     });
   }
 
+  @Post()
+  @AuthDecorators([Role.ADMIN])
+  async createSingularTaskInstance(
+    @Body() createTaskInstanceDto: CreateTaskInstanceDto,
+  ) {
+    return this.taskInstanceService.createTaskInstance(createTaskInstanceDto);
+  }
+
   @Patch(':id')
   @AuthDecorators([Role.ADMIN])
   async updateTaskInstance(
@@ -65,16 +75,47 @@ export class TaskinstanceController {
       updateTaskInstanceDto,
     );
   }
-
+  @Delete('/removeByUserTask')
+  @AuthDecorators([Role.ADMIN, Role.CLIENT])
+  async removeUserFromTaskInstance(
+    @Query('userId') userId: string,
+    @Query('taskId') taskId: string,
+  ) {
+    return this.taskInstanceService.deleteUserFromTaskInstance(
+      parseInt(taskId),
+      userId,
+    );
+  }
   @Delete(':id')
   @AuthDecorators([Role.ADMIN])
   async deleteTaskInstance(@Param('id') instanceId: string) {
     return this.taskInstanceService.deleteTaskInstance(parseInt(instanceId));
   }
+  @Get('underStaffed')
+  @HttpCode(HttpStatus.OK)
+  async getUnderstaffedTasks() {
+    return this.taskInstanceService.getUnderstaffedTaskInstances();
+  }
+  @Get('taskEfficiency')
+  @HttpCode(HttpStatus.OK)
+  async fetchTaskLoadAndEfficiency() {
+    return this.taskInstanceService.fetchTaskLoadAndEfficiency();
+  }
   @Get('statuscount')
   @AuthDecorators([Role.ADMIN, Role.CLIENT])
-  async getStatusCounts() {
-    return this.taskInstanceService.getStatusCounts();
+  async getStatusCounts(
+    @Query('startDate') start: string,
+    @Query('endDate') end: string,
+  ) {
+    return this.taskInstanceService.getTaskStatusCounts({
+      start: start,
+      end: end,
+    });
+  }
+  @Get('this-month')
+  @AuthDecorators([Role.ADMIN, Role.CLIENT])
+  async getTaskInstancesThisMonth() {
+    return this.taskInstanceService.getTaskInstancesThisMonth();
   }
 
   @Get('by-schedule/:scheduleId')
@@ -86,16 +127,56 @@ export class TaskinstanceController {
       parseInt(taskScheduleId),
     );
   }
-
+  @Get('by-date-state')
+  async getTaskInstancesByDateState(
+    @Query('month') month: string,
+    @Query('year') year: string,
+    @Query('contractId') contractId: string,
+    @Query('roomId') roomId: string,
+    @Query('locationId') locationId: string,
+    @Query('userId') userId: string,
+    @Query('includeWorkers') includeWorkers: string,
+  ) {
+    return this.taskInstanceService.getTaskInstancesByDateState(
+      month,
+      year,
+      contractId,
+      roomId,
+      userId,
+      !!includeWorkers,
+      locationId,
+    );
+  }
+  @Get('room/:roomId')
+  @AuthDecorators([Role.ADMIN, Role.CLIENT])
+  @PagSortApiQuery()
+  async getTaskInstancesByRoomId(
+    @Param('roomId') roomId: string,
+    @PaginationParamsDecorator() paginationParams: Pagination,
+    @SortingParamsDecorator(['id', 'date', 'status', 'roomId'])
+    sortingParams: Sorting,
+  ) {
+    return this.taskInstanceService.getTaskInstancesByRoomId(
+      roomId,
+      paginationParams,
+      sortingParams,
+    );
+  }
   @Get('by-date')
   @AuthDecorators([Role.ADMIN, Role.CLIENT])
   async getTaskInstancesByDateInterval(
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
+    @Query('contractId') contractId: string,
+    @Query('roomId') roomId: string,
+    @Query('locationId') locationId: string,
   ) {
     return this.taskInstanceService.getTaskInstancesByDateInterval(
       startDate,
       endDate,
+      contractId,
+      roomId,
+      locationId,
     );
   }
 
@@ -106,12 +187,12 @@ export class TaskinstanceController {
   }
 
   @Get('assigned-to-user-dates/:userId')
-  @AuthDecorators([Role.ADMIN, Role.CLIENT])
   async getTasksAssignedToUserWithinInterval(
     @Param('userId') userId: string,
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
   ) {
+    console.log('here');
     return this.taskInstanceService.getTasksAssignedToUserWithinInterval(
       userId,
       startDate,

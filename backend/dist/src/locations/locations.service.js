@@ -58,21 +58,23 @@ let LocationsService = class LocationsService {
                     [sortingParams.property || 'id']: sortingParams.direction || 'desc',
                 },
             ],
-            where: searchParams.field && searchParams.searchParam
-                ? {
-                    contractId: actualContractId
-                        ? actualContractId
-                        : { in: contractIds },
-                    [searchParams.field]: {
-                        contains: searchParams.searchParam,
-                        mode: 'insensitive',
-                    },
-                }
-                : {
-                    contractId: actualContractId
-                        ? actualContractId
-                        : { in: contractIds },
-                },
+            where: contractId && clientId
+                ? searchParams.field && searchParams.searchParam
+                    ? {
+                        contractId: actualContractId
+                            ? actualContractId
+                            : { in: contractIds },
+                        [searchParams.field]: {
+                            contains: searchParams.searchParam,
+                            mode: 'insensitive',
+                        },
+                    }
+                    : {
+                        contractId: actualContractId
+                            ? actualContractId
+                            : { in: contractIds },
+                    }
+                : {},
         });
         return {
             data: response,
@@ -90,6 +92,40 @@ let LocationsService = class LocationsService {
         });
         console.log(response);
         return response;
+    }
+    async getLocationsWithContractAndClient(paginationParams, sortingParams) {
+        console.log(paginationParams, sortingParams);
+        if (!paginationParams || !sortingParams) {
+            const resp = await this.prisma.location.findMany();
+            const totalLocations = await this.prisma.location.count();
+            return {
+                data: resp,
+                total: totalLocations,
+                page: 1,
+                size: 1,
+            };
+        }
+        const locations = await this.prisma.location.findMany({
+            skip: paginationParams.offset ?? 0,
+            take: paginationParams.limit ?? 10,
+            orderBy: {
+                [sortingParams.property || 'id']: sortingParams.direction || 'desc',
+            },
+            include: {
+                Contract: {
+                    include: {
+                        user: true,
+                    },
+                },
+            },
+        });
+        const totalLocations = await this.prisma.location.count();
+        return {
+            data: locations,
+            total: totalLocations,
+            page: paginationParams.page,
+            size: paginationParams.size,
+        };
     }
 };
 exports.LocationsService = LocationsService;

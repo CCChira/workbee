@@ -22,6 +22,11 @@ __decorate([
     __metadata("design:type", Number)
 ], CreateTaskInstanceDto.prototype, "taskScheduleId", void 0);
 __decorate([
+    (0, class_validator_1.IsInt)(),
+    (0, swagger_1.ApiProperty)(),
+    __metadata("design:type", Number)
+], CreateTaskInstanceDto.prototype, "taskTemplateId", void 0);
+__decorate([
     (0, class_validator_1.IsString)(),
     (0, swagger_1.ApiProperty)(),
     __metadata("design:type", String)

@@ -1,37 +1,18 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
-
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import {AntDesign, Entypo, FontAwesome, FontAwesome6} from "@expo/vector-icons";
+import {useUser} from "@/context/UserContext";
+import {useEffect} from "react";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+  const {user} = useUser();
+  useEffect(() => {
+    console.log(user)
+  }, []);
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
-          ),
-        }}
-      />
+    <Tabs screenOptions={{headerShown: false, tabBarActiveBackgroundColor: '#EA580C', tabBarInactiveBackgroundColor: '#292524'}}>
+      <Tabs.Screen name="(home)/index" options={{href: null}}/>
+      <Tabs.Screen name="(home)/details" options={user.name != '' ? {title: 'Chats', tabBarIcon: ({color}) =><Entypo name="message" size={26} color={color} />} : {href: null}} />
+      <Tabs.Screen name="settings" options={user.name != '' ? {title: 'Settings', tabBarIcon: ({color}) => <FontAwesome size={26} name={'cog'} color={color}/>} : {href: null}}/>
     </Tabs>
   );
 }

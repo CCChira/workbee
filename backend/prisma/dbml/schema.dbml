@@ -1,0 +1,214 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id String [pk]
+  email String [default: 'test@test.com']
+  phoneNumber String [default: '070000000']
+  role Role [not null, default: 'CLIENT']
+  name String
+  password String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  TaskAssignment TaskAssignment [not null]
+  Contract Contract [not null]
+  createdRequests Request [not null]
+  addressedRequests Request [not null]
+}
+
+Table Tools {
+  id Int [pk, increment]
+  name String [not null]
+  type ToolType [not null]
+}
+
+Table InviteCodes {
+  id String [pk]
+  email String [unique]
+  phoneNumber String
+  role Role [not null, default: 'CLIENT']
+  registered Boolean [not null, default: false]
+}
+
+Table TaskTemplate {
+  id Int [pk, increment]
+  title String [not null]
+  necessaryWorkers Int [not null, default: 1]
+  necessaryTools String[] [not null]
+  TaskSchedule TaskSchedule [not null]
+  Contract Contract
+  contractId Int
+  duration String [not null, default: '30m']
+  TaskInstance TaskInstance [not null]
+}
+
+Table TaskSchedule {
+  id Int [pk, increment]
+  taskTemplate TaskTemplate [not null]
+  taskTemplateId Int [not null]
+  description String [not null]
+  dayOfWeek Int[] [not null]
+  frequency Int[] [not null]
+  startDate DateTime [default: `now()`, not null]
+  endDate DateTime [not null]
+  isActive Boolean [not null]
+  status Status [not null, default: 'PENDING']
+  hour String [not null]
+  roomId Int [not null]
+  room Room [not null]
+  TaskInstance TaskInstance [not null]
+}
+
+Table TaskInstance {
+  id Int [pk, increment]
+  taskSchedule TaskSchedule
+  taskScheduleId Int
+  taskTemplate TaskTemplate
+  taskTemplateId Int
+  status Status [not null, default: 'PENDING']
+  date DateTime [not null]
+  hour String [not null]
+  room Room [not null]
+  roomId Int [not null]
+  updatedAt DateTime [default: `now()`, not null]
+  TaskAssignment TaskAssignment [not null]
+}
+
+Table Vehicle {
+  id Int [pk, increment]
+  name String [not null]
+  licensePlate String [not null]
+  loadCapacity Float [not null]
+  seats Int [not null]
+}
+
+Table TaskAssignment {
+  task TaskInstance [not null]
+  taskId Int [not null]
+  user User [not null]
+  userId String [not null]
+
+  indexes {
+    (taskId, userId) [pk]
+  }
+}
+
+Table Contract {
+  id Int [pk, increment]
+  title String [not null]
+  description String [not null]
+  startDate String
+  endDate String
+  clientId String
+  pdfUrl String
+  user User
+  taskTemplates TaskTemplate [not null]
+  locations Location [not null]
+}
+
+Table Location {
+  id Int [pk, increment]
+  name String [not null]
+  address String [not null]
+  latitude Float [not null]
+  longitude Float [not null]
+  Room Room [not null]
+  contractId Int
+  Contract Contract
+}
+
+Table Room {
+  id Int [pk, increment]
+  name String [not null]
+  location Location [not null]
+  locationId Int [not null]
+  accessMode AccessMode [not null]
+  images Image [not null]
+  TaskInstance TaskInstance [not null]
+  TaskSchedule TaskSchedule [not null]
+}
+
+Table Image {
+  id Int [pk, increment]
+  url String [not null]
+  roomId Int [not null]
+  room Room [not null]
+}
+
+Table Request {
+  id Int [pk, increment]
+  type RequestType [not null]
+  status Status [not null, default: 'PENDING']
+  details Json [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  createdBy User [not null]
+  assignedTo User [not null]
+  assignedToId String [not null]
+  createdById String [not null]
+}
+
+Enum AccessMode {
+  STAIRS
+  ELEVATOR
+  RAMP
+}
+
+Enum RequestType {
+  TASK_SCHEDULE_CREATION
+  TASK_INSTANCE_REDO
+  TASK_INSTANCE_CREATION
+  TASK_INSTANCE_UPDATE
+}
+
+Enum Status {
+  UNASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  INCOMPLETE
+  REQUESTED_CANCEL
+  VERIFIED
+  PENDING
+}
+
+Enum Role {
+  ADMIN
+  EMPLOYEE
+  CLIENT
+}
+
+Enum ToolType {
+  PLUG
+  BATTERIES
+  GASOLINE
+}
+
+Ref: TaskTemplate.contractId > Contract.id [delete: Cascade]
+
+Ref: TaskSchedule.taskTemplateId > TaskTemplate.id [delete: Cascade]
+
+Ref: TaskSchedule.roomId > Room.id [delete: Cascade]
+
+Ref: TaskInstance.taskScheduleId > TaskSchedule.id [delete: Cascade]
+
+Ref: TaskInstance.taskTemplateId > TaskTemplate.id [delete: Cascade]
+
+Ref: TaskInstance.roomId > Room.id [delete: Cascade]
+
+Ref: TaskAssignment.taskId > TaskInstance.id [delete: Cascade]
+
+Ref: TaskAssignment.userId > User.id [delete: Cascade]
+
+Ref: Contract.clientId > User.id [delete: Cascade]
+
+Ref: Location.contractId > Contract.id [delete: Cascade]
+
+Ref: Room.locationId > Location.id [delete: Cascade]
+
+Ref: Image.roomId > Room.id [delete: Cascade]
+
+Ref: Request.createdById > User.id [delete: Cascade]
+
+Ref: Request.assignedToId > User.id [delete: Cascade]

@@ -42,6 +42,9 @@ let ContractsController = class ContractsController {
     async getContracts(paginationParams, sortingParams, searchParam) {
         return this.contractsService.getAllContracts(paginationParams, sortingParams, searchParam);
     }
+    async getTopContracts() {
+        return this.contractsService.getTopContracts();
+    }
     async getContractsByClientId(paginationParams, sortingParams, searchParam, clientId) {
         return this.contractsService.getAllContractsByClientId(clientId, paginationParams, sortingParams, searchParam);
     }
@@ -69,6 +72,13 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], ContractsController.prototype, "getContracts", null);
+__decorate([
+    (0, common_1.Get)('top5contracts'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ContractsController.prototype, "getTopContracts", null);
 __decorate([
     (0, common_1.Get)('all'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),

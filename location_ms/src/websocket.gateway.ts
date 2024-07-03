@@ -9,11 +9,11 @@ import {
 import {Server, Socket} from 'socket.io';
 
 @WebSocketGateway({
-  cors: {
-    origin: '*',
-  }
+  path: '/ms',
+  namespace: '/ms'
 })
 export class LocationGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
+
   @WebSocketServer()
   server: Server;
 

@@ -6,9 +6,14 @@ import { LocationData, TaskTemplate } from '@/queries/clientDetails.ts';
 import Map, { Marker, Popup } from 'react-map-gl';
 import { useQuery } from 'react-query';
 import { QueryResponse } from '@/utils/types.ts';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx';
 import { getTaskTemplates } from '@/queries/taskTemplatesDetails.ts';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog.tsx';
+import CreateLocationForm from '@/components/forms/CreateLocationForm.tsx';
+import { Location } from '@/queries/getAllLocations.ts';
 
 const locationColumns: ColumnDef<LocationData>[] = [
   {
@@ -45,18 +50,17 @@ const taskTemplateColumns: ColumnDef<TaskTemplate>[] = [
   },
 ];
 
-const mapBoxAccessToken = 'pk.eyJ1Ijoic2t5MTMzNyIsImEiOiJjbHZtZXVrbXEwMXJ1MnFsOWZlM3VvZGw3In0.U_n4PkUbZjGV7gor_49rUA';
 function ContractDetails() {
   const [popUp, setPopUp] = useState({ latitude: 0, longitude: 0 });
   const { contractId } = useParams();
-  const { data, isLoading } = useQuery<QueryResponse<LocationData>>(`locationContract${contractId}`, {
+  const { data, isLoading } = useQuery<QueryResponse<LocationData[]>>(`locationContract${contractId}`, {
     queryFn: () => getContractLocations(contractId ?? ''),
   });
   let longitude = 0;
   let latitude = 0;
 
   if (!isLoading && data) {
-    data.data.forEach((location) => {
+    (data as unknown as { data: Location[] }).data.forEach((location) => {
       latitude += location.latitude;
       longitude += location.longitude;
     });
@@ -66,8 +70,8 @@ function ContractDetails() {
   const hoverFn = (rowNo: string) => {
     if (!isLoading && data) {
       setPopUp({
-        latitude: data.data[rowNo as keyof typeof data.data].latitude,
-        longitude: data.data[rowNo as keyof typeof data.data].longitude,
+        latitude: (data as unknown as { data: Location[] }).data[rowNo as keyof typeof data.data].latitude,
+        longitude: (data as unknown as { data: Location[] }).data[rowNo as keyof typeof data.data].longitude,
       });
     }
   };
@@ -77,30 +81,33 @@ function ContractDetails() {
       longitude: 0,
     });
   };
-  useEffect(() => {
-    console.log(popUp);
-  }, [popUp]);
+
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle>Details for contract</CardTitle>
-        </CardHeader>
-      </Card>
+      <h1 className="text-3xl font-medium">Details for contract</h1>
       {contractId && data && (
         <div className="flex flex-col gap-4">
           <Card className="h-fit bg-transparent">
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Locations</CardTitle>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button>Add Location</Button>
+                </DialogTrigger>
+                <DialogContent className="min-w-[calc(100vw-800px)] max-h-[900px] h-[600px] flex items-center justify-center">
+                  <CreateLocationForm onSuccess={() => console.log('ok')} contractId={contractId} lockFields={false} />
+                </DialogContent>
+              </Dialog>
             </CardHeader>
             <CardContent className="flex gap-4 w-full">
               <Map
-                mapboxAccessToken={mapBoxAccessToken}
+                mapboxAccessToken={import.meta.env.VITE_MAPS_KEY}
                 style={{ width: '400px', height: '400px', borderRadius: '2.5%' }}
                 mapStyle="mapbox://styles/mapbox/streets-v9"
                 initialViewState={{
                   latitude: latitude,
                   longitude: longitude,
+                  zoom: 10,
                 }}
               >
                 <>
@@ -128,7 +135,7 @@ function ContractDetails() {
                   )}
                 </>
               </Map>
-              <div className="w-1/2">
+              <div className="w-full">
                 <QueryTable
                   queryFn={(pagSort) => getContractLocations(contractId, pagSort)}
                   queryKey={`locationContract${contractId}`}
@@ -141,6 +148,7 @@ function ContractDetails() {
                   navigateToState="coords"
                   onRowHover={hoverFn}
                   onRowExit={leaveFn}
+                  searchField="name"
                 />
               </div>
             </CardContent>
@@ -158,6 +166,7 @@ function ContractDetails() {
               defaultSort={'title'}
               navigateTo="/task-templates"
               navigateToState="details"
+              searchField="title"
             />
           </div>
         </div>

@@ -12,7 +12,6 @@ interface CreateLocationFormProps {
   lockFields: boolean;
 }
 
-// Define the initial state for the map's view
 const initialViewState: ViewState = {
   longitude: 23.59991552647557,
   latitude: 46.76698245436452,
@@ -22,17 +21,16 @@ const initialViewState: ViewState = {
   padding: { top: 0, right: 0, bottom: 0, left: 0 },
 };
 
-// Reverse geocoding function using the Mapbox API
 const reverseGeocode = async (longitude: number, latitude: number) => {
-  const mapboxAccessToken = 'pk.eyJ1Ijoic2t5MTMzNyIsImEiOiJjbHZtZXVrbXEwMXJ1MnFsOWZlM3VvZGw3In0.U_n4PkUbZjGV7gor_49rUA';
   const response = await fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${mapboxAccessToken}`,
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${import.meta.env.VITE_MAPS_KEY}`,
   );
   const data = await response.json();
   return data.features[0]?.place_name || 'Unknown Location';
 };
 
 const CreateLocationForm = ({ contractId, lockFields, onSuccess }: CreateLocationFormProps) => {
+  console.log(lockFields);
   const [viewState, setViewState] = React.useState(initialViewState);
   const { markers, addMarker, updateMarker, deleteMarkers } = useCreateLocationMarkerStore();
   const createMultipleLocations = useCreateMultipleLocationsMutation();

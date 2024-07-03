@@ -46,6 +46,16 @@ export declare class RoomsService {
             url: string;
             roomId: number;
         }[];
+        TaskInstance: {
+            id: number;
+            taskScheduleId: number;
+            taskTemplateId: number;
+            status: import(".prisma/client").$Enums.Status;
+            date: Date;
+            hour: string;
+            roomId: number;
+            updatedAt: Date;
+        }[];
     } & {
         id: number;
         name: string;
@@ -59,5 +69,24 @@ export declare class RoomsService {
             locationId: number;
             accessMode: import(".prisma/client").$Enums.AccessMode;
         }[];
+    }>;
+    getRoomsByLocationId(locationId: string, pagination: Pagination, sorting: Sorting): Promise<{
+        data: {
+            images: {
+                url: string;
+                id: number;
+                roomId: number;
+            }[];
+            location: {
+                name: string;
+            };
+            id: number;
+            name: string;
+            locationId: number;
+            accessMode: import(".prisma/client").$Enums.AccessMode;
+        }[];
+        total: number;
+        page: number;
+        size: number;
     }>;
 }

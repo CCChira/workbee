@@ -65,6 +65,12 @@ export class ContractsController {
       searchParam,
     );
   }
+  @Get('top5contracts')
+  @HttpCode(HttpStatus.OK)
+  public async getTopContracts() {
+    return this.contractsService.getTopContracts();
+  }
+
   @Get('all')
   @HttpCode(HttpStatus.OK)
   @PagSortApiQuery()

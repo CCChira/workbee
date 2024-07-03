@@ -15,6 +15,9 @@ import { Button } from '../ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useMutation, useQueryClient } from 'react-query';
 import { deleteMultipleUsers } from '@/queries/users.ts';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog.tsx';
+import UpdateUserForm from '@/components/forms/UpdateUserForm.tsx';
+import { Router } from 'react-router-dom';
 
 const columns: ColumnDef<User>[] = [
   {
@@ -59,14 +62,14 @@ const columns: ColumnDef<User>[] = [
     cell: ({ row }) => {
       const date = new Date(row.original.createdAt);
 
-      return <div className="w-fit">{date.toLocaleDateString()}</div>;
+      return <div className="w-fit px-5">{date.toISOString().split('T')[0]}</div>;
     },
   },
   {
     id: 'taskInstances',
     accessorKey: 'taskInstances',
     header: 'Task Assigned',
-    cell: ({ row }) => <div>{row.original._count.TaskAssignment}</div>,
+    cell: ({ row }) => <div className="px-5">{row.original._count.TaskAssignment}</div>,
   },
   {
     id: 'actions',
@@ -83,6 +86,7 @@ const columns: ColumnDef<User>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
             <DropdownMenuItem
               onClick={(event) => {
                 event.preventDefault();
@@ -94,8 +98,25 @@ const columns: ColumnDef<User>[] = [
               View Employee
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Delete Employee</DropdownMenuItem>
-            <DropdownMenuItem>Update Employee</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+              }}
+            >
+              Delete Employee
+            </DropdownMenuItem>
+            <Dialog>
+              <DialogTrigger
+                onClick={(event) => event.stopPropagation()}
+                className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 hover:bg-primary-foreground"
+              >
+                Update Employee
+              </DialogTrigger>
+              <DialogContent onClick={(event) => event.stopPropagation()}>
+                <UpdateUserForm onSuccess={() => {}} id={row.original.id} />
+              </DialogContent>
+            </Dialog>
           </DropdownMenuContent>
         </DropdownMenu>
       );

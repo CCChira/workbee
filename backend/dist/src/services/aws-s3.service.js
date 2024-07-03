@@ -15,15 +15,17 @@ const common_1 = require("@nestjs/common");
 const client_s3_1 = require("@aws-sdk/client-s3");
 const s3_request_presigner_1 = require("@aws-sdk/s3-request-presigner");
 const dotenv = require("dotenv");
+const config_1 = require("@nestjs/config");
 dotenv.config();
 let AwsS3Service = AwsS3Service_1 = class AwsS3Service {
-    constructor() {
+    constructor(configService) {
+        this.configService = configService;
         this.logger = new common_1.Logger(AwsS3Service_1.name);
         this.s3Client = new client_s3_1.S3Client({
-            region: process.env.AWS_REGION,
+            region: this.configService.get('AWS_REGION'),
             credentials: {
-                accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+                accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID'),
+                secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
             },
         });
     }
@@ -64,6 +66,6 @@ let AwsS3Service = AwsS3Service_1 = class AwsS3Service {
 exports.AwsS3Service = AwsS3Service;
 exports.AwsS3Service = AwsS3Service = AwsS3Service_1 = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [config_1.ConfigService])
 ], AwsS3Service);
 //# sourceMappingURL=aws-s3.service.js.map

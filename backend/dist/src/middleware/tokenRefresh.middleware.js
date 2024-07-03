@@ -20,31 +20,34 @@ let TokenRefreshMiddleware = class TokenRefreshMiddleware {
         this.jwtService = jwtService;
     }
     async use(req, res, next) {
-        const accessToken = req.cookies['access_token'];
-        const refreshToken = req.cookies['refresh_token'];
-        if (!accessToken && refreshToken) {
-            try {
-                const decoded = this.jwtService.verify(refreshToken, {
-                    secret: 'zjP9h6ZI5LoSKCRj',
-                });
-                console.log(decoded);
-                const newAccessToken = this.jwtService.sign({ id: decoded.id, role: decoded.role }, { expiresIn: '1h', secret: 'zjP9h6ZI5LoSKCRj' });
-                const newRefreshToken = this.jwtService.sign({ id: decoded.id, tokenId: (0, uuid_1.v4)(), role: decoded.role }, { expiresIn: '7d', secret: 'zjP9h6ZI5LoSKCRj' });
-                res.cookie('access_token', newAccessToken, {
-                    httpOnly: true,
-                    maxAge: 3600000,
-                });
-                res.cookie('refresh_token', newRefreshToken, {
-                    httpOnly: true,
-                    maxAge: 604800000,
-                });
-                req.cookies['access_token'] = newAccessToken;
-                req.cookies['refresh_token'] = newRefreshToken;
-                next();
+        if (!req.url.includes('userChatId')) {
+            const accessToken = req.cookies['access_token'];
+            const refreshToken = req.cookies['refresh_token'];
+            if (!accessToken && refreshToken) {
+                try {
+                    const decoded = this.jwtService.verify(refreshToken, {
+                        secret: 'zjP9h6ZI5LoSKCRj',
+                    });
+                    const newAccessToken = this.jwtService.sign({ id: decoded.id, role: decoded.role }, { expiresIn: '1h', secret: 'zjP9h6ZI5LoSKCRj' });
+                    const newRefreshToken = this.jwtService.sign({ id: decoded.id, tokenId: (0, uuid_1.v4)(), role: decoded.role }, { expiresIn: '7d', secret: 'zjP9h6ZI5LoSKCRj' });
+                    res.cookie('access_token', newAccessToken, {
+                        httpOnly: true,
+                        maxAge: 3600000,
+                    });
+                    res.cookie('refresh_token', newRefreshToken, {
+                        httpOnly: true,
+                        maxAge: 604800000,
+                    });
+                    req.cookies['access_token'] = newAccessToken;
+                    req.cookies['refresh_token'] = newRefreshToken;
+                    next();
+                }
+                catch (error) {
+                    throw new common_1.UnauthorizedException('Session has expired, please log in again');
+                }
             }
-            catch (error) {
-                console.error('Token refresh error:', error);
-                throw new common_1.UnauthorizedException('Session has expired, please log in again');
+            else {
+                next();
             }
         }
         else {

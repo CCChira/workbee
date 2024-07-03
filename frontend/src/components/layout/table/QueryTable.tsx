@@ -8,10 +8,10 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { useCallback, useEffect, useReducer, useState } from 'react';
+import { useCallback, useReducer, useState } from 'react';
 import { Button } from '@/components/ui/button.tsx';
 import { Action, customPagSort, PaginationSortingState, QueryResponse } from '@/utils/types.ts';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { ArrowUpDown } from 'lucide-react';
 import { Input } from '@/components/ui/input.tsx';
 import { useForm } from 'react-hook-form';
@@ -20,6 +20,7 @@ import { debounce } from 'lodash';
 import { FormControl, FormField, FormItem } from '@/components/ui/form.tsx';
 import { useNavigate } from 'react-router-dom';
 import TableSkeleton from '@/components/layout/table/TableSkeleton.tsx';
+
 interface QueryTableProps<TType, TValue> {
   queryFn: (pagSort: PaginationSortingState) => Promise<QueryResponse<TType>>;
   queryKey: string | string[];
@@ -37,6 +38,7 @@ interface QueryTableProps<TType, TValue> {
   showActionBtns?: boolean;
   refetchOnMount?: boolean;
 }
+
 function reducer(state: PaginationSortingState, action: Action): PaginationSortingState {
   switch (action.type) {
     case 'SET_SIZE':
@@ -81,7 +83,6 @@ function QueryTable<TType extends { id: string | number }, TValue>({
   refetchOnMount = false,
 }: QueryTableProps<TType, TValue>) {
   const [pagSort, dispatch] = useReducer(reducer, customPagSort(maxResults, defaultSort));
-  const queryClient = useQueryClient();
   const { data, isLoading } = useQuery<QueryResponse<TType>, Error>(
     [queryKey, pagSort],
     () => {
@@ -155,6 +156,7 @@ function QueryTable<TType extends { id: string | number }, TValue>({
     if (selectedDeleteFn) selectedDeleteFn(table.getFilteredSelectedRowModel().rows);
     setRowSelection({});
   }, [selectedDeleteFn, table]);
+
   return (
     <div className="w-full flex flex-col gap-4 justify-between">
       <div className="flex w-full justify-between gap-4">

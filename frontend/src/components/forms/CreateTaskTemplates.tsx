@@ -87,7 +87,6 @@ function CreateMultipleTaskTemplatesForm({ onSuccess, lockFields, contractId }: 
   };
 
   return (
-    // src/components/CreateMultipleTaskTemplatesForm.tsx
     <div className="flex flex-col gap-4 items-center justify-center w-full px-4">
       {taskTemplates.map((template, index) => (
         <Card key={index} className="w-full mb-4 border border-primary">
@@ -120,7 +119,6 @@ function CreateMultipleTaskTemplatesForm({ onSuccess, lockFields, contractId }: 
               value={template.necessaryWorkers}
               onChange={(e) => handleInputChange(index, 'necessaryWorkers', parseInt(e.target.value))}
               disabled={lockFields}
-              //className="border-primary"
             />
 
             <div className="flex gap-4 w-full flex-wrap">
@@ -131,7 +129,7 @@ function CreateMultipleTaskTemplatesForm({ onSuccess, lockFields, contractId }: 
                     value={tool}
                     onChange={(e) => handleToolChange(index, toolIndex, e.target.value)}
                     disabled={lockFields}
-                    className="w-full rounded-r-none"
+                    className="w-full rounded-r-none focus:border-none"
                     key={`tool${toolIndex}`}
                   />
                   <Button

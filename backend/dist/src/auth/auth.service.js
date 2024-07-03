@@ -34,7 +34,7 @@ let AuthService = class AuthService {
     }
     async login(email, password) {
         console.log(email, password);
-        const user = await this.prisma.user.findUnique({ where: { email: email } });
+        const user = await this.prisma.user.findFirst({ where: { email: email } });
         if (!user) {
             throw new common_1.NotFoundException({
                 message: `Invalid email or password`,

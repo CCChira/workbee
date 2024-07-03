@@ -23,6 +23,28 @@ export declare class ContractsController {
         page: number;
         size: number;
     }>;
+    getTopContracts(): Promise<({
+        taskTemplates: ({
+            _count: {
+                TaskSchedule: number;
+            };
+        } & {
+            id: number;
+            title: string;
+            necessaryWorkers: number;
+            necessaryTools: string[];
+            contractId: number;
+            duration: string;
+        })[];
+    } & {
+        id: number;
+        title: string;
+        description: string;
+        startDate: string;
+        endDate: string;
+        clientId: string;
+        pdfUrl: string;
+    })[]>;
     getContractsByClientId(paginationParams: Pagination, sortingParams: Sorting, searchParam: ISearch, clientId: string): Promise<{
         data: {
             id: number;

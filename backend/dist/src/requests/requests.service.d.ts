@@ -61,6 +61,7 @@ export declare class RequestsService {
             createdBy: {
                 id: string;
                 email: string;
+                phoneNumber: string;
                 role: import(".prisma/client").$Enums.Role;
                 name: string;
                 password: string;

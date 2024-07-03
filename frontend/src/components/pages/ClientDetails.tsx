@@ -221,7 +221,6 @@ function ClientDetails() {
                 columns={contractColumns}
                 sortableColumns={{
                   title: true,
-                  description: true,
                   taskTemplates: false,
                 }}
                 searchField="title"

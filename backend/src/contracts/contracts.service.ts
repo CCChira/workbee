@@ -8,6 +8,38 @@ import { CreateContractDto } from './dto/createContract.dto';
 @Injectable()
 export class ContractsService {
   constructor(private readonly prisma: PrismaService) {}
+  async getTopContracts() {
+    return this.prisma.contract.findMany({
+      where: {
+        taskTemplates: {
+          some: {
+            TaskSchedule: {
+              some: {
+                isActive: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        taskTemplates: {
+          _count: 'desc',
+        },
+      },
+      take: 5,
+      include: {
+        taskTemplates: {
+          include: {
+            _count: {
+              select: {
+                TaskSchedule: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
   createContract(createContractDto: CreateContractDto, clientId: string) {
     console.log(createContractDto);
     return this.prisma.contract.create({

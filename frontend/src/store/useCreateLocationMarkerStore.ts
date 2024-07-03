@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-// Marker coordinates interface
 interface MarkerCoordinates {
   longitude: number;
   latitude: number;
@@ -9,7 +8,6 @@ interface MarkerCoordinates {
   name?: string;
 }
 
-// Store structure
 interface MarkerStore {
   markers: MarkerCoordinates[];
   addMarker: (marker: MarkerCoordinates) => void;
@@ -34,7 +32,7 @@ export const useCreateLocationMarkerStore = create(
       deleteMarkers: () => set({ markers: [] }),
     }),
     {
-      name: 'marker-storage', // Unique key for persisted storage
+      name: 'marker-storage',
     },
   ),
 );

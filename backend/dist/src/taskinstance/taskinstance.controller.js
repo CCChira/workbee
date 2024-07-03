@@ -41,25 +41,50 @@ let TaskinstanceController = class TaskinstanceController {
             addressedToId: user.id,
         });
     }
+    async createSingularTaskInstance(createTaskInstanceDto) {
+        return this.taskInstanceService.createTaskInstance(createTaskInstanceDto);
+    }
     async updateTaskInstance(instanceId, updateTaskInstanceDto) {
         return this.taskInstanceService.updateTaskInstance(parseInt(instanceId), updateTaskInstanceDto);
+    }
+    async removeUserFromTaskInstance(userId, taskId) {
+        return this.taskInstanceService.deleteUserFromTaskInstance(parseInt(taskId), userId);
     }
     async deleteTaskInstance(instanceId) {
         return this.taskInstanceService.deleteTaskInstance(parseInt(instanceId));
     }
-    async getStatusCounts() {
-        return this.taskInstanceService.getStatusCounts();
+    async getUnderstaffedTasks() {
+        return this.taskInstanceService.getUnderstaffedTaskInstances();
+    }
+    async fetchTaskLoadAndEfficiency() {
+        return this.taskInstanceService.fetchTaskLoadAndEfficiency();
+    }
+    async getStatusCounts(start, end) {
+        return this.taskInstanceService.getTaskStatusCounts({
+            start: start,
+            end: end,
+        });
+    }
+    async getTaskInstancesThisMonth() {
+        return this.taskInstanceService.getTaskInstancesThisMonth();
     }
     async getTaskInstancesByTaskScheduleId(taskScheduleId) {
         return this.taskInstanceService.getTaskInstancesByTaskScheduleId(parseInt(taskScheduleId));
     }
-    async getTaskInstancesByDateInterval(startDate, endDate) {
-        return this.taskInstanceService.getTaskInstancesByDateInterval(startDate, endDate);
+    async getTaskInstancesByDateState(month, year, contractId, roomId, locationId, userId, includeWorkers) {
+        return this.taskInstanceService.getTaskInstancesByDateState(month, year, contractId, roomId, userId, !!includeWorkers, locationId);
+    }
+    async getTaskInstancesByRoomId(roomId, paginationParams, sortingParams) {
+        return this.taskInstanceService.getTaskInstancesByRoomId(roomId, paginationParams, sortingParams);
+    }
+    async getTaskInstancesByDateInterval(startDate, endDate, contractId, roomId, locationId) {
+        return this.taskInstanceService.getTaskInstancesByDateInterval(startDate, endDate, contractId, roomId, locationId);
     }
     async getTasksAssignedToUser(userId) {
         return this.taskInstanceService.getTasksAssignedToUser(userId);
     }
     async getTasksAssignedToUserWithinInterval(userId, startDate, endDate) {
+        console.log('here');
         return this.taskInstanceService.getTasksAssignedToUserWithinInterval(userId, startDate, endDate);
     }
     async getTasksAssignedToUserThisWeek(userId) {
@@ -85,6 +110,14 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TaskinstanceController.prototype, "createTaskInstance", null);
 __decorate([
+    (0, common_1.Post)(),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN]),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [createTaskInstance_dto_1.CreateTaskInstanceDto]),
+    __metadata("design:returntype", Promise)
+], TaskinstanceController.prototype, "createSingularTaskInstance", null);
+__decorate([
     (0, common_1.Patch)(':id'),
     (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN]),
     __param(0, (0, common_1.Param)('id')),
@@ -94,6 +127,15 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TaskinstanceController.prototype, "updateTaskInstance", null);
 __decorate([
+    (0, common_1.Delete)('/removeByUserTask'),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
+    __param(0, (0, common_1.Query)('userId')),
+    __param(1, (0, common_1.Query)('taskId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], TaskinstanceController.prototype, "removeUserFromTaskInstance", null);
+__decorate([
     (0, common_1.Delete)(':id'),
     (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN]),
     __param(0, (0, common_1.Param)('id')),
@@ -102,12 +144,35 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TaskinstanceController.prototype, "deleteTaskInstance", null);
 __decorate([
+    (0, common_1.Get)('underStaffed'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], TaskinstanceController.prototype, "getUnderstaffedTasks", null);
+__decorate([
+    (0, common_1.Get)('taskEfficiency'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], TaskinstanceController.prototype, "fetchTaskLoadAndEfficiency", null);
+__decorate([
     (0, common_1.Get)('statuscount'),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
+    __param(0, (0, common_1.Query)('startDate')),
+    __param(1, (0, common_1.Query)('endDate')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], TaskinstanceController.prototype, "getStatusCounts", null);
+__decorate([
+    (0, common_1.Get)('this-month'),
     (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], TaskinstanceController.prototype, "getStatusCounts", null);
+], TaskinstanceController.prototype, "getTaskInstancesThisMonth", null);
 __decorate([
     (0, common_1.Get)('by-schedule/:scheduleId'),
     (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
@@ -117,12 +182,39 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TaskinstanceController.prototype, "getTaskInstancesByTaskScheduleId", null);
 __decorate([
+    (0, common_1.Get)('by-date-state'),
+    __param(0, (0, common_1.Query)('month')),
+    __param(1, (0, common_1.Query)('year')),
+    __param(2, (0, common_1.Query)('contractId')),
+    __param(3, (0, common_1.Query)('roomId')),
+    __param(4, (0, common_1.Query)('locationId')),
+    __param(5, (0, common_1.Query)('userId')),
+    __param(6, (0, common_1.Query)('includeWorkers')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, String, String, String, String, String]),
+    __metadata("design:returntype", Promise)
+], TaskinstanceController.prototype, "getTaskInstancesByDateState", null);
+__decorate([
+    (0, common_1.Get)('room/:roomId'),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
+    (0, PagSortApiQuery_decorator_1.PagSortApiQuery)(),
+    __param(0, (0, common_1.Param)('roomId')),
+    __param(1, (0, paginationParams_decorator_1.PaginationParamsDecorator)()),
+    __param(2, (0, sortingParams_decorator_1.SortingParamsDecorator)(['id', 'date', 'status', 'roomId'])),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], TaskinstanceController.prototype, "getTaskInstancesByRoomId", null);
+__decorate([
     (0, common_1.Get)('by-date'),
     (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
     __param(0, (0, common_1.Query)('startDate')),
     __param(1, (0, common_1.Query)('endDate')),
+    __param(2, (0, common_1.Query)('contractId')),
+    __param(3, (0, common_1.Query)('roomId')),
+    __param(4, (0, common_1.Query)('locationId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String, String, String, String, String]),
     __metadata("design:returntype", Promise)
 ], TaskinstanceController.prototype, "getTaskInstancesByDateInterval", null);
 __decorate([
@@ -135,7 +227,6 @@ __decorate([
 ], TaskinstanceController.prototype, "getTasksAssignedToUser", null);
 __decorate([
     (0, common_1.Get)('assigned-to-user-dates/:userId'),
-    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
     __param(0, (0, common_1.Param)('userId')),
     __param(1, (0, common_1.Query)('startDate')),
     __param(2, (0, common_1.Query)('endDate')),

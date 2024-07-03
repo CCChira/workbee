@@ -9,6 +9,8 @@ import {
   Logger,
   Param,
   Post,
+  Put,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -32,6 +34,7 @@ import { DeleteMultipleUsersDto } from './dto/deleteMultipleUsers.dto';
 import { DummyProvider } from '../providers/SMSProvider/dummyProvider.service';
 import { InviteUserDto } from './dto/inviteUser.dto';
 import { CreateUserDto } from './dto/createUser.dto';
+import { UpdateUserDto } from './dto/updateUser.dto';
 
 @ApiBearerAuth()
 @ApiTags('Users')
@@ -47,7 +50,6 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @PagSortApiQuery()
   @SearchApiQuery()
-  @AuthDecorators([Role.ADMIN])
   public async getUsers(
     @PaginationParamsDecorator() paginationParams: Pagination,
     @SortingParamsDecorator(['id', 'role', 'email', 'name', 'createdAt'])
@@ -60,6 +62,18 @@ export class UsersController {
       searchParams,
     );
   }
+  @Get('topEmployees')
+  @HttpCode(HttpStatus.OK)
+  public async topEmployees() {
+    return this.usersService.getTopUsersByCompletedTasks();
+  }
+
+  @Get('employeeUtil')
+  @HttpCode(HttpStatus.OK)
+  async getUtilEmployee() {
+    return this.usersService.getTaskCountsByStatusForEmployees();
+  }
+
   @Get('clients')
   @HttpCode(HttpStatus.OK)
   @PagSortApiQuery()
@@ -77,6 +91,13 @@ export class UsersController {
       searchParams,
     );
   }
+
+  @Get('getUserChat')
+  @HttpCode(HttpStatus.OK)
+  public async getUserChat(@Query('userChatId') userId: string) {
+    return this.usersService.getUserChat(userId);
+  }
+
   @Get('employees')
   @HttpCode(HttpStatus.OK)
   @PagSortApiQuery()
@@ -115,6 +136,14 @@ export class UsersController {
   public async deleteUser(@Body() userId: string) {
     return this.usersService.deleteUser(userId);
   }
+
+  @Put(':id')
+  async updateUser(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.usersService.updateUser(id, updateUserDto);
+  }
   @Post('')
   @HttpCode(HttpStatus.OK)
   public async generateUser(@Body() inviteUserDto: InviteUserDto) {
@@ -124,6 +153,11 @@ export class UsersController {
 
     await this.smsProvider.sendSmsCode(inviteUserDto.email, inviteUserDto.role);
     return await this.usersService.generateInviteCode(inviteUserDto);
+  }
+  @Post('employee-login')
+  @HttpCode(HttpStatus.OK)
+  public async validateLogin(@Body() token: { token: string }) {
+    return await this.usersService.employeeLogin(token);
   }
 
   @Post('/verify')

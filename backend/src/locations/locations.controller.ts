@@ -42,14 +42,19 @@ export class LocationsController {
     console.log(contractId);
     return this.locationsService.getLocationsByContractId(parseInt(contractId));
   }
-
-  @Get(':id')
+  @Get('/withContractAndClient')
   @HttpCode(HttpStatus.OK)
   @AuthDecorators([Role.ADMIN, Role.CLIENT])
-  public async getLocation(@Param() { id }: { id: number }) {
-    return this.locationsService.findLocation(id);
+  @PagSortApiQuery()
+  public async getLocationsWithContractAndClient(
+    @PaginationParamsDecorator() paginationParams: Pagination,
+    @SortingParamsDecorator(['name', 'id']) sortingParams: Sorting,
+  ) {
+    return this.locationsService.getLocationsWithContractAndClient(
+      paginationParams,
+      sortingParams,
+    );
   }
-
   @Get()
   @HttpCode(HttpStatus.OK)
   @PagSortApiQuery()
@@ -69,6 +74,12 @@ export class LocationsController {
       sortingParams,
       searchParams,
     );
+  }
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  @AuthDecorators([Role.ADMIN, Role.CLIENT])
+  public async getLocation(@Param() { id }: { id: number }) {
+    return this.locationsService.findLocation(id);
   }
 
   @Post()

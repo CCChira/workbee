@@ -6,6 +6,28 @@ import { CreateContractDto } from './dto/createContract.dto';
 export declare class ContractsService {
     private readonly prisma;
     constructor(prisma: PrismaService);
+    getTopContracts(): Promise<({
+        taskTemplates: ({
+            _count: {
+                TaskSchedule: number;
+            };
+        } & {
+            id: number;
+            title: string;
+            necessaryWorkers: number;
+            necessaryTools: string[];
+            contractId: number;
+            duration: string;
+        })[];
+    } & {
+        id: number;
+        title: string;
+        description: string;
+        startDate: string;
+        endDate: string;
+        clientId: string;
+        pdfUrl: string;
+    })[]>;
     createContract(createContractDto: CreateContractDto, clientId: string): import(".prisma/client").Prisma.Prisma__ContractClient<{
         id: number;
         title: string;

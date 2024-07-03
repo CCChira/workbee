@@ -31,11 +31,14 @@ let LocationsController = class LocationsController {
         console.log(contractId);
         return this.locationsService.getLocationsByContractId(parseInt(contractId));
     }
-    async getLocation({ id }) {
-        return this.locationsService.findLocation(id);
+    async getLocationsWithContractAndClient(paginationParams, sortingParams) {
+        return this.locationsService.getLocationsWithContractAndClient(paginationParams, sortingParams);
     }
     async getLocations(clientId, contractId, paginationParams, sortingParams, searchParams) {
         return this.locationsService.findLocations(clientId, contractId, paginationParams, sortingParams, searchParams);
+    }
+    async getLocation({ id }) {
+        return this.locationsService.findLocation(id);
     }
     async createLocation(locationDto, contractId) {
         return this.locationsService.createLocation(locationDto, contractId);
@@ -58,14 +61,16 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], LocationsController.prototype, "getLocationsByContractId", null);
 __decorate([
-    (0, common_1.Get)(':id'),
+    (0, common_1.Get)('/withContractAndClient'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
-    __param(0, (0, common_1.Param)()),
+    (0, PagSortApiQuery_decorator_1.PagSortApiQuery)(),
+    __param(0, (0, paginationParams_decorator_1.PaginationParamsDecorator)()),
+    __param(1, (0, sortingParams_decorator_1.SortingParamsDecorator)(['name', 'id'])),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
-], LocationsController.prototype, "getLocation", null);
+], LocationsController.prototype, "getLocationsWithContractAndClient", null);
 __decorate([
     (0, common_1.Get)(),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
@@ -80,6 +85,15 @@ __decorate([
     __metadata("design:paramtypes", [String, String, Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], LocationsController.prototype, "getLocations", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
+    __param(0, (0, common_1.Param)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], LocationsController.prototype, "getLocation", null);
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),

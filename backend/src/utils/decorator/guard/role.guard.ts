@@ -15,17 +15,19 @@ export class RolesGuard implements CanActivate {
   ) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.get<string[]>(
-      'roles',
-      context.getHandler(),
-    );
-    const decoded = this.jwtService.decode(
-      context.switchToHttp().getRequest().cookies['access_token'],
-    );
-    if (decoded) {
-      const decodedRole = decoded.role;
-      if (!requiredRoles) return true;
-      return requiredRoles.some((role) => decodedRole?.includes(role));
-    } else throw new UnauthorizedException(401, 'Unauthorized');
+    if (!context.switchToHttp().getRequest().url.includes('getUserChat')) {
+      const requiredRoles = this.reflector.get<string[]>(
+        'roles',
+        context.getHandler(),
+      );
+      const decoded = this.jwtService.decode(
+        context.switchToHttp().getRequest().cookies['access_token'],
+      );
+      if (decoded) {
+        const decodedRole = decoded.role;
+        if (!requiredRoles) return true;
+        return requiredRoles.some((role) => decodedRole?.includes(role));
+      } else throw new UnauthorizedException(401, 'Unauthorized');
+    } else return true;
   }
 }

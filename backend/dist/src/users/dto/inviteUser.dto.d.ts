@@ -3,4 +3,5 @@ export declare class InviteUserDto {
     email: string;
     phoneNumber: string;
     role: Role;
+    name: string;
 }

@@ -14,4 +14,8 @@ export class InviteUserDto {
   @IsNotEmpty()
   @ApiProperty()
   role: Role;
+
+  @IsString()
+  @ApiProperty()
+  name: string;
 }

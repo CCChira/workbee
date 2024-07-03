@@ -11,6 +11,7 @@ export declare class AuthService {
     validateToken(token: string): Promise<{
         id: string;
         email: string;
+        phoneNumber: string;
         role: import(".prisma/client").$Enums.Role;
         name: string;
         password: string;

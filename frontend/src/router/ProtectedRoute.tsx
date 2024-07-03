@@ -11,7 +11,8 @@ interface ProtectedRouteProps {
 function ProtectedRoute({ children, roles }: ProtectedRouteProps) {
   const userStore = useUserStore();
   console.log(userStore.user.loggedIn && roles.includes(userStore.user.role));
-  if (!userStore.user.loggedIn && roles.includes(userStore.user.role)) {
+  if (!userStore.user.loggedIn && !roles.includes(userStore.user.role)) {
+    console.log('here');
     return <Navigate to={'/login'} replace />;
   }
 

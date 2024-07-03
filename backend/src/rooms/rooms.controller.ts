@@ -17,6 +17,8 @@ import { AwsS3Service } from '../services/aws-s3.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CreateRoomDto } from './dto/createRoom.dto';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { Pagination } from '../utils/decorator/paginationParams.decorator';
+import { Sorting } from '../utils/decorator/sortingParams.decorator';
 
 const room: Room = {
   id: 0,
@@ -89,13 +91,17 @@ export class RoomsController {
   // public async getRoom(@Param() { id }: { id: string }) {
   //   return this.roomsService.getRoom(parseInt(id));
   // }
-  @Get('byLocation')
-  @HttpCode(HttpStatus.OK)
-  @AuthDecorators([Role.ADMIN, Role.CLIENT])
-  public async getRoomsFromLocation(@Query('locationId') locationId: string) {
-    if (locationId !== '')
-      return this.roomsService.getAllRoomsFromContract(parseInt(locationId));
-    else return { data: [] };
+  @Get('/byLocation/:locationId')
+  async getRoomsByLocationId(
+    @Param('locationId') locationId: string,
+    @Query() pagination: Pagination,
+    @Query() sorting: Sorting,
+  ) {
+    return this.roomsService.getRoomsByLocationId(
+      locationId,
+      pagination,
+      sorting,
+    );
   }
 
   @Get(':id')

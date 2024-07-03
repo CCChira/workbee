@@ -1,18 +1,11 @@
 import ReactMapGL, { Marker } from 'react-map-gl';
-import Map from 'react-map-gl';
 import QueryTable from '@/components/layout/table/QueryTable.tsx';
-import {
-  getEmployees,
-  getTasksAssignedToUserThisWeek,
-  getTasksAssisgnedToUser,
-  TaskInstance,
-} from '@/queries/employees.ts';
+import { getTasksAssignedToUserThisWeek, getTasksAssisgnedToUser, TaskInstance } from '@/queries/employees.ts';
 import { ColumnDef } from '@tanstack/react-table';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import employees from '@/components/pages/Employees.tsx';
 import { useQuery } from 'react-query';
-const mapBoxAccessToken = 'pk.eyJ1Ijoic2t5MTMzNyIsImEiOiJjbHZtZXVrbXEwMXJ1MnFsOWZlM3VvZGw3In0.U_n4PkUbZjGV7gor_49rUA';
+
 const taskInstanceColumns: ColumnDef<TaskInstance>[] = [
   {
     id: 'id',
@@ -34,7 +27,7 @@ function EmployeeDetails() {
   const [center, setCenter] = useState({
     longitude: 23.59991552647557,
     latitude: 46.76698245436452,
-    zoom: 14,
+    zoom: 12,
     bearing: 0,
     pitch: 0,
     padding: { top: 0, right: 0, bottom: 0, left: 0 },
@@ -64,7 +57,7 @@ function EmployeeDetails() {
         taskData?.data.reduce((acc, task) => acc + task.room.location.longitude, 0) / taskData?.data.length;
       const latitude =
         taskData?.data.reduce((acc, task) => acc + task.room.location.latitude, 0) / taskData?.data.length;
-      setCenter((prevState) => ({ ...prevState, latitude, longitude }));
+      if (longitude && latitude) setCenter((prevState) => ({ ...prevState, latitude, longitude }));
     }
   }, [isTaskDataLoading, taskData]);
 
@@ -75,7 +68,7 @@ function EmployeeDetails() {
           {taskData && !isTaskDataLoading && (
             <ReactMapGL
               {...center}
-              mapboxAccessToken={mapBoxAccessToken}
+              mapboxAccessToken={import.meta.env.VITE_MAPS_KEY}
               style={{ width: 600, height: 400 }}
               mapStyle="mapbox://styles/mapbox/streets-v9"
               onMove={(evt) => setCenter(evt.viewState)}

@@ -7,6 +7,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import * as dotenv from 'dotenv';
+import { ConfigService } from '@nestjs/config';
 
 dotenv.config(); // Load environment variables
 
@@ -15,18 +16,16 @@ export class AwsS3Service {
   private readonly s3Client: S3Client;
   private readonly logger = new Logger(AwsS3Service.name);
 
-  constructor() {
-    // Initialize the S3 client with credentials from environment variables
+  constructor(private configService: ConfigService) {
     this.s3Client = new S3Client({
-      region: process.env.AWS_REGION,
+      region: this.configService.get('AWS_REGION'),
       credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID'),
+        secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
       },
     });
   }
 
-  // Upload a file to an S3 bucket
   async uploadFile(
     bucketName: string,
     fileKey: string,
@@ -41,7 +40,6 @@ export class AwsS3Service {
     try {
       await this.s3Client.send(command);
       this.logger.log(`File uploaded to S3: ${fileKey}`);
-      // Return just the file key for consistent usage with getFileUrl
       return fileKey;
     } catch (error) {
       this.logger.error(`Failed to upload file to S3: ${fileKey}`, error);
@@ -58,7 +56,7 @@ export class AwsS3Service {
     try {
       const signedUrl = await getSignedUrl(this.s3Client, command, {
         expiresIn: 3600,
-      }); // Expires in 1 hour
+      });
       this.logger.log(`Generated presigned URL for file: ${fileKey}`);
       return signedUrl;
     } catch (error) {

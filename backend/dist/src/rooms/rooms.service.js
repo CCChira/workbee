@@ -80,7 +80,7 @@ let RoomsService = class RoomsService {
     async getRoomWithImages(id) {
         return this.prisma.room.findUnique({
             where: { id },
-            include: { images: true },
+            include: { images: true, TaskInstance: true },
         });
     }
     async getAllRoomsFromContract(locationId) {
@@ -90,6 +90,45 @@ let RoomsService = class RoomsService {
                     locationId: locationId,
                 },
             }),
+        };
+    }
+    async getRoomsByLocationId(locationId, pagination, sorting) {
+        const skip = (pagination.page - 1) * pagination.size;
+        const take = pagination.size;
+        const orderBy = { [sorting.property]: sorting.direction };
+        const rooms = await this.prisma.room.findMany({
+            where: { locationId: parseInt(locationId) },
+            skip,
+            take: pagination.limit,
+            orderBy: {
+                images: {
+                    _count: 'desc',
+                },
+            },
+            include: {
+                images: true,
+                location: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
+        });
+        const roomsWithSignedUrls = await Promise.all(rooms.map(async (room) => {
+            const images = await Promise.all(room.images.map(async (image) => {
+                const url = await this.s3Service.getFileUrl('workbee-files', image.url);
+                return { ...image, url };
+            }));
+            return { ...room, images };
+        }));
+        const total = await this.prisma.room.count({
+            where: { locationId: parseInt(locationId) },
+        });
+        return {
+            data: roomsWithSignedUrls,
+            total,
+            page: pagination.page,
+            size: pagination.size,
         };
     }
 };

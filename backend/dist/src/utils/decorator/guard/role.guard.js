@@ -19,16 +19,20 @@ let RolesGuard = class RolesGuard {
         this.jwtService = jwtService;
     }
     canActivate(context) {
-        const requiredRoles = this.reflector.get('roles', context.getHandler());
-        const decoded = this.jwtService.decode(context.switchToHttp().getRequest().cookies['access_token']);
-        if (decoded) {
-            const decodedRole = decoded.role;
-            if (!requiredRoles)
-                return true;
-            return requiredRoles.some((role) => decodedRole?.includes(role));
+        if (!context.switchToHttp().getRequest().url.includes('getUserChat')) {
+            const requiredRoles = this.reflector.get('roles', context.getHandler());
+            const decoded = this.jwtService.decode(context.switchToHttp().getRequest().cookies['access_token']);
+            if (decoded) {
+                const decodedRole = decoded.role;
+                if (!requiredRoles)
+                    return true;
+                return requiredRoles.some((role) => decodedRole?.includes(role));
+            }
+            else
+                throw new common_1.UnauthorizedException(401, 'Unauthorized');
         }
         else
-            throw new common_1.UnauthorizedException(401, 'Unauthorized');
+            return true;
     }
 };
 exports.RolesGuard = RolesGuard;

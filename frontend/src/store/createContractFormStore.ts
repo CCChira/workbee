@@ -40,7 +40,7 @@ export const useCreateContractFormStore = create(
         set({ formErrors }),
     }),
     {
-      name: 'contractFormStorage', // Use a unique name for storage key to avoid conflicts
+      name: 'contractFormStorage',
     },
   ),
 );

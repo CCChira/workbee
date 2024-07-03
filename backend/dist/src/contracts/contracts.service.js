@@ -16,6 +16,38 @@ let ContractsService = class ContractsService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async getTopContracts() {
+        return this.prisma.contract.findMany({
+            where: {
+                taskTemplates: {
+                    some: {
+                        TaskSchedule: {
+                            some: {
+                                isActive: true,
+                            },
+                        },
+                    },
+                },
+            },
+            orderBy: {
+                taskTemplates: {
+                    _count: 'desc',
+                },
+            },
+            take: 5,
+            include: {
+                taskTemplates: {
+                    include: {
+                        _count: {
+                            select: {
+                                TaskSchedule: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+    }
     createContract(createContractDto, clientId) {
         console.log(createContractDto);
         return this.prisma.contract.create({

@@ -20,9 +20,9 @@ export interface Request {
   id: number;
   type: RequestType;
   status: Status;
-  details: unknown; // 'details' field is JSON type, represent as 'any' or specific interface if structure is known
-  createdAt: string; // ISO string format
-  updatedAt: string; // ISO string format
+  details: unknown;
+  createdAt: string;
+  updatedAt: string;
   createdBy: User;
   assignedTo: User;
   assignedToId: string;

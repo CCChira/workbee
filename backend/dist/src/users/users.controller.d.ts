@@ -6,6 +6,7 @@ import { DeleteMultipleUsersDto } from './dto/deleteMultipleUsers.dto';
 import { DummyProvider } from '../providers/SMSProvider/dummyProvider.service';
 import { InviteUserDto } from './dto/inviteUser.dto';
 import { CreateUserDto } from './dto/createUser.dto';
+import { UpdateUserDto } from './dto/updateUser.dto';
 export declare class UsersController {
     private readonly usersService;
     private readonly smsProvider;
@@ -15,6 +16,7 @@ export declare class UsersController {
         data: {
             id: string;
             email: string;
+            phoneNumber: string;
             role: import(".prisma/client").$Enums.Role;
             name: string;
             password: string;
@@ -25,10 +27,35 @@ export declare class UsersController {
         page: number;
         size: number;
     }>;
+    topEmployees(): Promise<{
+        completedTaskCount: number;
+        TaskAssignment: ({
+            task: {
+                status: import(".prisma/client").$Enums.Status;
+            };
+        } & {
+            taskId: number;
+            userId: string;
+        })[];
+        id: string;
+        email: string;
+        phoneNumber: string;
+        role: import(".prisma/client").$Enums.Role;
+        name: string;
+        password: string;
+        createdAt: Date;
+        updatedAt: Date;
+    }[]>;
+    getUtilEmployee(): Promise<{
+        employeeId: string;
+        name: string;
+        taskCounts: {};
+    }[]>;
     getClients(paginationParams: Pagination, sortingParams: Sorting, searchParams: ISearch): Promise<{
         data: {
             id: string;
             email: string;
+            phoneNumber: string;
             role: import(".prisma/client").$Enums.Role;
             name: string;
             password: string;
@@ -38,6 +65,16 @@ export declare class UsersController {
         dataSize: number;
         page: number;
         size: number;
+    }>;
+    getUserChat(userId: string): Promise<{
+        id: string;
+        email: string;
+        phoneNumber: string;
+        role: import(".prisma/client").$Enums.Role;
+        name: string;
+        password: string;
+        createdAt: Date;
+        updatedAt: Date;
     }>;
     getEmployees(paginationParams: Pagination, sortingParams: Sorting, searchParams: ISearch): Promise<{
         data: ({
@@ -47,6 +84,7 @@ export declare class UsersController {
         } & {
             id: string;
             email: string;
+            phoneNumber: string;
             role: import(".prisma/client").$Enums.Role;
             name: string;
             password: string;
@@ -65,6 +103,7 @@ export declare class UsersController {
                 id: number;
                 _count: {
                     taskSchedule: number;
+                    taskTemplate: number;
                     room: number;
                     TaskAssignment: number;
                 };
@@ -76,6 +115,7 @@ export declare class UsersController {
     } & {
         id: string;
         email: string;
+        phoneNumber: string;
         role: import(".prisma/client").$Enums.Role;
         name: string;
         password: string;
@@ -87,6 +127,7 @@ export declare class UsersController {
     }): Promise<{
         id: string;
         email: string;
+        phoneNumber: string;
         role: import(".prisma/client").$Enums.Role;
         name: string;
         password: string;
@@ -96,6 +137,17 @@ export declare class UsersController {
     deleteUser(userId: string): Promise<{
         id: string;
         email: string;
+        phoneNumber: string;
+        role: import(".prisma/client").$Enums.Role;
+        name: string;
+        password: string;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    updateUser(id: string, updateUserDto: UpdateUserDto): Promise<{
+        id: string;
+        email: string;
+        phoneNumber: string;
         role: import(".prisma/client").$Enums.Role;
         name: string;
         password: string;
@@ -103,9 +155,22 @@ export declare class UsersController {
         updatedAt: Date;
     }>;
     generateUser(inviteUserDto: InviteUserDto): Promise<void>;
+    validateLogin(token: {
+        token: string;
+    }): Promise<{
+        id: string;
+        email: string;
+        phoneNumber: string;
+        role: import(".prisma/client").$Enums.Role;
+        name: string;
+        password: string;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
     createUser(createUser: CreateUserDto): Promise<{
         id: string;
         email: string;
+        phoneNumber: string;
         role: import(".prisma/client").$Enums.Role;
         name: string;
         password: string;

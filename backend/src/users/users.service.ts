@@ -10,6 +10,8 @@ import { InviteUserDto } from './dto/inviteUser.dto';
 import { ISearch } from '../utils/decorator/SearchDecorator.decorator';
 import { DeleteMultipleUsersDto } from './dto/deleteMultipleUsers.dto';
 import { TwilioService } from '../services/twilio.service';
+import { startOfWeek } from 'date-fns';
+import { UpdateUserDto } from './dto/updateUser.dto';
 
 @Injectable()
 export class UsersService {
@@ -17,6 +19,39 @@ export class UsersService {
     private prisma: PrismaService,
     private twilio: TwilioService,
   ) {}
+
+  async getTaskCountsByStatusForEmployees() {
+    const employees = await this.prisma.user.findMany({
+      include: {
+        TaskAssignment: {
+          include: {
+            task: true, // Assuming task points to TaskInstance
+          },
+        },
+      },
+      where: {
+        TaskAssignment: {
+          some: {
+            task: {
+              date: {
+                gte: startOfWeek(new Date(), { weekStartsOn: 1 }),
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return employees.map((employee) => ({
+      employeeId: employee.id,
+      name: employee.name || 'No Name Provided',
+      taskCounts: employee.TaskAssignment.reduce((acc, assignment) => {
+        const status = assignment.task.status || 'Undefined';
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+      }, {}),
+    }));
+  }
 
   async create(createUserDto: CreateUserDto) {
     createUserDto.password = await bcrypt.hash(
@@ -32,19 +67,32 @@ export class UsersService {
     return this.prisma.user.delete({ where: { id } });
   }
   async generateInviteCode(inviteUserDto: InviteUserDto) {
-    const { id } = await this.prisma.inviteCodes.create({
+    const { id } = await this.prisma.user.create({
       data: inviteUserDto.email
-        ? { email: inviteUserDto.email, role: inviteUserDto.role }
-        : { phoneNumber: inviteUserDto.phoneNumber, role: inviteUserDto.role },
+        ? {
+            name: inviteUserDto.name,
+            email: inviteUserDto.email,
+            role: inviteUserDto.role,
+            password: 'mockPass',
+          }
+        : {
+            name: inviteUserDto.name,
+            phoneNumber: inviteUserDto.phoneNumber,
+            role: inviteUserDto.role,
+            password: 'mockPass',
+          },
     });
-    console.log(inviteUserDto.phoneNumber, id);
     if (inviteUserDto.phoneNumber)
       await this.twilio.sendInviteCodeSMS(inviteUserDto.phoneNumber, id);
     else {
-      // send email
     }
   }
-
+  async updateUser(id: string, updateUserDto: UpdateUserDto) {
+    return this.prisma.user.update({
+      where: { id },
+      data: updateUserDto,
+    });
+  }
   userExists(id: string) {
     return this.prisma.user.findUnique({ where: { id } });
   }
@@ -122,7 +170,32 @@ export class UsersService {
       size,
     };
   }
+  async getTopUsersByCompletedTasks() {
+    const users = await this.prisma.user.findMany({
+      include: {
+        TaskAssignment: {
+          include: {
+            task: {
+              select: {
+                status: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
+    const processedUsers = users.map((user) => ({
+      ...user,
+      completedTaskCount: user.TaskAssignment.reduce((acc, assignment) => {
+        return acc + (assignment.task.status === 'COMPLETED' ? 1 : 0);
+      }, 0),
+    }));
+
+    processedUsers.sort((a, b) => b.completedTaskCount - a.completedTaskCount);
+
+    return processedUsers.slice(0, 10);
+  }
   async findAllEmployees(
     { page, limit, offset, size }: Pagination,
     sort?: Sorting,
@@ -201,6 +274,24 @@ export class UsersService {
             },
           },
         },
+      },
+    });
+  }
+
+  async employeeLogin(payload: { token: string }) {
+    const { token } = payload;
+    console.log(token);
+    const response = await this.prisma.user.findUnique({
+      where: { id: token },
+    });
+    console.log(response);
+    return response;
+  }
+
+  getUserChat(userId: string) {
+    return this.prisma.user.findUnique({
+      where: {
+        id: userId,
       },
     });
   }

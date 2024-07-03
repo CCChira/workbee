@@ -14,15 +14,18 @@ export declare class LocationsController {
         longitude: number;
         contractId: number;
     }[]>;
-    getLocation({ id }: {
-        id: number;
-    }): Promise<{
-        id: number;
-        name: string;
-        address: string;
-        latitude: number;
-        longitude: number;
-        contractId: number;
+    getLocationsWithContractAndClient(paginationParams: Pagination, sortingParams: Sorting): Promise<{
+        data: {
+            id: number;
+            name: string;
+            address: string;
+            latitude: number;
+            longitude: number;
+            contractId: number;
+        }[];
+        total: number;
+        page: number;
+        size: number;
     }>;
     getLocations(clientId: string, contractId: string, paginationParams: Pagination, sortingParams: Sorting, searchParams: ISearch): Promise<{
         data: {
@@ -36,6 +39,16 @@ export declare class LocationsController {
         dataSize: number;
         page: number;
         size: number;
+    }>;
+    getLocation({ id }: {
+        id: number;
+    }): Promise<{
+        id: number;
+        name: string;
+        address: string;
+        latitude: number;
+        longitude: number;
+        contractId: number;
     }>;
     createLocation(locationDto: CreateLocationDto, contractId: number): Promise<{
         id: number;

@@ -8,6 +8,10 @@ export class CreateTaskInstanceDto {
   @ApiProperty()
   taskScheduleId: number;
 
+  @IsInt()
+  @ApiProperty()
+  taskTemplateId: number;
+
   @IsString()
   @ApiProperty()
   status: Status;

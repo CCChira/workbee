@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import Navbar from '@/components/layout/Navbar.tsx';
 import { useUserStore } from '@/store/user.ts';
 import { Toaster } from '@/components/ui/toaster.tsx';
+import MessageBar from '@/components/layout/messageBar/MessageBar.tsx';
 
 interface LayoutProps {
   children: ReactNode;
@@ -15,7 +16,7 @@ function Layout({ children }: LayoutProps) {
           <Navbar />
         </aside>
       )}
-      <main className={`${user.loggedIn ? 'ml-16' : ''} p-8 min-h-screen`}>{children}</main>
+      <main className={`${user.loggedIn ? 'ml-16' : ''} p-8 min-h-screen h-screen relative`}>{children}</main>
       <Toaster />
     </div>
   );

@@ -13,6 +13,7 @@ import {
   startOfWeek,
 } from 'date-fns';
 import { Status } from '@prisma/client';
+import { UpdateTaskInstanceStatusDto } from './dto/updateTaskInstanceStatus.dto';
 
 interface TaskData {
   count: number;
@@ -254,18 +255,21 @@ export class TaskinstanceService {
     };
   }
   async assignUserToTaskInstance(instanceId: number, userId: string) {
+    console.log('$$$$$$$$$$$$$$', instanceId, userId);
     await this.prismaService.taskInstance.update({
       where: { id: instanceId },
       data: {
         status: Status.PENDING,
       },
     });
-    return this.prismaService.taskAssignment.create({
+    const resp = await this.prismaService.taskAssignment.create({
       data: {
         taskId: instanceId,
         userId: userId,
       },
     });
+    console.log('################', resp);
+    return resp;
   }
   async deleteUserFromTaskInstance(instanceId: number, userId: string) {
     return this.prismaService.taskAssignment.delete({
@@ -278,6 +282,15 @@ export class TaskinstanceService {
     });
   }
 
+  async updateTaskInstanceStatus(
+    id: number,
+    updateTaskInstanceStatusDto: UpdateTaskInstanceStatusDto,
+  ) {
+    return this.prismaService.taskInstance.update({
+      where: { id },
+      data: { status: updateTaskInstanceStatusDto.status },
+    });
+  }
   async getStatusCounts() {
     const today = new Date(); // Current date
     const currentWeekStart = startOfWeek(today, { weekStartsOn: 1 }); // Start of the week (Monday)

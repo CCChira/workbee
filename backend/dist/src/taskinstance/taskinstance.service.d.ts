@@ -3,6 +3,7 @@ import { Sorting } from '../utils/decorator/sortingParams.decorator';
 import { Pagination } from '../utils/decorator/paginationParams.decorator';
 import { ISearch } from '../utils/decorator/SearchDecorator.decorator';
 import { CreateTaskInstanceDto } from './dto/createTaskInstance.dto';
+import { UpdateTaskInstanceStatusDto } from './dto/updateTaskInstanceStatus.dto';
 export declare class TaskinstanceService {
     private readonly prismaService;
     constructor(prismaService: PrismaService);
@@ -209,6 +210,16 @@ export declare class TaskinstanceService {
     deleteUserFromTaskInstance(instanceId: number, userId: string): Promise<{
         taskId: number;
         userId: string;
+    }>;
+    updateTaskInstanceStatus(id: number, updateTaskInstanceStatusDto: UpdateTaskInstanceStatusDto): Promise<{
+        id: number;
+        taskScheduleId: number;
+        taskTemplateId: number;
+        status: import(".prisma/client").$Enums.Status;
+        date: Date;
+        hour: string;
+        roomId: number;
+        updatedAt: Date;
     }>;
     getStatusCounts(): Promise<(import(".prisma/client").Prisma.PickEnumerable<import(".prisma/client").Prisma.TaskInstanceGroupByOutputType, "status"[]> & {
         _count: {

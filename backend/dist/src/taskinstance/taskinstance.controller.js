@@ -25,6 +25,7 @@ const sortingParams_decorator_1 = require("../utils/decorator/sortingParams.deco
 const swagger_1 = require("@nestjs/swagger");
 const requests_service_1 = require("../requests/requests.service");
 const prisma_service_1 = require("../prisma/prisma.service");
+const updateTaskInstanceStatus_dto_1 = require("./dto/updateTaskInstanceStatus.dto");
 let TaskinstanceController = class TaskinstanceController {
     constructor(taskInstanceService, requestService, prisma) {
         this.taskInstanceService = taskInstanceService;
@@ -67,6 +68,9 @@ let TaskinstanceController = class TaskinstanceController {
     }
     async getTaskInstancesThisMonth() {
         return this.taskInstanceService.getTaskInstancesThisMonth();
+    }
+    async updateTaskInstanceStatus(id, updateTaskInstanceStatusDto) {
+        return this.taskInstanceService.updateTaskInstanceStatus(parseInt(id), updateTaskInstanceStatusDto);
     }
     async getTaskInstancesByTaskScheduleId(taskScheduleId) {
         return this.taskInstanceService.getTaskInstancesByTaskScheduleId(parseInt(taskScheduleId));
@@ -173,6 +177,14 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], TaskinstanceController.prototype, "getTaskInstancesThisMonth", null);
+__decorate([
+    (0, common_1.Patch)(':id/status'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, updateTaskInstanceStatus_dto_1.UpdateTaskInstanceStatusDto]),
+    __metadata("design:returntype", Promise)
+], TaskinstanceController.prototype, "updateTaskInstanceStatus", null);
 __decorate([
     (0, common_1.Get)('by-schedule/:scheduleId'),
     (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),

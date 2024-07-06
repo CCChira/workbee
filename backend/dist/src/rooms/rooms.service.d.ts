@@ -41,11 +41,6 @@ export declare class RoomsService {
         accessMode: import(".prisma/client").$Enums.AccessMode;
     }>;
     getRoomWithImages(id: number): Promise<{
-        images: {
-            id: number;
-            url: string;
-            roomId: number;
-        }[];
         TaskInstance: {
             id: number;
             taskScheduleId: number;
@@ -55,6 +50,11 @@ export declare class RoomsService {
             hour: string;
             roomId: number;
             updatedAt: Date;
+        }[];
+        images: {
+            id: number;
+            url: string;
+            roomId: number;
         }[];
     } & {
         id: number;

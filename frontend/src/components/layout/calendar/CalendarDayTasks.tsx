@@ -20,12 +20,13 @@ type CalendarDayTasksProps = {
   tasks: CalendarTaskInstance[];
   qKey: string;
 };
-export default function CalendarDayTasks({ tasks, date, qKey }: CalendarDayTasksProps) {
+export default function CalendarDayTasks({ tasks, date, qKey, contractId, roomId, userId }: CalendarDayTasksProps) {
   const [selectedTask, setSelectedTask] = useState(tasks[0].id);
   const [selectedTaskName, setSelectedTaskName] = useState(tasks[0].taskSchedule.taskTemplate.title);
   const [searchEmployee, setSearchEmployee] = useState('');
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
+  useEffect(() => {}, []);
   const usersAssigned = tasks.reduce(
     (
       acc: Record<
@@ -42,30 +43,31 @@ export default function CalendarDayTasks({ tasks, date, qKey }: CalendarDayTasks
       >,
       cur,
     ) => {
-      const userMap = cur.TaskAssignment.reduce(
-        (
-          userAcc: Record<
-            string,
-            {
-              id: string;
-              email: string;
-              phoneNumber: string;
-              name: string;
-            }
-          >,
-          ass,
-        ) => {
-          userAcc[ass.user.id] = {
-            id: ass.user.id,
-            email: ass.user.email,
-            phoneNumber: ass.user.phoneNumber,
-            name: ass.user.name,
-          };
-          return userAcc;
-        },
-        {},
-      );
-      acc[cur.id] = userMap;
+      acc[cur.id] = cur.TaskAssignment
+        ? cur.TaskAssignment.reduce(
+            (
+              userAcc: Record<
+                string,
+                {
+                  id: string;
+                  email: string;
+                  phoneNumber: string;
+                  name: string;
+                }
+              >,
+              ass,
+            ) => {
+              userAcc[ass.user.id] = {
+                id: ass.user.id,
+                email: ass.user.email,
+                phoneNumber: ass.user.phoneNumber,
+                name: ass.user.name,
+              };
+              return userAcc;
+            },
+            {},
+          )
+        : {};
       return acc;
     },
     {},

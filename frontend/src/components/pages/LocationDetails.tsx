@@ -9,6 +9,14 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { useQuery, useQueryClient } from 'react-query';
 import { PaginationSortingState } from '@/utils/types.ts';
 import { Popover, PopoverContent } from '@/components/ui/popover.tsx';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog.tsx';
+import { Button } from '@/components/ui/button.tsx';
+import CreateLocationForm from '@/components/forms/CreateLocationForm.tsx';
+import { getContractLocations } from '@/queries/contractDetails.ts';
+import { getTaskTemplates } from '@/queries/taskTemplatesDetails.ts';
+import TasksCalendar from '@/components/layout/calendar/TasksCalendar.tsx';
+import { fetchTaskInstancesByMonthYear } from '@/queries/taskInstanceThisMonth.ts';
 
 const columns: ColumnDef<Room>[] = [
   {
@@ -67,29 +75,51 @@ function LocationDetails() {
       <h1 className="text-3xl font-medium">Rooms</h1>
       {locationId && (
         <div className="flex flex-col gap-4">
-          <Card className="h-fit bg-transparent">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Rooms</CardTitle>
-            </CardHeader>
-            <CardContent className="flex gap-4 w-full">
-              {data && !isLoading && (
-                <QueryTable
-                  queryFn={(pagSort) => fetchRoomsByLocation(parseInt(locationId ?? '0'), pagSort)}
-                  queryKey={`rooms${locationId}`}
-                  columns={columns}
-                  sortableColumns={{
-                    name: true,
-                    accessMode: true,
-                  }}
-                  onRowHover={(rowNo) => {
-                    setHoveredImage(data.data[rowNo].images[0] ? data.data[rowNo].images[0].url : '');
-                  }}
-                  onRowExit={() => setHoveredImage('')}
-                  searchField="name"
-                />
-              )}
-            </CardContent>
-          </Card>
+          <Tabs defaultValue="locations">
+            <TabsList>
+              <TabsTrigger value="locations">Locations</TabsTrigger>
+              <TabsTrigger value="instances">Task Instances</TabsTrigger>
+            </TabsList>
+            <TabsContent value="locations">
+              <Card className="h-fit bg-transparent">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle>Rooms</CardTitle>
+                </CardHeader>
+                <CardContent className="flex gap-4 w-full">
+                  {data && !isLoading && (
+                    <QueryTable
+                      queryFn={(pagSort) => fetchRoomsByLocation(parseInt(locationId ?? '0'), pagSort)}
+                      queryKey={`rooms${locationId}`}
+                      columns={columns}
+                      sortableColumns={{
+                        name: true,
+                        accessMode: true,
+                      }}
+                      onRowHover={(rowNo) => {
+                        setHoveredImage(data.data[rowNo].images[0] ? data.data[rowNo].images[0].url : '');
+                      }}
+                      onRowExit={() => setHoveredImage('')}
+                      searchField="name"
+                    />
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="instances">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Task Instances</CardTitle>
+                </CardHeader>
+                <CardContent className="h-full">
+                  <TasksCalendar
+                    locationId={locationId}
+                    queryFn={fetchTaskInstancesByMonthYear}
+                    queryKey="idkPulaMea"
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
           {hoveredImage !== '' && (
             <Popover open={hoveredImage !== ''} defaultOpen={true}>
               <PopoverContent

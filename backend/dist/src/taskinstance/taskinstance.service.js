@@ -219,18 +219,21 @@ let TaskinstanceService = class TaskinstanceService {
         };
     }
     async assignUserToTaskInstance(instanceId, userId) {
+        console.log('$$$$$$$$$$$$$$', instanceId, userId);
         await this.prismaService.taskInstance.update({
             where: { id: instanceId },
             data: {
                 status: client_1.Status.PENDING,
             },
         });
-        return this.prismaService.taskAssignment.create({
+        const resp = await this.prismaService.taskAssignment.create({
             data: {
                 taskId: instanceId,
                 userId: userId,
             },
         });
+        console.log('################', resp);
+        return resp;
     }
     async deleteUserFromTaskInstance(instanceId, userId) {
         return this.prismaService.taskAssignment.delete({
@@ -240,6 +243,12 @@ let TaskinstanceService = class TaskinstanceService {
                     userId: userId,
                 },
             },
+        });
+    }
+    async updateTaskInstanceStatus(id, updateTaskInstanceStatusDto) {
+        return this.prismaService.taskInstance.update({
+            where: { id },
+            data: { status: updateTaskInstanceStatusDto.status },
         });
     }
     async getStatusCounts() {

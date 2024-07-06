@@ -31,6 +31,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { RequestsService } from '../requests/requests.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { UpdateTaskInstanceStatusDto } from './dto/updateTaskInstanceStatus.dto';
 
 @ApiTags('Task Instances')
 @Controller('taskinstance')
@@ -117,7 +118,16 @@ export class TaskinstanceController {
   async getTaskInstancesThisMonth() {
     return this.taskInstanceService.getTaskInstancesThisMonth();
   }
-
+  @Patch(':id/status')
+  async updateTaskInstanceStatus(
+    @Param('id') id: string,
+    @Body() updateTaskInstanceStatusDto: UpdateTaskInstanceStatusDto,
+  ) {
+    return this.taskInstanceService.updateTaskInstanceStatus(
+      parseInt(id),
+      updateTaskInstanceStatusDto,
+    );
+  }
   @Get('by-schedule/:scheduleId')
   @AuthDecorators([Role.ADMIN, Role.CLIENT])
   async getTaskInstancesByTaskScheduleId(

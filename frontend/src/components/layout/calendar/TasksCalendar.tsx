@@ -9,28 +9,29 @@ import { CalendarIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Calendar } from '@/components/ui/calendar.tsx';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog.tsx';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog.tsx';
 import CalendarDayTasks from '@/components/layout/calendar/CalendarDayTasks.tsx';
 import React from 'react';
+import { colors, hovers } from '@/utils/taskStatusCell.ts';
 type DateState = {
   month: string;
   year: string;
 };
 type TaskCalendarProps = {
   dateState?: DateState;
-  queryFn?: (date: DateState, contractId: string, roomId: string, locationId: string) => CalendarTaskInstanceResponse;
+  queryFn?: (
+    date: DateState,
+    contractId?: string,
+    roomId?: string,
+    locationId?: string,
+    userId?: string,
+  ) => CalendarTaskInstanceResponse;
   queryKey?: string;
   contractId?: string;
   roomId?: string;
   enableTaskInstanceCreation?: boolean;
-  locationId: string;
+  locationId?: string;
+  userId?: string;
 };
 export default function TasksCalendar({
   dateState,
@@ -40,7 +41,25 @@ export default function TasksCalendar({
   contractId,
   roomId,
   locationId,
+  userId,
 }: TaskCalendarProps) {
+  const colors = {
+    PENDING: 'bg-secondary text-black',
+    IN_PROGRESS: 'bg-primary',
+    REDO: 'bg-destructive',
+    COMPLETED: 'bg-green-500 text-white',
+    INCOMPLETE: 'bg-destructive',
+    UNASSIGNED: 'bg-muted-foreground',
+  };
+  const hovers = {
+    PENDING: 'hover:bg-secondary text-black',
+    IN_PROGRESS: 'hover:bg-primary hover:text-white',
+    REDO: 'hover:bg-destructive',
+    COMPLETED: 'hover:bg-green-500',
+    INCOMPLETE: 'hover:bg-destructive',
+    UNASSIGNED: 'hover:bg-muted-foreground hover:text-white',
+  };
+
   const [ownDate, setOwnDate] = useState<DateState>({
     month: date.format(new Date(), 'MMMM'),
     year: date.getYear(new Date()).toString(),
@@ -51,11 +70,11 @@ export default function TasksCalendar({
     }
   }, [dateState]);
   const qKey = queryKey ? `${queryKey}${ownDate.month}${ownDate.year}` : 'taskInstancesThisMonth';
-  const { data, error, isLoading } = useQuery<CalendarTaskInstanceResponse>(
+  const { data, isLoading } = useQuery<CalendarTaskInstanceResponse>(
     qKey,
     queryFn
-      ? () => queryFn(ownDate, contractId, roomId, locationId)
-      : () => fetchTaskInstancesThisMonth(contractId, roomId, locationId),
+      ? () => queryFn(ownDate, contractId, roomId, locationId, userId)
+      : () => fetchTaskInstancesThisMonth(contractId ?? '', roomId ?? '', locationId ?? ''),
     {
       cacheTime: 0,
     },
@@ -168,11 +187,15 @@ export default function TasksCalendar({
                                   data[day].map((task) => {
                                     return (
                                       <button
-                                        className="flex items-center flex-shrink-0 h-5 px-1 text-xs hover:bg-primary hover:text-accent transition-colors"
+                                        className={`
+                                          flex items-center flex-shrink-0 h-5 px-1 text-xs hover:bg-primary ${hovers[task.status as keyof typeof hovers]} transition-colors
+                                        `}
                                         key={`${day}${task.taskScheduleId}`}
                                         id={`${day}${task.taskScheduleId}`}
                                       >
-                                        <span className="flex-shrink-0 w-2 h-2 bg-gray-500 rounded-full"></span>
+                                        <span
+                                          className={`flex-shrink-0 w-2 h-2 rounded-full ${colors[task.status as keyof typeof colors]}`}
+                                        ></span>
                                         <span className="ml-2 font-light leading-none">{task.hour}</span>
                                         <span className="ml-2 font-medium leading-none truncate">
                                           {task.taskSchedule.taskTemplate.title}
@@ -208,7 +231,9 @@ export default function TasksCalendar({
                           className="relative flex flex-col bg-white group"
                           key={`${day}${data[day]}`}
                           id={`${day}${data[day]}`}
-                        ></div>
+                        >
+                          <span className="mx-2 my-1 text-xs font-bold">{day}</span>
+                        </div>
                       )}
                     </React.Fragment>
                   );

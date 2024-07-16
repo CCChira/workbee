@@ -1,21 +1,43 @@
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient } from '@prisma/client';
+import * as fs from 'fs';
+
 const prisma = new PrismaClient();
 
 async function seed() {
   // Fetch the contract
-  await prisma.taskAssignment.deleteMany({});
-  await prisma.taskInstance.deleteMany({});
-  await prisma.taskSchedule.deleteMany({});
-  await prisma.taskTemplate.deleteMany({});
-  await prisma.tools.deleteMany({});
-  await prisma.inviteCodes.deleteMany({});
-  await prisma.vehicle.deleteMany({});
-  await prisma.contract.deleteMany({});
-  await prisma.location.deleteMany({});
-  await prisma.room.deleteMany({});
-  await prisma.image.deleteMany({});
-  await prisma.request.deleteMany({});
-  await prisma.user.deleteMany({});
+  const models = [
+    'User',
+    'Tools',
+    'InviteCodes',
+    'TaskTemplate',
+    'TaskSchedule',
+    'TaskInstance',
+    'Vehicle',
+    'TaskAssignment',
+    'Contract',
+    'Location',
+    'Room',
+    'Image',
+    'Request',
+  ];
+
+  const data = JSON.parse(fs.readFileSync('data.json', 'utf8'));
+  async function insertData() {
+    for (const model in data) {
+      for (const record of data[model]) {
+        await prisma[model].create({
+          data: record,
+        });
+      }
+    }
+    await prisma.$disconnect();
+    console.log('Data inserted successfully');
+  }
+
+  insertData().catch((error) => {
+    console.error('Error inserting data:', error);
+    prisma.$disconnect();
+  });
 }
 
 seed()

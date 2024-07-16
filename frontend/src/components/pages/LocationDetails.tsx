@@ -17,6 +17,7 @@ import { getContractLocations } from '@/queries/contractDetails.ts';
 import { getTaskTemplates } from '@/queries/taskTemplatesDetails.ts';
 import TasksCalendar from '@/components/layout/calendar/TasksCalendar.tsx';
 import { fetchTaskInstancesByMonthYear } from '@/queries/taskInstanceThisMonth.ts';
+import CreateRoomForm from '@/components/forms/CreateRoomForm.tsx';
 
 const columns: ColumnDef<Room>[] = [
   {
@@ -82,6 +83,14 @@ function LocationDetails() {
               <Card className="h-fit bg-transparent">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle>Rooms</CardTitle>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button>Add Room</Button>
+                    </DialogTrigger>
+                    <DialogContent className="min-w-[calc(100vw-800px)] max-h-[900px] h-[600px] flex items-center justify-center">
+                      <CreateRoomForm onSuccess={() => console.log('ok')} locationId={parseInt(locationId)} />
+                    </DialogContent>
+                  </Dialog>
                 </CardHeader>
                 <CardContent className="flex gap-4 w-full">
                   {data && !isLoading && (

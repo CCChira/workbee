@@ -75,7 +75,23 @@ const taskInstanceColumns: ColumnDef<TaskInstance>[] = [
 ];
 function EmployeeDetails() {
   const [location, setLocation] = useState({ latitude: 0, longitude: 0, deviceId: '' });
+  const [currentCoordinate, setCurrentCoordinate] = useState({
+    latitude: 46.77255207858516,
+    longitude: 23.58524763098239,
+  });
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const range = 0.001;
+      const randomOffset = () => Math.random() * range * 2 - range;
 
+      setCurrentCoordinate((prevState) => ({
+        latitude: prevState.latitude + randomOffset(),
+        longitude: prevState.longitude + randomOffset(),
+      }));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
   useEffect(() => {
     const socket = io('http://localhost:3000');
 
@@ -99,8 +115,8 @@ function EmployeeDetails() {
   }, []);
 
   const [center, setCenter] = useState({
-    longitude: 23.59991552647557,
-    latitude: 46.76698245436452,
+    longitude: 23.59891552647557,
+    latitude: 46.7898245436452,
     zoom: 12,
     bearing: 0,
     pitch: 0,
@@ -150,7 +166,11 @@ function EmployeeDetails() {
               mapStyle="mapbox://styles/mapbox/streets-v9"
               onMove={(evt) => setCenter(evt.viewState)}
             >
-              <Marker latitude={location.latitude} longitude={location.longitude} anchor={'center'}></Marker>
+              <Marker
+                latitude={currentCoordinate.latitude}
+                longitude={currentCoordinate.longitude}
+                anchor={'center'}
+              ></Marker>
               {taskData.data.map((task) => {
                 return (
                   <Marker

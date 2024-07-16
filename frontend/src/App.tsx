@@ -468,7 +468,7 @@ function App() {
           </CardContent>
         </Card>
 
-        <Card className="col-span-3 h-[20rem]">
+        <Card className="col-span-3 h-[30rem]">
           <CardHeader>
             <CardTitle>Average Duration by Month</CardTitle>
           </CardHeader>
@@ -478,7 +478,7 @@ function App() {
                 options={chartOptions2}
                 series={[...volumeSeries, ...durationSeries]}
                 type="line"
-                height={300}
+                height={350}
                 width={900}
               />
             )}

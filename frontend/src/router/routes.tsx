@@ -1,6 +1,7 @@
 import App from '@/App.tsx';
 import { ReactNode } from 'react';
 import {
+  CalendarIcon,
   ContactRound,
   DoorOpenIcon,
   HardHatIcon,
@@ -136,6 +137,7 @@ const routes: CustomRouteObject[] = [
     path: '/tasks/calendar',
     alias: 'Task Scheduling',
     element: <Calendar />,
+    icon: <CalendarIcon />,
   },
   {
     path: '/tasks',

@@ -6,10 +6,13 @@ import { useMutation } from 'react-query';
 import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { Button } from '@/components/ui/button.tsx';
+import { toast } from '@/components/ui/use-toast.ts';
+import { queryClient } from '@/main.tsx';
 
 interface CreateRoomFormProps {
   onSuccess: (roomId: string) => void;
   lockFields?: boolean;
+  locationId: number;
 }
 
 const createRoomFormSchema = z.object({
@@ -18,14 +21,14 @@ const createRoomFormSchema = z.object({
   accessMode: z.enum(['STAIRS', 'PUBLIC', 'RESTRICTED']),
 });
 
-function CreateRoomForm({ onSuccess, lockFields }: CreateRoomFormProps) {
+function CreateRoomForm({ onSuccess, lockFields, locationId }: CreateRoomFormProps) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const form = useForm<z.infer<typeof createRoomFormSchema>>({
     resolver: zodResolver(createRoomFormSchema),
     defaultValues: {
       name: '',
-      locationId: 0,
+      locationId: locationId,
       accessMode: 'STAIRS',
     },
   });
@@ -48,7 +51,12 @@ function CreateRoomForm({ onSuccess, lockFields }: CreateRoomFormProps) {
       }
     },
     onSuccess: (response) => {
-      console.log('Room created successfully:', response);
+      toast({
+        title: 'Room created',
+        description: 'Room was created successfully. You can now create schedules for it',
+      });
+      queryClient.invalidateQueries('rooms' + locationId);
+      queryClient.refetchQueries('rooms' + locationId);
       onSuccess(response.id);
     },
     onError: (error) => {
@@ -61,7 +69,7 @@ function CreateRoomForm({ onSuccess, lockFields }: CreateRoomFormProps) {
 
     const formPayload = new FormData();
     formPayload.append('name', formData.name);
-    formPayload.append('locationId', formData.locationId.toString());
+    formPayload.append('locationId', formData.locationId);
     formPayload.append('accessMode', formData.accessMode);
 
     selectedFiles.forEach((file) => {
@@ -95,18 +103,6 @@ function CreateRoomForm({ onSuccess, lockFields }: CreateRoomFormProps) {
           />
 
           <FormField
-            name="locationId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Location ID</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="Location ID" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
             name="accessMode"
             render={({ field }) => (
               <FormItem>
@@ -125,7 +121,7 @@ function CreateRoomForm({ onSuccess, lockFields }: CreateRoomFormProps) {
             </FormControl>
           </FormItem>
 
-          <Button type="submit" disabled={lockFields || mutation.isLoading}>
+          <Button type="submit" disabled={lockFields || mutation.isSuccess || mutation.isLoading}>
             Create new Room!
           </Button>
         </form>

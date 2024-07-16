@@ -6,7 +6,7 @@ import { LocationData, TaskTemplate } from '@/queries/clientDetails.ts';
 import Map, { Marker, Popup } from 'react-map-gl';
 import { useQuery } from 'react-query';
 import { QueryResponse } from '@/utils/types.ts';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx';
 import { getTaskTemplates } from '@/queries/taskTemplatesDetails.ts';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover.tsx';

@@ -161,7 +161,7 @@ function ClientDetails() {
               <h4>{clientData.name}'s locations</h4>
               <QueryTable
                 queryFn={(pagSort: PaginationSortingState) => getClientLocations(pagSort, clientData.id)}
-                queryKey={'locationsClient'}
+                queryKey={['loc', clientId ?? '']}
                 columns={locationColumns}
                 sortableColumns={{
                   name: true,
@@ -221,7 +221,7 @@ function ClientDetails() {
               <Separator />
               <QueryTable
                 queryFn={(pagSort: PaginationSortingState) => getClientContract(pagSort, clientData.id)}
-                queryKey={clientId ?? ''}
+                queryKey={[clientId] ?? ''}
                 columns={contractColumns}
                 sortableColumns={{
                   title: true,

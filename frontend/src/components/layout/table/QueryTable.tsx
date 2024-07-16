@@ -8,7 +8,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { useCallback, useReducer, useState } from 'react';
+import { useCallback, useEffect, useReducer, useState } from 'react';
 import { Button } from '@/components/ui/button.tsx';
 import { Action, customPagSort, PaginationSortingState, QueryResponse } from '@/utils/types.ts';
 import { useQuery } from 'react-query';
@@ -85,7 +85,14 @@ function QueryTable<TType extends { id: string | number }, TValue>({
   const [pagSort, dispatch] = useReducer(reducer, customPagSort(maxResults, defaultSort));
   const queryArr = typeof queryKey === 'string' ? [queryKey] : [...queryKey];
   const { data, isLoading } = useQuery<QueryResponse<TType>, Error>(
-    [...queryArr, pagSort.page, pagSort.size, pagSort.search],
+    [
+      ...queryArr,
+      pagSort.page,
+      pagSort.sortOrder.property,
+      pagSort.sortOrder.direction,
+      pagSort.search ? pagSort.search.searchParam : '',
+      pagSort.search ? pagSort.search.field : '',
+    ],
     () => {
       return queryFn(pagSort);
     },
@@ -95,7 +102,9 @@ function QueryTable<TType extends { id: string | number }, TValue>({
       cacheTime: refetchOnMount ? 0 : 1000000,
     },
   );
-
+  useEffect(() => {
+    console.log(pagSort);
+  }, [pagSort]);
   const [rowSelection, setRowSelection] = useState({});
   const sortAppliedColumns = columns.map((column) => {
     return {

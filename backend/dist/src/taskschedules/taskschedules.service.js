@@ -35,7 +35,6 @@ let TaskSchedulesService = class TaskSchedulesService {
         return days.filter((day, index) => {
             if (weeksOfInterval.includes(Math.floor((index % 28) / 7))) {
                 if (daysOfWeek.includes(daysToNos[(0, date_fns_1.format)(day, 'EEEE')] % 7)) {
-                    console.log(day, Math.floor((index % 28) / 7), (0, date_fns_1.format)(day, 'EEEE'), daysToNos[(0, date_fns_1.format)(day, 'EEEE')]);
                     return day;
                 }
             }

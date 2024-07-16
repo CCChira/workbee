@@ -65,7 +65,7 @@ export class LocationsController {
     @PaginationParamsDecorator() paginationParams: Pagination,
     @SortingParamsDecorator(['name', 'id'])
     sortingParams: Sorting,
-    @SearchDecorator('email') searchParams: ISearch,
+    @SearchDecorator('name') searchParams: ISearch,
   ) {
     return this.locationsService.findLocations(
       clientId,

@@ -57,6 +57,27 @@ let ContractsController = class ContractsController {
         createContractDto.pdfUrl = pdfUrl ? pdfUrl : '';
         return this.contractsService.createContract(createContractDto, clientId);
     }
+    async getContractById(id) {
+        const contract = await this.contractsService.getContractById(id);
+        if (!contract) {
+            throw new common_1.NotFoundException(`Contract with ID ${id} not found`);
+        }
+        return contract;
+    }
+    async updateContract(id, updateData) {
+        const updatedContract = await this.contractsService.updateContract(id, updateData);
+        if (!updatedContract) {
+            throw new common_1.NotFoundException(`Contract with ID ${id} not found`);
+        }
+        return updatedContract;
+    }
+    async deleteContract(id) {
+        const deleted = await this.contractsService.deleteContract(parseInt(id));
+        if (!deleted) {
+            throw new common_1.NotFoundException(`Contract with ID ${id} not found`);
+        }
+        return deleted;
+    }
 };
 exports.ContractsController = ContractsController;
 __decorate([
@@ -129,6 +150,32 @@ __decorate([
     __metadata("design:paramtypes", [createContract_dto_1.CreateContractDto, Object, String]),
     __metadata("design:returntype", Promise)
 ], ContractsController.prototype, "createContract", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ContractsController.prototype, "getContractById", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN]),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], ContractsController.prototype, "updateContract", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN]),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ContractsController.prototype, "deleteContract", null);
 exports.ContractsController = ContractsController = __decorate([
     (0, swagger_1.ApiTags)('Contracts'),
     (0, common_1.Controller)('contracts'),

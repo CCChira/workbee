@@ -60,6 +60,10 @@ let TaskinstanceController = class TaskinstanceController {
     async fetchTaskLoadAndEfficiency() {
         return this.taskInstanceService.fetchTaskLoadAndEfficiency();
     }
+    async getTaskInstancesToday(userId) {
+        console.log(userId);
+        return this.taskInstanceService.findTasksForToday(userId);
+    }
     async getStatusCounts(start, end) {
         return this.taskInstanceService.getTaskStatusCounts({
             start: start,
@@ -161,6 +165,13 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], TaskinstanceController.prototype, "fetchTaskLoadAndEfficiency", null);
+__decorate([
+    (0, common_1.Get)('instancesToday/:userId'),
+    __param(0, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], TaskinstanceController.prototype, "getTaskInstancesToday", null);
 __decorate([
     (0, common_1.Get)('statuscount'),
     (0, AuthDecorators_decorator_1.AuthDecorators)([client_1.Role.ADMIN, client_1.Role.CLIENT]),

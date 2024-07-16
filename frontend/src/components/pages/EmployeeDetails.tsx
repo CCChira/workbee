@@ -81,7 +81,7 @@ function EmployeeDetails() {
 
     socket.on('connect', () => {
       console.log('Connected to WebSocket server!');
-      socket.emit('register_user'); // If needed, otherwise just handle it server-side
+      socket.emit('register_user');
     });
 
     socket.on('update_location', (data) => {
@@ -146,11 +146,20 @@ function EmployeeDetails() {
             <ReactMapGL
               {...center}
               mapboxAccessToken={import.meta.env.VITE_MAPS_KEY}
-              style={{ width: 600, height: 400 }}
+              style={{ width: 420, height: 280 }}
               mapStyle="mapbox://styles/mapbox/streets-v9"
               onMove={(evt) => setCenter(evt.viewState)}
             >
               <Marker latitude={location.latitude} longitude={location.longitude} anchor={'center'}></Marker>
+              {taskData.data.map((task) => {
+                return (
+                  <Marker
+                    latitude={task.room.location.latitude}
+                    longitude={task.room.location.longitude}
+                    color="hsl(24.6 95% 53.1%)"
+                  ></Marker>
+                );
+              })}
             </ReactMapGL>
           )}
         </div>
@@ -158,12 +167,12 @@ function EmployeeDetails() {
           <Tabs defaultValue="calendar">
             <TabsList>
               <TabsTrigger value="calendar">Calendar</TabsTrigger>
-              <TabsTrigger value="instances">Task Templates</TabsTrigger>
+              <TabsTrigger value="instances">Task Instances</TabsTrigger>
             </TabsList>
             <TabsContent value="instances" className="w-full">
               <Card>
                 <CardHeader>
-                  <CardTitle>Task Templates</CardTitle>
+                  <CardTitle>Task Instances</CardTitle>
                 </CardHeader>
                 <CardContent className="flex min-w-max">
                   {employeeId && (
@@ -188,7 +197,7 @@ function EmployeeDetails() {
                   <CardTitle>Task Instances</CardTitle>
                 </CardHeader>
                 <CardContent className="h-full">
-                  <TasksCalendar userId={employeeId} queryFn={fetchTaskInstancesByMonthYear} queryKey="idkPulaMea" />
+                  <TasksCalendar userId={employeeId} queryFn={fetchTaskInstancesByMonthYear} queryKey="calendar" />
                 </CardContent>
               </Card>
             </TabsContent>

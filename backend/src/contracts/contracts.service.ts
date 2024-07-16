@@ -114,4 +114,22 @@ export class ContractsService {
       size,
     };
   }
+
+  async getContractById(id: number) {
+    return this.prisma.contract.findUnique({
+      where: { id },
+    });
+  }
+  async updateContract(id: number, updateData: any) {
+    return this.prisma.contract.update({
+      where: { id },
+      data: updateData,
+    });
+  }
+
+  async deleteContract(id: number) {
+    return this.prisma.contract.delete({
+      where: { id },
+    });
+  }
 }

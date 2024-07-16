@@ -25,7 +25,7 @@ export class UsersService {
       include: {
         TaskAssignment: {
           include: {
-            task: true, // Assuming task points to TaskInstance
+            task: true,
           },
         },
       },
@@ -284,7 +284,6 @@ export class UsersService {
     const response = await this.prisma.user.findUnique({
       where: { id: token },
     });
-    console.log(response);
     return response;
   }
 

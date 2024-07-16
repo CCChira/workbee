@@ -1,15 +1,10 @@
-// src/aws-s3.service.ts
 import { Injectable, Logger } from '@nestjs/common';
-import {
-  GetObjectCommand,
-  PutObjectCommand,
-  S3Client,
-} from '@aws-sdk/client-s3';
+import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import * as dotenv from 'dotenv';
 import { ConfigService } from '@nestjs/config';
 
-dotenv.config(); // Load environment variables
+dotenv.config();
 
 @Injectable()
 export class AwsS3Service {

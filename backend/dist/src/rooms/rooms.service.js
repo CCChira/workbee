@@ -21,6 +21,7 @@ let RoomsService = class RoomsService {
         this.prismaImageService = prismaImageService;
     }
     async getAllRooms(paginationParams, sortingParams, searchParam) {
+        console.log(sortingParams);
         const response = await this.prisma.room.findMany({
             skip: paginationParams.offset,
             take: paginationParams.limit,
@@ -37,9 +38,24 @@ let RoomsService = class RoomsService {
                     },
                 }
                 : {},
+            include: {
+                images: true,
+                location: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
         });
+        const roomsWithSignedUrls = await Promise.all(response.map(async (room) => {
+            const images = await Promise.all(room.images.map(async (image) => {
+                const url = await this.s3Service.getFileUrl('workbee-files', image.url);
+                return { ...image, url };
+            }));
+            return { ...room, images };
+        }));
         return {
-            data: response,
+            data: roomsWithSignedUrls,
             dataSize: response.length,
             page: paginationParams.page,
             size: paginationParams.size,
@@ -92,14 +108,35 @@ let RoomsService = class RoomsService {
             }),
         };
     }
+    async getRooms(pagination, sorting, search) {
+        const skip = (pagination.page - 1) * pagination.size;
+        const take = pagination.size;
+        const orderBy = { [sorting.property]: sorting.direction };
+        const rooms = this.prisma.room.findMany({
+            skip,
+            take: pagination.limit,
+            orderBy: {
+                [sorting.property]: sorting.direction,
+            },
+            include: {
+                images: true,
+                location: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
+        });
+    }
     async getRoomsByLocationId(locationId, pagination, sorting) {
+        console.log('skip');
         const skip = (pagination.page - 1) * pagination.size;
         const take = pagination.size;
         const orderBy = { [sorting.property]: sorting.direction };
         const rooms = await this.prisma.room.findMany({
             where: { locationId: parseInt(locationId) },
-            skip,
-            take: pagination.limit,
+            skip: undefined,
+            take: pagination.limit ?? undefined,
             orderBy: {
                 images: {
                     _count: 'desc',

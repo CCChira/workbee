@@ -1,4 +1,4 @@
-// src/queries/getTaskTemplates.ts
+
 import { PaginationSortingState } from '@/utils/types.ts';
 import addPagSortParams from '@/queries/addPagSortParams.ts';
 import { useQuery } from 'react-query';
@@ -24,20 +24,20 @@ export async function getTaskTemplates(pagSort: PaginationSortingState, contract
   });
 
   if (!response.ok) {
-    const errorBody = await response.json(); // Assuming the server returns JSON with error details
+    const errorBody = await response.json();
     throw new Error(errorBody.message || 'Failed to fetch task templates');
   }
   return response.json();
 }
-// src/hooks/useGetTaskTemplates.ts
+
 
 export function useGetTaskTemplates(pagSort: PaginationSortingState, contractId: string) {
   return useQuery(
-    [`taskTemplates${contractId}`, pagSort, contractId], // Query key
-    () => getTaskTemplates(pagSort, contractId), // Fetch function with parameters
+    [`taskTemplates${contractId}`, pagSort, contractId],
+    () => getTaskTemplates(pagSort, contractId),
     {
-      keepPreviousData: true, // Keep previous data during refetch
-      staleTime: 5 * 60 * 1000, // Keep data fresh for 5 minutes
+      keepPreviousData: true,
+      staleTime: 5 * 60 * 1000,
     },
   );
 }

@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { PaginationSortingState, QueryResponse } from '@/utils/types';
+import { PaginationSortingState } from '@/utils/types';
 
 export interface Room {
   id: number;
@@ -29,6 +29,30 @@ export async function fetchRoomsByLocation(locationId: number, pagSort: Paginati
   } catch (e) {
     console.log(e);
   }
+}
+export async function fetchRooms(pagSort: PaginationSortingState) {
+  try {
+    const fetchURL = `${import.meta.env.VITE_API_URL}/rooms/?page=${pagSort.page}&size=${pagSort.size}&sort:order=${pagSort.sortOrder.property}:${pagSort.sortOrder.direction}`;
+
+    const response = await fetch(fetchURL, {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    return response.json();
+  } catch (e) {
+    console.log(e);
+  }
+}
+export function useGetRooms(pagSort: PaginationSortingState) {
+  return useQuery(['rooms', pagSort], () => fetchRooms(pagSort));
 }
 
 export function useRoomsByLocation(locationId: number, pagSort: PaginationSortingState) {

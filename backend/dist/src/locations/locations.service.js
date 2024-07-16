@@ -50,6 +50,7 @@ let LocationsService = class LocationsService {
         const actualContractId = parseInt(contractId ? contractId : '0');
         const { data } = await this.contractsService.getAllContractsByClientId(clientId, paginationParams);
         const contractIds = data.map((contract) => contract.id);
+        console.log(searchParams);
         const response = await this.prisma.location.findMany({
             skip: paginationParams.offset ?? 0,
             take: paginationParams.limit ?? 10,
@@ -58,23 +59,26 @@ let LocationsService = class LocationsService {
                     [sortingParams.property || 'id']: sortingParams.direction || 'desc',
                 },
             ],
-            where: contractId && clientId
-                ? searchParams.field && searchParams.searchParam
-                    ? {
-                        contractId: actualContractId
-                            ? actualContractId
-                            : { in: contractIds },
-                        [searchParams.field]: {
-                            contains: searchParams.searchParam,
-                            mode: 'insensitive',
-                        },
-                    }
-                    : {
-                        contractId: actualContractId
-                            ? actualContractId
-                            : { in: contractIds },
-                    }
-                : {},
+            where: searchParams.field && searchParams.searchParam
+                ? {
+                    Contract: clientId
+                        ? {
+                            clientId: clientId,
+                        }
+                        : undefined,
+                    contractId: contractId ? parseInt(contractId) : undefined,
+                    [searchParams.field]: {
+                        contains: searchParams.searchParam,
+                    },
+                }
+                : {
+                    Contract: clientId
+                        ? {
+                            clientId: clientId,
+                        }
+                        : undefined,
+                    contractId: contractId ? parseInt(contractId) : undefined,
+                },
         });
         return {
             data: response,
@@ -90,7 +94,6 @@ let LocationsService = class LocationsService {
                 contractId: contractId,
             },
         });
-        console.log(response);
         return response;
     }
     async getLocationsWithContractAndClient(paginationParams, sortingParams) {

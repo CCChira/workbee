@@ -80,7 +80,7 @@ __decorate([
     __param(1, (0, common_1.Query)('contractId')),
     __param(2, (0, paginationParams_decorator_1.PaginationParamsDecorator)()),
     __param(3, (0, sortingParams_decorator_1.SortingParamsDecorator)(['name', 'id'])),
-    __param(4, (0, SearchDecorator_decorator_1.SearchDecorator)('email')),
+    __param(4, (0, SearchDecorator_decorator_1.SearchDecorator)('name')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, Object, Object, Object]),
     __metadata("design:returntype", Promise)

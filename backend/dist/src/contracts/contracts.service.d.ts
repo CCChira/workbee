@@ -65,4 +65,31 @@ export declare class ContractsService {
         page: number;
         size: number;
     }>;
+    getContractById(id: number): Promise<{
+        id: number;
+        title: string;
+        description: string;
+        startDate: string;
+        endDate: string;
+        clientId: string;
+        pdfUrl: string;
+    }>;
+    updateContract(id: number, updateData: any): Promise<{
+        id: number;
+        title: string;
+        description: string;
+        startDate: string;
+        endDate: string;
+        clientId: string;
+        pdfUrl: string;
+    }>;
+    deleteContract(id: number): Promise<{
+        id: number;
+        title: string;
+        description: string;
+        startDate: string;
+        endDate: string;
+        clientId: string;
+        pdfUrl: string;
+    }>;
 }

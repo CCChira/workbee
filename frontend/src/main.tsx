@@ -15,8 +15,6 @@ export const queryClient = new QueryClient({
       retry: false,
       onError: (error) => {
         const { logoutUser } = useUserStore.getState();
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         if (error?.message === '401') {
           logoutUser();
         }

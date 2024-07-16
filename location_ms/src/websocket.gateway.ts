@@ -19,7 +19,7 @@ export class LocationGateway implements OnGatewayConnection, OnGatewayDisconnect
   server: Server;
 
   private userSocket: Socket | null = null;
-  private intervalId: NodeJS.Timeout | null = null; // To store the interval ID
+  private intervalId: NodeJS.Timeout | null = null;
 
   afterInit(server: Server) {
     console.log('WebSocket Gateway initialized');
@@ -28,7 +28,7 @@ export class LocationGateway implements OnGatewayConnection, OnGatewayDisconnect
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);
     if (this.userSocket) {
-      this.clearUpdateInterval(); // Clear previous interval if any
+      this.clearUpdateInterval();
     }
     this.userSocket = client;
     this.startSendingLocation();
@@ -52,7 +52,7 @@ export class LocationGateway implements OnGatewayConnection, OnGatewayDisconnect
   startSendingLocation() {
     const baseLatitude = 46.749245;
     const baseLongitude = 23.585616;
-    const variance = 0.001; // This sets the range of random values around the base coordinates
+    const variance = 0.001;
 
     this.intervalId = setInterval(() => {
       const randomLat = baseLatitude + (Math.random() * variance * 2 - variance);
@@ -64,7 +64,7 @@ export class LocationGateway implements OnGatewayConnection, OnGatewayDisconnect
         longitude: randomLong
       };
       this.handleLocationUpdate(mockData);
-    }, 10000); // Every 10 seconds
+    }, 10000);
   }
 
   clearUpdateInterval() {

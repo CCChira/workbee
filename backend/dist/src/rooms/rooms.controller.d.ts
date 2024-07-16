@@ -4,6 +4,7 @@ import { AwsS3Service } from '../services/aws-s3.service';
 import { CreateRoomDto } from './dto/createRoom.dto';
 import { Pagination } from '../utils/decorator/paginationParams.decorator';
 import { Sorting } from '../utils/decorator/sortingParams.decorator';
+import { ISearch } from '../utils/decorator/SearchDecorator.decorator';
 export declare class RoomsController {
     private readonly roomsService;
     private readonly awsS3Service;
@@ -24,6 +25,25 @@ export declare class RoomsController {
             accessMode: import(".prisma/client").$Enums.AccessMode;
         }[];
         total: number;
+        page: number;
+        size: number;
+    }>;
+    getRooms(paginationParams: Pagination, sortingParams: Sorting, searchParams: ISearch): Promise<{
+        data: {
+            images: {
+                url: string;
+                id: number;
+                roomId: number;
+            }[];
+            location: {
+                name: string;
+            };
+            id: number;
+            name: string;
+            locationId: number;
+            accessMode: import(".prisma/client").$Enums.AccessMode;
+        }[];
+        dataSize: number;
         page: number;
         size: number;
     }>;

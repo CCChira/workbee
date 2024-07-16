@@ -102,11 +102,14 @@ function App() {
             width: 200,
           },
           legend: {
-            position: 'bottom',
+            position: 'top',
           },
         },
       },
     ],
+    legend: {
+      position: 'top',
+    },
   };
   const options2 = {
     chart: {
@@ -188,7 +191,11 @@ function App() {
     },
     series: series,
     xaxis: {
-      categories: underStaffed && underStaffed.map((task) => `Task ${task.id}`),
+      categories:
+        underStaffed &&
+        underStaffed.map((task) => {
+          return ` ${task.date}: ${task.title}`;
+        }),
     },
     yaxis: {
       title: {
@@ -209,6 +216,10 @@ function App() {
       position: 'top',
       horizontalAlign: 'left',
       offsetX: 40,
+    },
+    stroke: {
+      show: true,
+      width: 3,
     },
   };
 
@@ -245,6 +256,10 @@ function App() {
     {
       name: 'Pending',
       data: employeeUtils && employeeUtils.map((emp) => emp.taskCounts['PENDING'] || 0),
+    },
+    {
+      name: 'In Progress',
+      data: employeeUtils && employeeUtils.map((emp) => emp.taskCounts['IN_PROGRESS'] || 0),
     },
     {
       name: 'Completed',
@@ -297,12 +312,6 @@ function App() {
   };
 
   const blabla = useGetEfficiency();
-
-  useEffect(() => {
-    if (blabla.data) {
-      console.log(blabla.data);
-    }
-  }, [blabla.data]);
 
   const aggregatedVolumeData = {};
   const aggregatedDurationData = {};
@@ -422,9 +431,9 @@ function App() {
               </Popover>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex items-center justify-center">
             {!isLoadingStatusCounts && statusCounts && (
-              <Chart options={chartOptions} series={statusCountSeries} type={'pie'} height={350} />
+              <Chart options={chartOptions} series={statusCountSeries} type={'pie'} width={300} />
             )}
           </CardContent>
         </Card>
@@ -438,17 +447,7 @@ function App() {
             )}
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Top 10 employees</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {!isLoadingTop10Employees && top10EmployeesData && (
-              <Chart options={options2} series={top10EmployeesData} type={'bar'} height={350} />
-            )}
-          </CardContent>
-        </Card>
-        <Card>
+        <Card className="col-span-2">
           <CardHeader>
             <CardTitle>Upcoming Understaffed Tasks</CardTitle>
           </CardHeader>
@@ -469,7 +468,7 @@ function App() {
           </CardContent>
         </Card>
 
-        <Card className="col-span-3 h-[35rem]">
+        <Card className="col-span-3 h-[20rem]">
           <CardHeader>
             <CardTitle>Average Duration by Month</CardTitle>
           </CardHeader>
@@ -479,8 +478,8 @@ function App() {
                 options={chartOptions2}
                 series={[...volumeSeries, ...durationSeries]}
                 type="line"
-                height={400}
-                width={1250}
+                height={300}
+                width={900}
               />
             )}
           </CardContent>

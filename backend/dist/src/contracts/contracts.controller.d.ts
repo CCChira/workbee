@@ -1,5 +1,6 @@
 /// <reference types="multer" />
 import { ISearch } from '../utils/decorator/SearchDecorator.decorator';
+import { Contract } from '@prisma/client';
 import { Pagination } from '../utils/decorator/paginationParams.decorator';
 import { Sorting } from '../utils/decorator/sortingParams.decorator';
 import { ContractsService } from './contracts.service';
@@ -60,6 +61,25 @@ export declare class ContractsController {
         size: number;
     }>;
     createContract(createContractDto: CreateContractDto, pdf: Express.Multer.File, clientId: string): Promise<{
+        id: number;
+        title: string;
+        description: string;
+        startDate: string;
+        endDate: string;
+        clientId: string;
+        pdfUrl: string;
+    }>;
+    getContractById(id: number): Promise<Contract>;
+    updateContract(id: number, updateData: any): Promise<{
+        id: number;
+        title: string;
+        description: string;
+        startDate: string;
+        endDate: string;
+        clientId: string;
+        pdfUrl: string;
+    }>;
+    deleteContract(id: string): Promise<{
         id: number;
         title: string;
         description: string;

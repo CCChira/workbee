@@ -58,7 +58,7 @@ export default function MessageWindow({
             setMessage('');
           }}
         >
-          muie
+          submit
         </button>
       </div>
     </div>

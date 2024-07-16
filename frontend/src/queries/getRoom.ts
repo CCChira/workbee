@@ -28,7 +28,7 @@ export async function getRoom(id: string) {
       method: 'GET',
     });
     if (!response.ok) {
-      const errorBody = await response.json(); // Assuming the server returns JSON with error details
+      const errorBody = await response.json(); 
 
       throw new Error(errorBody.message || 'Failed to fetch user');
     }
@@ -55,7 +55,7 @@ export async function getTasksFromRoom(id: string, pagSort: PaginationSortingSta
       },
     );
     if (!response.ok) {
-      const errorBody = await response.json(); // Assuming the server returns JSON with error details
+      const errorBody = await response.json(); 
 
       throw new Error(errorBody.message || 'Failed to fetch user');
     }

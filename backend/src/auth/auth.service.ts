@@ -19,9 +19,6 @@ export class AuthService {
   ) {}
 
   async createAccessToken(userId: string, role: Role) {
-    console.log(
-      await this.jwtService.sign({ id: userId, role }, { expiresIn: '1h' }),
-    );
     return this.jwtService.sign({ id: userId, role }, { expiresIn: '1h' });
   }
   async createRefreshToken(userId: string, role: Role) {
@@ -36,7 +33,6 @@ export class AuthService {
     return this.prisma.user.findUnique({ where: { id } });
   }
   async login(email?: string, password?: string): Promise<AuthEntity> {
-    console.log(email, password);
     const user = await this.prisma.user.findFirst({ where: { email: email } });
 
     if (!user) {
@@ -64,23 +60,4 @@ export class AuthService {
       role: user.role,
     };
   }
-
-  // async authenticateEmployee(loginCode: string): Promise<AuthEntity> {
-  //   const employee = await this.prisma.user.findUnique({
-  //     where: {
-  //       loginCode: loginCode,
-  //     },
-  //   });
-  //
-  //   if (!employee) {
-  //     throw new NotFoundException(`No employee found for code: ${code}`);
-  //   }
-  //
-  //   return {
-  //     accessToken: this.jwtService.sign({ userId: employee.id }),
-  //     id: employee.id,
-  //     email: employee.email,
-  //     role: employee.role,
-  //   };
-  // }
 }

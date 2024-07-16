@@ -70,6 +70,15 @@ export declare class TaskinstanceService {
     getTasksAssignedToUser(userId: string): Promise<{
         data: ({
             taskSchedule: {
+                taskTemplate: {
+                    id: number;
+                    title: string;
+                    necessaryWorkers: number;
+                    necessaryTools: string[];
+                    contractId: number;
+                    duration: string;
+                };
+            } & {
                 id: number;
                 taskTemplateId: number;
                 description: string;
@@ -86,8 +95,12 @@ export declare class TaskinstanceService {
                 id: number;
                 name: string;
                 location: {
+                    id: number;
+                    name: string;
+                    address: string;
                     latitude: number;
                     longitude: number;
+                    contractId: number;
                 };
             };
             TaskAssignment: {
@@ -105,8 +118,78 @@ export declare class TaskinstanceService {
             updatedAt: Date;
         })[];
     }>;
+    findTasksForToday(userId: string): Promise<({
+        taskSchedule: {
+            taskTemplate: {
+                id: number;
+                title: string;
+                necessaryWorkers: number;
+                necessaryTools: string[];
+                contractId: number;
+                duration: string;
+            };
+        } & {
+            id: number;
+            taskTemplateId: number;
+            description: string;
+            dayOfWeek: number[];
+            frequency: number[];
+            startDate: Date;
+            endDate: Date;
+            isActive: boolean;
+            status: import(".prisma/client").$Enums.Status;
+            hour: string;
+            roomId: number;
+        };
+        taskTemplate: {
+            id: number;
+            title: string;
+            necessaryWorkers: number;
+            necessaryTools: string[];
+            contractId: number;
+            duration: string;
+        };
+        room: {
+            location: {
+                id: number;
+                name: string;
+                address: string;
+                latitude: number;
+                longitude: number;
+                contractId: number;
+            };
+            images: {
+                id: number;
+                url: string;
+                roomId: number;
+            }[];
+        } & {
+            id: number;
+            name: string;
+            locationId: number;
+            accessMode: import(".prisma/client").$Enums.AccessMode;
+        };
+    } & {
+        id: number;
+        taskScheduleId: number;
+        taskTemplateId: number;
+        status: import(".prisma/client").$Enums.Status;
+        date: Date;
+        hour: string;
+        roomId: number;
+        updatedAt: Date;
+    })[]>;
     getTasksAssignedToUserWithinInterval(userId: string, startDate: string, endDate: string): Promise<({
         taskSchedule: {
+            taskTemplate: {
+                id: number;
+                title: string;
+                necessaryWorkers: number;
+                necessaryTools: string[];
+                contractId: number;
+                duration: string;
+            };
+        } & {
             id: number;
             taskTemplateId: number;
             description: string;
@@ -242,6 +325,7 @@ export declare class TaskinstanceService {
     getUnderstaffedTaskInstances(): Promise<{
         id: number;
         title: string;
+        date: string;
         neededWorkers: number;
         assignedWorkers: number;
     }[]>;

@@ -1,4 +1,3 @@
-// src/services/prisma-image.service.ts
 import { Injectable } from '@nestjs/common';
 
 import { Prisma } from '@prisma/client';
@@ -16,7 +15,7 @@ export class PrismaImageService {
       }),
     );
 
-    // Insert the images using createMany
+   
     return this.prisma.image.createMany({
       data: imageCreates,
     });

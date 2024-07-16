@@ -14,7 +14,7 @@ export async function assignUserToTask(data: { taskId: string; userId: string })
     },
   );
   if (!response.ok) {
-    const errorBody = await response.json(); // Assuming the server returns JSON with error details
+    const errorBody = await response.json();
 
     throw new Error(errorBody.message || 'Failed to fetch user');
   }
@@ -53,7 +53,7 @@ export async function removeUserFromTask(data: { userId: string; taskId: string 
     },
   );
   if (!response.ok) {
-    const errorBody = await response.json(); // Assuming the server returns JSON with error details
+    const errorBody = await response.json(); 
 
     throw new Error(errorBody.message || 'Failed to fetch user');
   }

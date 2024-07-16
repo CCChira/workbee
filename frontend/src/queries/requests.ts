@@ -5,7 +5,6 @@ interface User {
   id: string;
   email?: string;
   name?: string;
-  // Include other relevant user fields if needed
 }
 type Status =
   | 'UNASSIGNED'
@@ -84,7 +83,7 @@ const denyRequest = async (requestId: number) => {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + localStorage.getItem('token'), // Your auth token storage strategy
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
     },
   });
 

@@ -1,4 +1,3 @@
-// src/task-schedules/dto/create-task-schedule.dto.ts
 import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Status } from '@prisma/client';

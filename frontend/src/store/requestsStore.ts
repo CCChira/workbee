@@ -2,7 +2,7 @@ import create from 'zustand';
 
 Request;
 interface RequestsStore {
-  requests: any[]; // Adjust the type according to your data structure
+  requests: any[];
   setRequests: (requests: any[]) => void;
 }
 

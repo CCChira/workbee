@@ -1,6 +1,6 @@
 import { PaginationSortingState, Roles } from '@/utils/types.ts';
 import addPagSortParams from '@/queries/addPagSortParams.ts';
-// src/queries/clientDetails.ts (or an appropriate file for data models)
+
 export interface TaskTemplate {
   id: number;
   title: string;
@@ -52,7 +52,7 @@ export async function getClientDetails(id: string) {
     method: 'GET',
   });
   if (!response.ok) {
-    const errorBody = await response.json(); // Assuming the server returns JSON with error details
+    const errorBody = await response.json();
 
     throw new Error(errorBody.message || 'Failed to fetch user');
   }
@@ -77,13 +77,14 @@ export async function getClientContract(pagSort: PaginationSortingState, clientI
     method: 'GET',
   });
   if (!response.ok) {
-    const errorBody = await response.json(); // Assuming the server returns JSON with error details
+    const errorBody = await response.json();
 
     throw new Error(errorBody.message || 'Failed to fetch contracts');
   }
   return response.json();
 }
 export async function getClientLocations(pagSort: PaginationSortingState, clientId: string) {
+  console.log(pagSort.search);
   const paginationFetchURL = addPagSortParams(
     pagSort.page,
     pagSort.size,
@@ -102,7 +103,7 @@ export async function getClientLocations(pagSort: PaginationSortingState, client
     method: 'GET',
   });
   if (!response.ok) {
-    const errorBody = await response.json(); // Assuming the server returns JSON with error details
+    const errorBody = await response.json();
 
     throw new Error(errorBody.message || 'Failed to fetch contracts');
   }

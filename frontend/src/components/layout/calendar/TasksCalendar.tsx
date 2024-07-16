@@ -47,16 +47,16 @@ export default function TasksCalendar({
     PENDING: 'bg-secondary text-black',
     IN_PROGRESS: 'bg-primary',
     REDO: 'bg-destructive',
-    COMPLETED: 'bg-green-500 text-white',
+    COMPLETED: 'bg-green-500',
     INCOMPLETE: 'bg-destructive',
     UNASSIGNED: 'bg-muted-foreground',
   };
   const hovers = {
     PENDING: 'hover:bg-secondary text-black',
     IN_PROGRESS: 'hover:bg-primary hover:text-white',
-    REDO: 'hover:bg-destructive',
-    COMPLETED: 'hover:bg-green-500',
-    INCOMPLETE: 'hover:bg-destructive',
+    REDO: 'hover:bg-destructive hover:text-white',
+    COMPLETED: 'hover:bg-green-500 hover:text-white',
+    INCOMPLETE: 'hover:bg-destructive hover:text-white',
     UNASSIGNED: 'hover:bg-muted-foreground hover:text-white',
   };
 
@@ -70,6 +70,7 @@ export default function TasksCalendar({
     }
   }, [dateState]);
   const qKey = queryKey ? `${queryKey}${ownDate.month}${ownDate.year}` : 'taskInstancesThisMonth';
+
   const { data, isLoading } = useQuery<CalendarTaskInstanceResponse>(
     qKey,
     queryFn
@@ -188,7 +189,7 @@ export default function TasksCalendar({
                                     return (
                                       <button
                                         className={`
-                                          flex items-center flex-shrink-0 h-5 px-1 text-xs hover:bg-primary ${hovers[task.status as keyof typeof hovers]} transition-colors
+                                          flex items-center flex-shrink-0 h-5 px-1 text-xs  ${hovers[task.status as keyof typeof hovers]} transition-colors
                                         `}
                                         key={`${day}${task.taskScheduleId}`}
                                         id={`${day}${task.taskScheduleId}`}

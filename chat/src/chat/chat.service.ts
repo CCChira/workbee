@@ -1,5 +1,3 @@
-// src/chat/message/message.service.ts
-
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 

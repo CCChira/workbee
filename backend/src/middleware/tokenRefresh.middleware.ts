@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NestMiddleware,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
 import { NextFunction, Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
@@ -35,7 +31,6 @@ export class TokenRefreshMiddleware implements NestMiddleware {
             { expiresIn: '7d', secret: 'zjP9h6ZI5LoSKCRj' },
           );
 
-          // Set cookies with new tokens
           res.cookie('access_token', newAccessToken, {
             httpOnly: true,
             maxAge: 3600000,

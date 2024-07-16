@@ -253,7 +253,6 @@ let UsersService = class UsersService {
         const response = await this.prisma.user.findUnique({
             where: { id: token },
         });
-        console.log(response);
         return response;
     }
     getUserChat(userId) {

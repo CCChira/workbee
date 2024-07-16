@@ -21,7 +21,6 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
     }
     async createAccessToken(userId, role) {
-        console.log(await this.jwtService.sign({ id: userId, role }, { expiresIn: '1h' }));
         return this.jwtService.sign({ id: userId, role }, { expiresIn: '1h' });
     }
     async createRefreshToken(userId, role) {
@@ -33,7 +32,6 @@ let AuthService = class AuthService {
         return this.prisma.user.findUnique({ where: { id } });
     }
     async login(email, password) {
-        console.log(email, password);
         const user = await this.prisma.user.findFirst({ where: { email: email } });
         if (!user) {
             throw new common_1.NotFoundException({

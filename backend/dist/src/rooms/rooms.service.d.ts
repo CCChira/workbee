@@ -13,6 +13,14 @@ export declare class RoomsService {
     constructor(prisma: PrismaService, s3Service: AwsS3Service, prismaImageService: PrismaImageService);
     getAllRooms(paginationParams: Pagination, sortingParams: Sorting, searchParam: ISearch): Promise<{
         data: {
+            images: {
+                url: string;
+                id: number;
+                roomId: number;
+            }[];
+            location: {
+                name: string;
+            };
             id: number;
             name: string;
             locationId: number;
@@ -70,6 +78,7 @@ export declare class RoomsService {
             accessMode: import(".prisma/client").$Enums.AccessMode;
         }[];
     }>;
+    getRooms(pagination: Pagination, sorting: Sorting, search: ISearch): Promise<void>;
     getRoomsByLocationId(locationId: string, pagination: Pagination, sorting: Sorting): Promise<{
         data: {
             images: {

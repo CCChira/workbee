@@ -1,4 +1,3 @@
-// src/services/prisma-image.service.ts
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Twilio } from 'twilio';

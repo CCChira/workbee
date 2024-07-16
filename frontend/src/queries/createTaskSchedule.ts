@@ -22,7 +22,7 @@ export const useCreateTaskSchedule = () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`, // Assuming you store the token in localStorage
+        Authorization: `Bearer ${localStorage.getItem('token')}`, 
       },
       body: JSON.stringify(taskScheduleData),
     });

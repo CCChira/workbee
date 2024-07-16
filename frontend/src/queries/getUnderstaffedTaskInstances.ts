@@ -10,7 +10,9 @@ export async function getUnderstaffedTaskInstances() {
       },
     });
     if (response.ok) {
-      return response.json();
+      const resp = await response.json();
+      console.log(resp);
+      return resp;
     } else {
       throw new Error('Network response was not ok');
     }

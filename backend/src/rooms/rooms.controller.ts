@@ -17,8 +17,18 @@ import { AwsS3Service } from '../services/aws-s3.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CreateRoomDto } from './dto/createRoom.dto';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { Pagination } from '../utils/decorator/paginationParams.decorator';
-import { Sorting } from '../utils/decorator/sortingParams.decorator';
+import {
+  Pagination,
+  PaginationParamsDecorator,
+} from '../utils/decorator/paginationParams.decorator';
+import {
+  Sorting,
+  SortingParamsDecorator,
+} from '../utils/decorator/sortingParams.decorator';
+import {
+  ISearch,
+  SearchDecorator,
+} from '../utils/decorator/SearchDecorator.decorator';
 
 const room: Room = {
   id: 0,
@@ -52,7 +62,7 @@ export class RoomsController {
   //     searchParam,
   //   );
   //
-  //   // Add presigned URLs to the images for each room
+  //
   //   const roomsWithPresignedUrls = await Promise.all(
   //     allRooms.data.map(async (room) => {
   //       const imagesWithPresignedUrls = await Promise.all(
@@ -97,13 +107,28 @@ export class RoomsController {
     @Query() pagination: Pagination,
     @Query() sorting: Sorting,
   ) {
+    console.log(
+      'uhwetifgovo89u4wrteyfgvn 45728ty0235n7894tcvnh928y5647tv834o7tyn v4753h8t0wc9tof m2345ryv7toghc4wemu',
+    );
     return this.roomsService.getRoomsByLocationId(
       locationId,
       pagination,
       sorting,
     );
   }
-
+  @Get()
+  async getRooms(
+    @PaginationParamsDecorator() paginationParams: Pagination,
+    @SortingParamsDecorator(['name', 'accessMode'])
+    sortingParams: Sorting,
+    @SearchDecorator('name') searchParams: ISearch,
+  ) {
+    return this.roomsService.getAllRooms(
+      paginationParams,
+      sortingParams,
+      searchParams,
+    );
+  }
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   public async getRoomWithImages(@Param('id') id: string) {
@@ -147,7 +172,7 @@ export class RoomsController {
   }
   @Post()
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FilesInterceptor('imageFiles', 10)) // Adjust the limit according to your needs
+  @UseInterceptors(FilesInterceptor('imageFiles', 10))
   @AuthDecorators([Role.ADMIN, Role.CLIENT])
   async createRoomWithImages(
     @UploadedFiles() files: Express.Multer.File[],

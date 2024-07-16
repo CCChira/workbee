@@ -16,7 +16,7 @@ const postLocations = async (locations: CreateLocationDto[], contractId: string)
   });
 
   if (!response.ok) {
-    const errorBody = await response.json(); // Assuming error is returned in JSON format
+    const errorBody = await response.json(); 
     throw new Error(errorBody.message || 'Failed to create multiple locations');
   }
 

@@ -111,6 +111,22 @@ let ContractsService = class ContractsService {
             size,
         };
     }
+    async getContractById(id) {
+        return this.prisma.contract.findUnique({
+            where: { id },
+        });
+    }
+    async updateContract(id, updateData) {
+        return this.prisma.contract.update({
+            where: { id },
+            data: updateData,
+        });
+    }
+    async deleteContract(id) {
+        return this.prisma.contract.delete({
+            where: { id },
+        });
+    }
 };
 exports.ContractsService = ContractsService;
 exports.ContractsService = ContractsService = __decorate([

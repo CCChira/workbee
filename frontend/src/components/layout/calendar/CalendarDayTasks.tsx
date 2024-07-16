@@ -90,7 +90,6 @@ export default function CalendarDayTasks({ tasks, date, qKey, contractId, roomId
     [],
   );
 
-  // Focus management
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     setIsFocused(false);
   };

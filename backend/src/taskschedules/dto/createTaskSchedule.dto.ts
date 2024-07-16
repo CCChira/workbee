@@ -1,12 +1,4 @@
-// src/task-schedules/dto/create-task-schedule.dto.ts
-import {
-  IsArray,
-  IsBoolean,
-  IsDateString,
-  IsInt,
-  IsNotEmpty,
-  IsString,
-} from 'class-validator';
+import { IsArray, IsBoolean, IsDateString, IsInt, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateTaskScheduleDto {

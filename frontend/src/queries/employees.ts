@@ -24,7 +24,7 @@ export async function getEmployees(pagSort: PaginationSortingState): Promise<Que
   });
 
   if (!response.ok) {
-    const errorBody = await response.json(); // Assuming the server returns JSON with error details
+    const errorBody = await response.json(); 
 
     throw new Error(errorBody.message || 'Failed to login');
   }
@@ -69,7 +69,7 @@ export async function getTasksAssisgnedToUser(pagSort: PaginationSortingState, i
     method: 'GET',
   });
   if (!response.ok) {
-    const errorBody = await response.json(); // Assuming the server returns JSON with error details
+    const errorBody = await response.json(); 
 
     throw new Error(errorBody.message || 'Failed to fetch tasks');
   }
@@ -97,7 +97,7 @@ export async function getTasksAssignedToUserThisWeek(pagSort: PaginationSortingS
     method: 'GET',
   });
   if (!response.ok) {
-    const errorBody = await response.json(); // Assuming the server returns JSON with error details
+    const errorBody = await response.json(); 
 
     throw new Error(errorBody.message || 'Failed to fetch tasks');
   }

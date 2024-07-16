@@ -26,9 +26,9 @@ export declare class TaskTemplatesService {
             necessaryTools: string[];
             contractId: number;
             TaskSchedule: {
+                status: import(".prisma/client").$Enums.Status;
                 id: number;
                 description: string;
-                status: import(".prisma/client").$Enums.Status;
                 isActive: boolean;
             }[];
         }[];

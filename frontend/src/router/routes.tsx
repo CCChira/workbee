@@ -1,6 +1,14 @@
 import App from '@/App.tsx';
 import { ReactNode } from 'react';
-import { ContactRound, HardHatIcon, HomeIcon, MapPin, MessageSquareTextIcon, PackageOpenIcon } from 'lucide-react';
+import {
+  ContactRound,
+  DoorOpenIcon,
+  HardHatIcon,
+  HomeIcon,
+  MapPin,
+  MessageSquareTextIcon,
+  PackageOpenIcon,
+} from 'lucide-react';
 import Login from '@/components/pages/Login.tsx';
 import ProtectedRoute from '@/router/ProtectedRoute.tsx';
 import Clients from '@/components/pages/Clients.tsx';
@@ -16,6 +24,7 @@ import EmployeeDetails from '@/components/pages/EmployeeDetails.tsx';
 import Calendar from '@/components/pages/Calendar.tsx';
 import Messages from '@/components/pages/Messages.tsx';
 import RoomDetails from '@/components/pages/RoomDetails.tsx';
+import Rooms from '@/components/pages/Rooms';
 
 interface CustomRouteObject {
   path: string;
@@ -133,7 +142,7 @@ const routes: CustomRouteObject[] = [
     alias: 'Tasks Overview',
     element: (
       <ProtectedRoute roles={[Roles.ADMIN, Roles.CLIENT]}>
-        <App />
+        <Tasks />
       </ProtectedRoute>
     ),
     icon: <PackageOpenIcon />,
@@ -162,6 +171,25 @@ const routes: CustomRouteObject[] = [
     element: (
       <ProtectedRoute roles={[Roles.ADMIN, Roles.CLIENT]}>
         <Messages />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: 'rooms',
+    alias: 'Rooms',
+    element: (
+      <ProtectedRoute roles={[Roles.ADMIN, Roles.CLIENT]}>
+        <Rooms />
+      </ProtectedRoute>
+    ),
+    icon: <DoorOpenIcon />,
+  },
+  {
+    path: 'rooms/:roomId',
+    alias: 'Rooms',
+    element: (
+      <ProtectedRoute roles={[Roles.ADMIN, Roles.CLIENT]}>
+        <RoomDetails />
       </ProtectedRoute>
     ),
   },

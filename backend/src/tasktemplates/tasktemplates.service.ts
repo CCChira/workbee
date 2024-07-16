@@ -1,4 +1,3 @@
-// src/task-template.service.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskTemplateDto } from './dto/createTaskTemplate.dto';
@@ -30,7 +29,7 @@ export class TaskTemplatesService {
 
     return this.prisma.taskTemplate.createMany({
       data: taskTemplatesData,
-      skipDuplicates: true, // Optional, to skip duplicates
+      skipDuplicates: true,
     });
   }
   async findAllTaskTemplates(
@@ -81,7 +80,7 @@ export class TaskTemplatesService {
         },
         _count: {
           select: {
-            TaskSchedule: true, // Count the number of schedules linked to this instance
+            TaskSchedule: true,
           },
         },
       },

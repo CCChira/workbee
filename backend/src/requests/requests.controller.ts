@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Patch,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Param, Patch, Query } from '@nestjs/common';
 import { RequestsService } from './requests.service';
 import { TaskSchedulesService } from '../taskschedules/taskschedules.service';
 import { CreateTaskScheduleDto } from '../taskschedules/dto/createTaskSchedule.dto';
@@ -14,19 +6,9 @@ import { RequestType, Role, Status } from '@prisma/client';
 import { AuthDecorators } from '../utils/decorator/AuthDecorators.decorator';
 import { ApiTags } from '@nestjs/swagger';
 import { PagSortApiQuery } from '../utils/decorator/PagSortApiQuery.decorator';
-import {
-  ISearch,
-  SearchApiQuery,
-  SearchDecorator,
-} from '../utils/decorator/SearchDecorator.decorator';
-import {
-  Pagination,
-  PaginationParamsDecorator,
-} from '../utils/decorator/paginationParams.decorator';
-import {
-  Sorting,
-  SortingParamsDecorator,
-} from '../utils/decorator/sortingParams.decorator';
+import { ISearch, SearchApiQuery, SearchDecorator } from '../utils/decorator/SearchDecorator.decorator';
+import { Pagination, PaginationParamsDecorator } from '../utils/decorator/paginationParams.decorator';
+import { Sorting, SortingParamsDecorator } from '../utils/decorator/sortingParams.decorator';
 import { TaskinstanceService } from '../taskinstance/taskinstance.service';
 import { CreateTaskInstanceDto } from '../taskinstance/dto/createTaskInstance.dto';
 
@@ -104,7 +86,7 @@ export class RequestsController {
   @HttpCode(HttpStatus.OK)
   @PagSortApiQuery()
   @SearchApiQuery()
-  @AuthDecorators([Role.ADMIN, Role.EMPLOYEE]) // Assuming employees can also view requests
+  @AuthDecorators([Role.ADMIN, Role.EMPLOYEE])
   async getAllRequests(
     @PaginationParamsDecorator() paginationParams: Pagination,
     @SortingParamsDecorator(['id', 'createdAt', 'status'])

@@ -1,30 +1,24 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
+  Param,
+  Patch,
   Post,
   Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { PagSortApiQuery } from '../utils/decorator/PagSortApiQuery.decorator';
-import {
-  ISearch,
-  SearchApiQuery,
-  SearchDecorator,
-} from '../utils/decorator/SearchDecorator.decorator';
+import { ISearch, SearchApiQuery, SearchDecorator } from '../utils/decorator/SearchDecorator.decorator';
 import { AuthDecorators } from '../utils/decorator/AuthDecorators.decorator';
 import { Contract, Role } from '@prisma/client';
-import {
-  Pagination,
-  PaginationParamsDecorator,
-} from '../utils/decorator/paginationParams.decorator';
-import {
-  Sorting,
-  SortingParamsDecorator,
-} from '../utils/decorator/sortingParams.decorator';
+import { Pagination, PaginationParamsDecorator } from '../utils/decorator/paginationParams.decorator';
+import { Sorting, SortingParamsDecorator } from '../utils/decorator/sortingParams.decorator';
 import { ContractsService } from './contracts.service';
 import { CreateContractDto } from './dto/createContract.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -94,7 +88,7 @@ export class ContractsController {
   @Post()
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(FileInterceptor('pdf'))
-  @ApiConsumes('multipart/form-data') // Indicates the endpoint accepts form-data
+  @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
@@ -135,5 +129,41 @@ export class ContractsController {
       );
     createContractDto.pdfUrl = pdfUrl ? pdfUrl : '';
     return this.contractsService.createContract(createContractDto, clientId);
+  }
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  @AuthDecorators([Role.ADMIN, Role.CLIENT])
+  public async getContractById(@Param('id') id: number): Promise<Contract> {
+    const contract = await this.contractsService.getContractById(id);
+    if (!contract) {
+      throw new NotFoundException(`Contract with ID ${id} not found`);
+    }
+    return contract;
+  }
+
+  @Patch(':id')
+  @AuthDecorators([Role.ADMIN])
+  public async updateContract(
+    @Param('id') id: number,
+    @Body() updateData: any,
+  ) {
+    const updatedContract = await this.contractsService.updateContract(
+      id,
+      updateData,
+    );
+    if (!updatedContract) {
+      throw new NotFoundException(`Contract with ID ${id} not found`);
+    }
+    return updatedContract;
+  }
+
+  @Delete(':id')
+  @AuthDecorators([Role.ADMIN]) 
+  public async deleteContract(@Param('id') id: string) {
+    const deleted = await this.contractsService.deleteContract(parseInt(id));
+    if (!deleted) {
+      throw new NotFoundException(`Contract with ID ${id} not found`);
+    }
+    return deleted;
   }
 }

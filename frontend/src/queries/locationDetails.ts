@@ -10,7 +10,7 @@ export async function getLocationsByContractId(contractId: string) {
     method: 'GET',
   });
   if (!response.ok) {
-    const errorBody = await response.json(); // Assuming the server returns JSON with error details
+    const errorBody = await response.json();
 
     throw new Error(errorBody.message || 'Failed to fetch user');
   }
@@ -20,7 +20,7 @@ export const useGetLocationsByContract = (contractId: string) => {
   return useQuery(contractId + 'locations', () => getLocationsByContractId(contractId));
 };
 export async function getRoomByLocationId(locationId: string) {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/rooms/byLocation?locationId=${locationId}`, {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/rooms/byLocation/${locationId}`, {
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
@@ -29,7 +29,7 @@ export async function getRoomByLocationId(locationId: string) {
     method: 'GET',
   });
   if (!response.ok) {
-    const errorBody = await response.json(); // Assuming the server returns JSON with error details
+    const errorBody = await response.json();
 
     throw new Error(errorBody.message || 'Failed to fetch user');
   }

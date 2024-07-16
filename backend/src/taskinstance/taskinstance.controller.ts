@@ -102,6 +102,11 @@ export class TaskinstanceController {
   async fetchTaskLoadAndEfficiency() {
     return this.taskInstanceService.fetchTaskLoadAndEfficiency();
   }
+  @Get('instancesToday/:userId')
+  async getTaskInstancesToday(@Param('userId') userId: string) {
+    console.log(userId);
+    return this.taskInstanceService.findTasksForToday(userId);
+  }
   @Get('statuscount')
   @AuthDecorators([Role.ADMIN, Role.CLIENT])
   async getStatusCounts(
@@ -209,6 +214,7 @@ export class TaskinstanceController {
       endDate,
     );
   }
+
   @Get('assigned-to-user-week/:userId')
   @AuthDecorators([Role.ADMIN, Role.CLIENT])
   async getTasksAssignedToUserThisWeek(@Param('userId') userId: string) {

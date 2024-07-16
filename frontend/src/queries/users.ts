@@ -18,6 +18,6 @@ export async function deleteMultipleUsers(userIds: string[]) {
     return data;
   } catch (error) {
     console.error('Error:', error);
-    throw error; // Rethrow or handle error as needed
+    throw error;
   }
 }

@@ -83,8 +83,9 @@ function QueryTable<TType extends { id: string | number }, TValue>({
   refetchOnMount = false,
 }: QueryTableProps<TType, TValue>) {
   const [pagSort, dispatch] = useReducer(reducer, customPagSort(maxResults, defaultSort));
+  const queryArr = typeof queryKey === 'string' ? [queryKey] : [...queryKey];
   const { data, isLoading } = useQuery<QueryResponse<TType>, Error>(
-    [queryKey, pagSort],
+    [...queryArr, pagSort.page, pagSort.size, pagSort.search],
     () => {
       return queryFn(pagSort);
     },

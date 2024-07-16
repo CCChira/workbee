@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import {
   ClientData,
   ContractData,
@@ -19,7 +19,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog.tsx
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
 import { TabsContent } from '@radix-ui/react-tabs';
 import CreateContractForm from '@/components/forms/CreateContractForm.tsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useToast } from '@/components/ui/use-toast.ts';
 import { useCreateContractFormStore } from '@/store/createContractFormStore.ts';
 import CreateLocationForm from '@/components/forms/CreateLocationForm.tsx';
@@ -79,7 +79,9 @@ const locationColumns: ColumnDef<LocationData>[] = [
 
 function ClientDetails() {
   const { clientId } = useParams();
-  const { data: clientData } = useQuery<ClientData>('client', { queryFn: () => getClientDetails(clientId ?? '') });
+  const { data: clientData } = useQuery<ClientData>('client' + clientId, {
+    queryFn: () => getClientDetails(clientId ?? ''),
+  });
   const [locationsEnabled, setLocationsEnabled] = useState(false);
   const [lockContractFields, setLockContractFields] = useState(false);
   const [lockLocationFields, setLockLocationFields] = useState(false);
@@ -89,6 +91,8 @@ function ClientDetails() {
   const createContractFormStore = useCreateContractFormStore();
   const createLocationFormStore = useCreateLocationMarkerStore();
   const { toast } = useToast();
+  const qclient = useQueryClient();
+
   const onContractCreationSuccess = (responseContractId: string) => {
     setLockContractFields(true);
     toast({
@@ -119,9 +123,9 @@ function ClientDetails() {
   };
   return (
     <div className="flex gap-16 h-full">
-      <section className="flex flex-col gap-16 flex-1">
+      <section className="flex flex-col gap-5 flex-1">
         <section>
-          <Card className="h-52 w-fit">
+          <Card className=" w-fit">
             <CardHeader>
               <CardTitle>Client {clientData?.name}</CardTitle>
               <CardDescription>
@@ -217,7 +221,7 @@ function ClientDetails() {
               <Separator />
               <QueryTable
                 queryFn={(pagSort: PaginationSortingState) => getClientContract(pagSort, clientData.id)}
-                queryKey={'contracts'}
+                queryKey={clientId ?? ''}
                 columns={contractColumns}
                 sortableColumns={{
                   title: true,

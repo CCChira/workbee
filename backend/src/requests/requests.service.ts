@@ -126,7 +126,7 @@ export class RequestsService {
         type: RequestType.TASK_INSTANCE_UPDATE,
         details: data as unknown as Prisma.JsonObject,
         createdById: createdById,
-        assignedToId: createdById, // Assuming self-assignment for simplicity
+        assignedToId: createdById, 
         status: Status.PENDING,
       },
     });

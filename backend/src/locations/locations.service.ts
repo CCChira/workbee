@@ -53,6 +53,7 @@ export class LocationsService {
       paginationParams,
     );
     const contractIds = data.map((contract) => contract.id);
+    console.log(searchParams);
     const response = await this.prisma.location.findMany({
       skip: paginationParams.offset ?? 0,
       take: paginationParams.limit ?? 10,
@@ -63,23 +64,26 @@ export class LocationsService {
       ],
 
       where:
-        contractId && clientId
-          ? searchParams.field && searchParams.searchParam
-            ? {
-                contractId: actualContractId
-                  ? actualContractId
-                  : { in: contractIds },
-                [searchParams.field]: {
-                  contains: searchParams.searchParam,
-                  mode: 'insensitive',
-                },
-              }
-            : {
-                contractId: actualContractId
-                  ? actualContractId
-                  : { in: contractIds },
-              }
-          : {},
+        searchParams.field && searchParams.searchParam
+          ? {
+              Contract: clientId
+                ? {
+                    clientId: clientId,
+                  }
+                : undefined,
+              contractId: contractId ? parseInt(contractId) : undefined,
+              [searchParams.field]: {
+                contains: searchParams.searchParam,
+              },
+            }
+          : {
+              Contract: clientId
+                ? {
+                    clientId: clientId,
+                  }
+                : undefined,
+              contractId: contractId ? parseInt(contractId) : undefined,
+            },
     });
     return {
       data: response,
@@ -96,7 +100,6 @@ export class LocationsService {
         contractId: contractId,
       },
     });
-    console.log(response);
     return response;
   }
   async getLocationsWithContractAndClient(

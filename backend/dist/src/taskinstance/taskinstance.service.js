@@ -88,20 +88,49 @@ let TaskinstanceService = class TaskinstanceService {
                     select: {
                         id: true,
                         name: true,
-                        location: {
-                            select: {
-                                latitude: true,
-                                longitude: true,
-                            },
-                        },
+                        location: true,
                     },
                 },
-                taskSchedule: true,
+                taskSchedule: {
+                    include: {
+                        taskTemplate: true,
+                    },
+                },
             },
         });
         return {
             data: response,
         };
+    }
+    async findTasksForToday(userId) {
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        return this.prismaService.taskInstance.findMany({
+            where: {
+                TaskAssignment: {
+                    some: {
+                        userId: userId,
+                    },
+                },
+                date: {
+                    gte: todayStart,
+                },
+            },
+            include: {
+                taskSchedule: {
+                    include: {
+                        taskTemplate: true,
+                    },
+                },
+                room: {
+                    include: {
+                        location: true,
+                        images: true,
+                    },
+                },
+                taskTemplate: true,
+            },
+        });
     }
     async getTasksAssignedToUserWithinInterval(userId, startDate, endDate) {
         return this.prismaService.taskInstance.findMany({
@@ -117,7 +146,6 @@ let TaskinstanceService = class TaskinstanceService {
                     {
                         date: {
                             gte: new Date(startDate),
-                            lte: new Date(endDate),
                         },
                     },
                 ],
@@ -125,7 +153,11 @@ let TaskinstanceService = class TaskinstanceService {
             include: {
                 TaskAssignment: true,
                 room: true,
-                taskSchedule: true,
+                taskSchedule: {
+                    include: {
+                        taskTemplate: true,
+                    },
+                },
             },
         });
     }
@@ -219,11 +251,10 @@ let TaskinstanceService = class TaskinstanceService {
         };
     }
     async assignUserToTaskInstance(instanceId, userId) {
-        console.log('$$$$$$$$$$$$$$', instanceId, userId);
         await this.prismaService.taskInstance.update({
             where: { id: instanceId },
             data: {
-                status: client_1.Status.PENDING,
+                status: client_1.Status.IN_PROGRESS,
             },
         });
         const resp = await this.prismaService.taskAssignment.create({
@@ -232,7 +263,6 @@ let TaskinstanceService = class TaskinstanceService {
                 userId: userId,
             },
         });
-        console.log('################', resp);
         return resp;
     }
     async deleteUserFromTaskInstance(instanceId, userId) {
@@ -348,7 +378,7 @@ let TaskinstanceService = class TaskinstanceService {
         const taskInstances = await this.prismaService.taskInstance.findMany({
             include: {
                 taskSchedule: {
-                    select: {
+                    include: {
                         taskTemplate: true,
                     },
                 },
@@ -365,6 +395,7 @@ let TaskinstanceService = class TaskinstanceService {
             return {
                 id: ti.id,
                 title: ti.taskSchedule.taskTemplate.title,
+                date: (0, date_fns_1.format)(ti.date, 'E'),
                 neededWorkers: ti.taskSchedule.taskTemplate.necessaryWorkers,
                 assignedWorkers: ti.TaskAssignment.length,
             };
@@ -424,7 +455,7 @@ let TaskinstanceService = class TaskinstanceService {
         const date = (0, date_fns_1.parse)(`${year}-${month}`, 'yyyy-MMMM', new Date());
         const start = (0, date_fns_1.startOfMonth)(date);
         const end = (0, date_fns_1.endOfMonth)(date);
-        console.log(contractId, roomId, locationId);
+        console.log(contractId);
         const response = (await this.prismaService.taskInstance.findMany({
             where: {
                 date: {
@@ -476,7 +507,6 @@ let TaskinstanceService = class TaskinstanceService {
             }
             return acc;
         }, {});
-        console.log(response);
         return response;
     }
 };

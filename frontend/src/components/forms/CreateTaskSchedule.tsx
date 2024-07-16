@@ -26,9 +26,7 @@ import { data } from 'autoprefixer';
 import { getRoomByLocationId, useGetLocationsByContract, useGetRoomsByLocation } from '@/queries/locationDetails.ts';
 import { useQuery } from 'react-query';
 import { debounce } from 'lodash';
-
-// Define the Zod schema based on the TaskSchedule interface
-// Type for the form based on the schema
+import { queryClient } from '@/main.tsx';
 
 const daysOfWeek = [
   { id: 0, name: 'Sunday' },
@@ -45,14 +43,16 @@ const weeksOfMonth = [
   { id: 2, name: 'Week 3' },
   { id: 3, name: 'Week 4' },
 ];
-
-export const CreateTaskScheduleForm = () => {
+interface FormProps {
+  contractId: number;
+}
+export const CreateTaskScheduleForm = ({ contractId }: FormProps) => {
   const [selectedTaskTemplate, setSelectedTaskTemplate] = useState('');
   const [locationId, setLocationId] = useState<string>('');
   const [selectedRoom, setSelectedRoom] = useState('');
   const [selectedLocation, setSelectedLocation] = useState('');
   const { mutate } = useCreateTaskSchedule();
-  const { data: locations, isLoading: isLocationsLoading } = useGetLocationsByContract('105');
+  const { data: locations, isLoading: isLocationsLoading } = useGetLocationsByContract(`${contractId}`);
   const {
     data: rooms,
     isLoading: isRoomsLoading,
@@ -61,13 +61,14 @@ export const CreateTaskScheduleForm = () => {
     enabled: !!locationId,
     cacheTime: 0,
   });
+
   const { data: taskTemplates, isLoading: isTaskTemplatesLoading } = useGetTaskTemplates(
     {
       page: 1,
       size: 100,
       sortOrder: { property: 'title', direction: 'asc' },
     },
-    '105',
+    contractId,
   );
   const form = useForm<TaskSchedule>({
     defaultValues: {
@@ -113,248 +114,276 @@ export const CreateTaskScheduleForm = () => {
   );
   const onTaskTemplateChange = useCallback(
     debounce((value: string) => {
-      if (rooms) {
-        const taskTempalte = taskTemplates.data.find((room) => room.id === parseInt(value));
-        setSelectedTaskTemplate(taskTempalte.title);
+      if (taskTemplates) {
+        const taskTemplate = taskTemplates.data.find((room) => room.id === parseInt(value));
+        console.log('ugabuga', taskTemplate);
+        setSelectedTaskTemplate(taskTemplate.title);
       }
     }),
     [taskTemplates],
   );
   useEffect(() => {
-    refetchRooms();
+    queryClient.invalidateQueries('roomz');
+    queryClient.refetchQueries('roomz');
   }, [locationId, refetchRooms]);
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8">
-        <Select
-          onValueChange={(value) => {
-            onChange(value);
-          }}
-          defaultValue={0}
-        >
-          <FormLabel>Location</FormLabel>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a location">{selectedLocation}</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {!isLocationsLoading &&
-              locations &&
-              locations.map((location) => (
-                <SelectItem value={location.id} key={location.id}>
-                  {location.name}
-                </SelectItem>
-              ))}
-          </SelectContent>
-        </Select>
-        <FormField
-          name="roomId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Rooms</FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  form.setValue('roomId', parseInt(value));
-                  onRoomChange(value);
-                  return field.onChange;
-                }}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a room">{selectedRoom}</SelectValue>
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {!isRoomsLoading &&
-                    rooms &&
-                    rooms.data.map((room) => (
-                      <SelectItem value={room.id} key={room.id}>
-                        {room.name}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="taskTemplateId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Task Template</FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  form.setValue('taskTemplateId', parseInt(value));
-                  onTaskTemplateChange(value);
-                  return field.onChange;
-                }}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a task template">{selectedTaskTemplate}</SelectValue>
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {!isTaskTemplatesLoading &&
-                    taskTemplates &&
-                    taskTemplates.data.map((taskTemplate) => (
-                      <SelectItem value={taskTemplate.id} key={taskTemplate.id}>
-                        {taskTemplate.title}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </FormItem>
-          )}
-        />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col justify-between h-full gap-8 w-full">
+        <div className="flex items-center justify-center w-full gap-12 h-full">
+          <div className="w-1/2 h-full flex flex-col justify-center gap-4">
+            <Select
+              onValueChange={(value) => {
+                onChange(value);
+              }}
+              defaultValue={0}
+            >
+              <FormLabel className="text-xl">Location</FormLabel>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a location">{selectedLocation}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {!isLocationsLoading &&
+                  locations &&
+                  locations.map((location) => (
+                    <SelectItem value={location.id} key={location.id}>
+                      {location.name}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+            <FormField
+              name="roomId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xl">Rooms</FormLabel>
+                  <Select
+                    onValueChange={(value) => {
+                      form.setValue('roomId', parseInt(value));
+                      onRoomChange(value);
+                      return field.onChange;
+                    }}
+                    defaultValue={field.value}
+                    onOpenChange={() => refetchRooms}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a room">{selectedRoom}</SelectValue>
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {!isRoomsLoading &&
+                        rooms &&
+                        rooms.data.map((room) => (
+                          <SelectItem value={room.id} key={room.id}>
+                            {room.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="taskTemplateId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xl">Task Template</FormLabel>
+                  <Select
+                    onValueChange={(value) => {
+                      form.setValue('taskTemplateId', parseInt(value));
+                      onTaskTemplateChange(value);
+                      return field.onChange;
+                    }}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a task template">{selectedTaskTemplate}</SelectValue>
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {!isTaskTemplatesLoading &&
+                        taskTemplates &&
+                        taskTemplates.data.map(
+                          (taskTemplate) =>
+                            taskTemplate && (
+                              <SelectItem value={taskTemplate.id} key={taskTemplate.id}>
+                                {taskTemplate.title}
+                              </SelectItem>
+                            ),
+                        )}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="startDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="text-xl">Start Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            'w-[240px] pl-3 text-left font-normal',
+                            !field.value && 'text-muted-foreground',
+                          )}
+                        >
+                          {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
+                    </PopoverContent>
+                  </Popover>
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="endDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="text-xl">End Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            'w-[240px] pl-3 text-left font-normal',
+                            !field.value && 'text-muted-foreground',
+                          )}
+                        >
+                          {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
+                    </PopoverContent>
+                  </Popover>
+                </FormItem>
+              )}
+            />
+          </div>
 
-        <FormField
-          name="description"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea placeholder="description" {...field} />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="dayOfWeek"
-          render={() => (
-            <FormItem>
-              <div className="mb-4">
-                <FormLabel className="text-base">Sidebar</FormLabel>
-                <FormDescription>Select the items you want to display in the sidebar.</FormDescription>
-              </div>
-              {daysOfWeek.map((item) => (
-                <FormField
-                  key={item.id}
-                  control={form.control}
-                  name="dayOfWeek"
-                  render={({ field }) => {
-                    return (
-                      <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value?.includes(item.id)}
-                            onCheckedChange={(checked) => {
-                              return checked
-                                ? field.onChange([...field.value, item.id])
-                                : field.onChange(field.value?.filter((value) => value !== item.id));
-                            }}
-                          />
-                        </FormControl>
-                        <FormLabel className="font-normal">{item.name}</FormLabel>
-                      </FormItem>
-                    );
-                  }}
-                />
-              ))}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="frequency"
-          render={() => (
-            <FormItem>
-              <div className="mb-4">
-                <FormLabel className="text-base">Sidebar</FormLabel>
-                <FormDescription>Select the items you want to display in the sidebar.</FormDescription>
-              </div>
-              {weeksOfMonth.map((item) => (
-                <FormField
-                  key={item.id}
-                  control={form.control}
-                  name="frequency"
-                  render={({ field }) => {
-                    return (
-                      <FormItem key={item.id} className="flex flex-row items-start space-x-3 space-y-0">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value?.includes(item.id)}
-                            onCheckedChange={(checked) => {
-                              return checked
-                                ? field.onChange([...field.value, item.id])
-                                : field.onChange(field.value?.filter((value) => value !== item.id));
-                            }}
-                          />
-                        </FormControl>
-                        <FormLabel className="font-normal">{item.name}</FormLabel>
-                      </FormItem>
-                    );
-                  }}
-                />
-              ))}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="hour"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Input type={'time'} placeholder="hour" {...field} className="bg-primary" />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="startDate"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Start Date</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
+          <div className="w-1/2 h-full flex flex-col justify-center gap-8">
+            <FormField
+              control={form.control}
+              name="dayOfWeek"
+              render={() => (
+                <FormItem>
+                  <div className="mb-4">
+                    <FormLabel className="text-xl">Sidebar</FormLabel>
+                    <FormDescription className="text-lg">
+                      Select the items you want to display in the sidebar.
+                    </FormDescription>
+                  </div>
+                  <div className="flex flex-col flex-wrap max-h-[50px]">
+                    {daysOfWeek.map((item) => (
+                      <FormField
+                        key={item.id}
+                        control={form.control}
+                        name="dayOfWeek"
+                        render={({ field }) => {
+                          return (
+                            <FormItem key={item.id} className="flex flex-row items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(item.id)}
+                                  onCheckedChange={(checked) => {
+                                    return checked
+                                      ? field.onChange([...field.value, item.id])
+                                      : field.onChange(field.value?.filter((value) => value !== item.id));
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="font-normal text-base">{item.name}</FormLabel>
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    ))}
+                  </div>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="frequency"
+              render={() => (
+                <FormItem>
+                  <div className="mb-4">
+                    <FormLabel className="text-xl">Sidebar</FormLabel>
+                    <FormDescription className="text-lg">
+                      Select the items you want to display in the sidebar.
+                    </FormDescription>
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    {weeksOfMonth.map((item) => (
+                      <FormField
+                        key={item.id}
+                        control={form.control}
+                        name="frequency"
+                        render={({ field }) => {
+                          return (
+                            <FormItem key={item.id} className="flex flex-row items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(item.id)}
+                                  onCheckedChange={(checked) => {
+                                    return checked
+                                      ? field.onChange([...field.value, item.id])
+                                      : field.onChange(field.value?.filter((value) => value !== item.id));
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="font-normal text-base">{item.name}</FormLabel>
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    ))}
+                  </div>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="hour"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-medium text-xl">Hour</FormLabel>
                   <FormControl>
-                    <Button
-                      variant="outline"
-                      className={cn('w-[240px] pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}
-                    >
-                      {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
+                    <Input type={'time'} placeholder="hour" {...field} className="bg-primary" />
                   </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
-                </PopoverContent>
-              </Popover>
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="endDate"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>End Date</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="description"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xl">Description</FormLabel>
                   <FormControl>
-                    <Button
-                      variant="outline"
-                      className={cn('w-[240px] pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}
-                    >
-                      {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
+                    <Textarea placeholder="description" {...field} />
                   </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
-                </PopoverContent>
-              </Popover>
-            </FormItem>
-          )}
-        />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
         <Button type="submit">Create new Task Schedule</Button>
       </form>
     </Form>

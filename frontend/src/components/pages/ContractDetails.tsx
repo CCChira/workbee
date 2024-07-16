@@ -17,6 +17,7 @@ import { Location } from '@/queries/getAllLocations.ts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx';
 import TasksCalendar from '@/components/layout/calendar/TasksCalendar.tsx';
 import { fetchTaskInstancesByMonthYear } from '@/queries/taskInstanceThisMonth.ts';
+import CreateTaskScheduleForm from '@/components/forms/CreateTaskSchedule.tsx';
 
 const locationColumns: ColumnDef<LocationData>[] = [
   {
@@ -100,18 +101,28 @@ function ContractDetails() {
               <Card className="h-fit bg-transparent">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle>Locations</CardTitle>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button>Add Location</Button>
-                    </DialogTrigger>
-                    <DialogContent className="min-w-[calc(100vw-400px)] max-h-[900px] h-[600px] flex items-center justify-center">
-                      <CreateLocationForm
-                        onSuccess={() => console.log('ok')}
-                        contractId={contractId}
-                        lockFields={false}
-                      />
-                    </DialogContent>
-                  </Dialog>
+                  <div className="flex gap-4">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button>Add Location</Button>
+                      </DialogTrigger>
+                      <DialogContent className="min-w-[calc(100vw-400px)] max-h-[900px] h-[600px] flex items-center justify-center">
+                        <CreateLocationForm
+                          onSuccess={() => console.log('ok')}
+                          contractId={contractId}
+                          lockFields={false}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button>Add Task Schedule</Button>
+                      </DialogTrigger>
+                      <DialogContent className="min-w-[1200px] w-[1200px] max-h-[1000px] h-[750px] flex items-center justify-center">
+                        <CreateTaskScheduleForm contractId={contractId} />
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                 </CardHeader>
                 <CardContent className="flex gap-4 w-full">
                   <Map
@@ -197,11 +208,7 @@ function ContractDetails() {
                   <CardTitle>Task Instances</CardTitle>
                 </CardHeader>
                 <CardContent className="h-full">
-                  <TasksCalendar
-                    contractId={contractId}
-                    queryFn={fetchTaskInstancesByMonthYear}
-                    queryKey="idkPulaMea"
-                  />
+                  <TasksCalendar contractId={contractId} queryFn={fetchTaskInstancesByMonthYear} queryKey="calendar" />
                 </CardContent>
               </Card>
             </TabsContent>

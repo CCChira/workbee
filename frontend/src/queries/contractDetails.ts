@@ -21,7 +21,7 @@ export async function getClientContract(pagSort: PaginationSortingState, clientI
   });
   console.log('response');
   if (!response.ok) {
-    const errorBody = await response.json(); // Assuming the server returns JSON with error details
+    const errorBody = await response.json(); 
 
     throw new Error(errorBody.message || 'Failed to fetch contracts');
   }
@@ -46,7 +46,7 @@ export async function getContractLocations(contractId: string, pagSort?: Paginat
     method: 'GET',
   });
   if (!response.ok) {
-    const errorBody = await response.json(); // Assuming the server returns JSON with error details
+    const errorBody = await response.json(); 
 
     throw new Error(errorBody.message || 'Failed to fetch contracts');
   }

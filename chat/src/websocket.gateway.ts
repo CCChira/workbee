@@ -54,7 +54,7 @@ export class ChatGateway
         },
       );
       if (!response.ok) {
-        const errorBody = await response.json(); // Assuming the server returns JSON with error details
+        const errorBody = await response.json();
 
         throw new Error(errorBody.message || 'Failed to create contract');
       }

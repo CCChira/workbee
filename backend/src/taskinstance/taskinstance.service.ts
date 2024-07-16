@@ -106,22 +106,51 @@ export class TaskinstanceService {
           select: {
             id: true,
             name: true,
-            location: {
-              select: {
-                latitude: true,
-                longitude: true,
-              },
-            },
+            location: true,
           },
         },
-        taskSchedule: true,
+        taskSchedule: {
+          include: {
+            taskTemplate: true,
+          },
+        },
       },
     });
     return {
       data: response,
     };
   }
+  async findTasksForToday(userId: string) {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
 
+    return this.prismaService.taskInstance.findMany({
+      where: {
+        TaskAssignment: {
+          some: {
+            userId: userId,
+          },
+        },
+        date: {
+          gte: todayStart,
+        },
+      },
+      include: {
+        taskSchedule: {
+          include: {
+            taskTemplate: true,
+          },
+        },
+        room: {
+          include: {
+            location: true,
+            images: true,
+          },
+        },
+        taskTemplate: true,
+      },
+    });
+  }
   async getTasksAssignedToUserWithinInterval(
     userId: string,
     startDate: string,
@@ -140,7 +169,6 @@ export class TaskinstanceService {
           {
             date: {
               gte: new Date(startDate),
-              lte: new Date(endDate),
             },
           },
         ],
@@ -148,7 +176,11 @@ export class TaskinstanceService {
       include: {
         TaskAssignment: true,
         room: true,
-        taskSchedule: true,
+        taskSchedule: {
+          include: {
+            taskTemplate: true,
+          },
+        },
       },
     });
   }
@@ -255,11 +287,10 @@ export class TaskinstanceService {
     };
   }
   async assignUserToTaskInstance(instanceId: number, userId: string) {
-    console.log('$$$$$$$$$$$$$$', instanceId, userId);
     await this.prismaService.taskInstance.update({
       where: { id: instanceId },
       data: {
-        status: Status.PENDING,
+        status: Status.IN_PROGRESS,
       },
     });
     const resp = await this.prismaService.taskAssignment.create({
@@ -268,7 +299,6 @@ export class TaskinstanceService {
         userId: userId,
       },
     });
-    console.log('################', resp);
     return resp;
   }
   async deleteUserFromTaskInstance(instanceId: number, userId: string) {
@@ -292,9 +322,9 @@ export class TaskinstanceService {
     });
   }
   async getStatusCounts() {
-    const today = new Date(); // Current date
-    const currentWeekStart = startOfWeek(today, { weekStartsOn: 1 }); // Start of the week (Monday)
-    const currentWeekEnd = endOfWeek(today, { weekStartsOn: 1 }); // End of the week (Sunday)
+    const today = new Date();
+    const currentWeekStart = startOfWeek(today, { weekStartsOn: 1 });
+    const currentWeekEnd = endOfWeek(today, { weekStartsOn: 1 });
 
     return this.prismaService.taskInstance.groupBy({
       by: ['status'],
@@ -306,8 +336,8 @@ export class TaskinstanceService {
           in: ['IN_PROGRESS', 'COMPLETED', 'INCOMPLETE'],
         },
         date: {
-          gte: currentWeekStart, // Greater than or equal to the start of the week
-          lte: currentWeekEnd, // Less than or equal to the end of the week
+          gte: currentWeekStart,
+          lte: currentWeekEnd,
         },
       },
     });
@@ -397,7 +427,7 @@ export class TaskinstanceService {
     const taskInstances = await this.prismaService.taskInstance.findMany({
       include: {
         taskSchedule: {
-          select: {
+          include: {
             taskTemplate: true,
           },
         },
@@ -415,6 +445,7 @@ export class TaskinstanceService {
       return {
         id: ti.id,
         title: ti.taskSchedule.taskTemplate.title,
+        date: format(ti.date, 'E'),
         neededWorkers: ti.taskSchedule.taskTemplate.necessaryWorkers,
         assignedWorkers: ti.TaskAssignment.length,
       };
@@ -485,7 +516,7 @@ export class TaskinstanceService {
     const date = parse(`${year}-${month}`, 'yyyy-MMMM', new Date());
     const start = startOfMonth(date);
     const end = endOfMonth(date);
-    console.log(contractId, roomId, locationId);
+    console.log(contractId);
     const response = (
       await this.prismaService.taskInstance.findMany({
         where: {
@@ -538,7 +569,6 @@ export class TaskinstanceService {
       }
       return acc;
     }, {});
-    console.log(response);
     return response;
   }
 }

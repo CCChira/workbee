@@ -21,6 +21,9 @@ const aws_s3_service_1 = require("../services/aws-s3.service");
 const platform_express_1 = require("@nestjs/platform-express");
 const createRoom_dto_1 = require("./dto/createRoom.dto");
 const swagger_1 = require("@nestjs/swagger");
+const paginationParams_decorator_1 = require("../utils/decorator/paginationParams.decorator");
+const sortingParams_decorator_1 = require("../utils/decorator/sortingParams.decorator");
+const SearchDecorator_decorator_1 = require("../utils/decorator/SearchDecorator.decorator");
 const room = {
     id: 0,
     name: '',
@@ -33,7 +36,11 @@ let RoomsController = class RoomsController {
         this.awsS3Service = awsS3Service;
     }
     async getRoomsByLocationId(locationId, pagination, sorting) {
+        console.log('uhwetifgovo89u4wrteyfgvn 45728ty0235n7894tcvnh928y5647tv834o7tyn v4753h8t0wc9tof m2345ryv7toghc4wemu');
         return this.roomsService.getRoomsByLocationId(locationId, pagination, sorting);
+    }
+    async getRooms(paginationParams, sortingParams, searchParams) {
+        return this.roomsService.getAllRooms(paginationParams, sortingParams, searchParams);
     }
     async getRoomWithImages(id) {
         const bucketName = 'workbee-files';
@@ -77,6 +84,15 @@ __decorate([
     __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], RoomsController.prototype, "getRoomsByLocationId", null);
+__decorate([
+    (0, common_1.Get)(),
+    __param(0, (0, paginationParams_decorator_1.PaginationParamsDecorator)()),
+    __param(1, (0, sortingParams_decorator_1.SortingParamsDecorator)(['name', 'accessMode'])),
+    __param(2, (0, SearchDecorator_decorator_1.SearchDecorator)('name')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, Object]),
+    __metadata("design:returntype", Promise)
+], RoomsController.prototype, "getRooms", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),

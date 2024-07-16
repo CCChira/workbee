@@ -54,9 +54,7 @@ function LocationDetails() {
   const { data, error, isLoading } = useQuery(`rooms${locationId}`, () =>
     fetchRoomsByLocation(parseInt(locationId ?? '0'), defaultPagSort),
   );
-  useEffect(() => {
-    console.log(hoveredImage);
-  }, [hoveredImage]);
+
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -111,11 +109,7 @@ function LocationDetails() {
                   <CardTitle>Task Instances</CardTitle>
                 </CardHeader>
                 <CardContent className="h-full">
-                  <TasksCalendar
-                    locationId={locationId}
-                    queryFn={fetchTaskInstancesByMonthYear}
-                    queryKey="idkPulaMea"
-                  />
+                  <TasksCalendar locationId={locationId} queryFn={fetchTaskInstancesByMonthYear} queryKey="calendar" />
                 </CardContent>
               </Card>
             </TabsContent>

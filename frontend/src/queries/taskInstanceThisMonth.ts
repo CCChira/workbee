@@ -61,6 +61,7 @@ export const fetchTaskInstancesByMonthYear = async (
   locationId: string,
   userId: string,
 ) => {
+  console.log(contractId);
   const response = await fetch(
     `/api/taskinstance/by-date-state?month=${date.month}&year=${date.year}&includeWorkers=true${contractId && `&contractId=${contractId}`}${roomId && `&roomId=${roomId}`}${locationId && `&locationId=${locationId}`}${userId && `&userId=${userId}`}`,
     {

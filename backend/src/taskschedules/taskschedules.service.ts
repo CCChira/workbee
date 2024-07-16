@@ -32,12 +32,6 @@ export class TaskSchedulesService {
     return days.filter((day, index) => {
       if (weeksOfInterval.includes(Math.floor((index % 28) / 7))) {
         if (daysOfWeek.includes(daysToNos[format(day, 'EEEE')] % 7)) {
-          console.log(
-            day,
-            Math.floor((index % 28) / 7),
-            format(day, 'EEEE'),
-            daysToNos[format(day, 'EEEE')],
-          );
           return day;
         }
       }

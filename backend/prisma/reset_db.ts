@@ -7,19 +7,20 @@ async function seed() {
   // Fetch the contract
   const models = [
     'User',
-    'Tools',
-    'InviteCodes',
+    'Contract',
     'TaskTemplate',
     'TaskSchedule',
     'TaskInstance',
     'Vehicle',
     'TaskAssignment',
-    'Contract',
     'Location',
     'Room',
     'Image',
     'Request',
+    'Tools',
+    'InviteCodes',
   ];
+
   for (const model in models) {
     await prisma[model].deleteMany();
   }

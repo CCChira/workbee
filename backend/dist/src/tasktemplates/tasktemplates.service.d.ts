@@ -17,6 +17,12 @@ export declare class TaskTemplatesService {
     createMultipleTaskTemplates(dto: CreateTaskTemplateDto[]): Promise<import(".prisma/client").Prisma.BatchPayload>;
     findAllTaskTemplates(contractId: number, { page, limit, offset, size }: Pagination, sort?: Sorting, search?: ISearch): Promise<{
         data: {
+            TaskSchedule: {
+                id: number;
+                description: string;
+                status: import(".prisma/client").$Enums.Status;
+                isActive: boolean;
+            }[];
             id: number;
             _count: {
                 TaskSchedule: number;
@@ -25,12 +31,6 @@ export declare class TaskTemplatesService {
             necessaryWorkers: number;
             necessaryTools: string[];
             contractId: number;
-            TaskSchedule: {
-                status: import(".prisma/client").$Enums.Status;
-                id: number;
-                description: string;
-                isActive: boolean;
-            }[];
         }[];
         dataSize: number;
         page: number;

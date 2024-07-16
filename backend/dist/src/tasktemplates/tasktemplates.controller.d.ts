@@ -33,6 +33,12 @@ export declare class TaskTemplatesController {
     }>;
     getTaskTemplates(paginationParams: Pagination, sortingParams: Sorting, searchParam: ISearch, contractId: string): Promise<{
         data: {
+            TaskSchedule: {
+                id: number;
+                description: string;
+                status: import(".prisma/client").$Enums.Status;
+                isActive: boolean;
+            }[];
             id: number;
             _count: {
                 TaskSchedule: number;
@@ -41,12 +47,6 @@ export declare class TaskTemplatesController {
             necessaryWorkers: number;
             necessaryTools: string[];
             contractId: number;
-            TaskSchedule: {
-                status: import(".prisma/client").$Enums.Status;
-                id: number;
-                description: string;
-                isActive: boolean;
-            }[];
         }[];
         dataSize: number;
         page: number;

@@ -5,6 +5,7 @@ import { Separator } from '@/components/ui/separator.tsx';
 import { useUserStore } from '@/store/user.ts';
 import { useCallback, useEffect, useState } from 'react';
 import { debounce } from 'lodash';
+import { Button } from '@/components/ui/button.tsx';
 type MessageWindowProps = {
   messages: Message[];
   sendMessage: (senderId: string, receiverId: string, message: string) => void;
@@ -21,12 +22,6 @@ export default function MessageWindow({
 }: MessageWindowProps) {
   const { user } = useUserStore();
   const [message, setMessage] = useState('');
-  const debouncedSetMessage = useCallback(
-    debounce((msg: string) => {
-      setMessage(msg);
-    }, 300),
-    [],
-  );
 
   useEffect(() => {
     joinRoom(user.id, receiverId);
@@ -37,29 +32,30 @@ export default function MessageWindow({
         {messages.map((message, index) => (
           <div
             key={message.id}
-            className={`${index % 2 ? 'self-end bg-primary text-white font-medium' : 'self-start bg-accent-foreground text-accent font-medium'} rounded-full bg-primary p-2 m-2`}
+            className={`${message.senderId === user.id ? 'self-end bg-primary text-white font-medium' : 'self-start bg-black text-accent font-medium'} rounded-full bg-primary p-2 m-2`}
           >
             {message.content}
           </div>
         ))}
       </div>
-      <div>
+      <div className="w-full px-5 flex">
         <Input
           className="self-end"
           onChange={(event) => {
             const msg = event.target.value;
-            debouncedSetMessage(msg);
+            setMessage(msg);
           }}
+          value={message}
           onFocus={() => readMessage(user.id, receiverId, messages[0].id)}
         />
-        <button
+        <Button
           onClick={() => {
             sendMessage(user.id, receiverId, message);
             setMessage('');
           }}
         >
           submit
-        </button>
+        </Button>
       </div>
     </div>
   );

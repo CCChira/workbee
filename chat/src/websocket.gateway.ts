@@ -40,7 +40,10 @@ export class ChatGateway
     data: { senderId: string; receiverId: string },
   ) {
     const { senderId, receiverId } = data;
-
+    console.log(
+      await this.prismaService.users.findUnique({ where: { id: senderId } }),
+      await this.prismaService.users.findUnique({ where: { id: receiverId } }),
+    );
     if (
       !(await this.prismaService.users.findUnique({ where: { id: senderId } }))
     ) {
@@ -59,7 +62,6 @@ export class ChatGateway
         throw new Error(errorBody.message || 'Failed to create contract');
       }
       const user = await response.json();
-      console.log(user);
       await this.prismaService.users.create({
         data: {
           id: user.id,

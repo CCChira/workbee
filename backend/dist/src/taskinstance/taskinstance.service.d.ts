@@ -69,6 +69,10 @@ export declare class TaskinstanceService {
     }[]>;
     getTasksAssignedToUser(userId: string): Promise<{
         data: ({
+            TaskAssignment: {
+                taskId: number;
+                userId: string;
+            }[];
             taskSchedule: {
                 taskTemplate: {
                     id: number;
@@ -103,10 +107,6 @@ export declare class TaskinstanceService {
                     contractId: number;
                 };
             };
-            TaskAssignment: {
-                taskId: number;
-                userId: string;
-            }[];
         } & {
             id: number;
             taskScheduleId: number;
@@ -119,6 +119,14 @@ export declare class TaskinstanceService {
         })[];
     }>;
     findTasksForToday(userId: string): Promise<({
+        taskTemplate: {
+            id: number;
+            title: string;
+            necessaryWorkers: number;
+            necessaryTools: string[];
+            contractId: number;
+            duration: string;
+        };
         taskSchedule: {
             taskTemplate: {
                 id: number;
@@ -140,14 +148,6 @@ export declare class TaskinstanceService {
             status: import(".prisma/client").$Enums.Status;
             hour: string;
             roomId: number;
-        };
-        taskTemplate: {
-            id: number;
-            title: string;
-            necessaryWorkers: number;
-            necessaryTools: string[];
-            contractId: number;
-            duration: string;
         };
         room: {
             location: {
@@ -180,6 +180,10 @@ export declare class TaskinstanceService {
         updatedAt: Date;
     })[]>;
     getTasksAssignedToUserWithinInterval(userId: string, startDate: string, endDate: string): Promise<({
+        TaskAssignment: {
+            taskId: number;
+            userId: string;
+        }[];
         taskSchedule: {
             taskTemplate: {
                 id: number;
@@ -208,10 +212,6 @@ export declare class TaskinstanceService {
             locationId: number;
             accessMode: import(".prisma/client").$Enums.AccessMode;
         };
-        TaskAssignment: {
-            taskId: number;
-            userId: string;
-        }[];
     } & {
         id: number;
         taskScheduleId: number;
@@ -223,6 +223,10 @@ export declare class TaskinstanceService {
         updatedAt: Date;
     })[]>;
     getTasksAssignedToUserThisWeek(userId: string): Promise<({
+        TaskAssignment: {
+            taskId: number;
+            userId: string;
+        }[];
         taskSchedule: {
             id: number;
             taskTemplateId: number;
@@ -242,10 +246,6 @@ export declare class TaskinstanceService {
             locationId: number;
             accessMode: import(".prisma/client").$Enums.AccessMode;
         };
-        TaskAssignment: {
-            taskId: number;
-            userId: string;
-        }[];
     } & {
         id: number;
         taskScheduleId: number;

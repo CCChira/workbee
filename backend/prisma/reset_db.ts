@@ -20,7 +20,11 @@ async function seed() {
     'Image',
     'Request',
   ];
-
+  for (const model in data) {
+    for (const record of data[model]) {
+      await prisma[model].deleteMany();
+    }
+  }
   const data = JSON.parse(fs.readFileSync('data.json', 'utf8'));
   async function insertData() {
     for (const model in data) {
